@@ -43,16 +43,17 @@ public class TogglWebApi {
 		createHttpClient();
 	}
 
-	public void AuthenticateWithCredentials(String email, String password) {
+	public String AuthenticateWithCredentials(String email, String password) {
 		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair(EMAIL, email));
 		params.add(new BasicNameValuePair(PASSWORD, password));
 
 		HttpResponse response = executePostRequest(SESSIONS_URL, params);
-    
+		String responseContent = null;
+		
     if(ok(response)) {
       try {
-        String responseContent = Util.inputStreamToString(response.getEntity().getContent());
+        responseContent = Util.inputStreamToString(response.getEntity().getContent());
         Log.d(TAG, "TogglWebApi#AuthenticateWithCredentials got a successful response body: " + responseContent);
       } catch (IOException e) {
         // TODO: Error handling
@@ -61,6 +62,7 @@ public class TogglWebApi {
       Log.e(TAG, "TogglWebApi#AuthenticateWithCredentials got a failed request: " + response.getStatusLine().getStatusCode());
     }		
 
+    return responseContent;
 	}
 
 	public void AuthenticateWithToken(String api_token) {
