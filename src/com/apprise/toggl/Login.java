@@ -5,7 +5,6 @@ import com.apprise.toggl.storage.User;
 import com.google.gson.Gson;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,14 +65,8 @@ public class Login extends Activity {
 		createNewAccount.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
-				Intent i = new Intent();
-				ComponentName comp =
-				new ComponentName("com.android.browser", "com.android.browser.BrowserActivity");
-				i.setComponent(comp);
-				i.setAction("android.intent.action.VIEW");
-				i.addCategory("android.intent.category.BROWSABLE");
-				Uri uri = Uri.parse(CREATE_NEW_ACCOUNT_URL);
-				i.setData(uri);
+				Uri uri = Uri.parse(CREATE_NEW_ACCOUNT_URL);				
+				Intent i = new Intent("android.intent.action.VIEW", uri);  
 				startActivity(i);				
 			}
 		});
