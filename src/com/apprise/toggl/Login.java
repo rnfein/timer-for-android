@@ -15,60 +15,60 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class Login extends Activity {
-	
-	private TogglWebApi webApi;
-	
-	private EditText emailEditText;
-	private EditText passwordEditText;
-	private TextView createNewAccount;
-	private Button loginButton;
-	private Toggl app;
-	
-	private static final String TAG = "Login";
-	private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
-	
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
-		
-		app = (Toggl) getApplication();
-		webApi = new TogglWebApi();
-		initViews();
-		attachEvents();
-	}
-	
-	protected void initViews() {
-		emailEditText = (EditText) findViewById(R.id.email);
-		passwordEditText = (EditText) findViewById(R.id.password);
-		loginButton = (Button) findViewById(R.id.login);
-		createNewAccount = (TextView) findViewById(R.id.create_account);
-	}
-	
-	protected void attachEvents() {
-		loginButton.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				String email = emailEditText.getText().toString();
-				String password = passwordEditText.getText().toString();
-				String response = webApi.AuthenticateWithCredentials(email, password);
-				
-				Gson gson = new Gson();
-				User user = gson.fromJson(response, User.class);
-				Log.d(TAG, "user:" + user);
-				
-				app.storeAPIToken(user.apiToken);
-			}
-		});
-		
-		createNewAccount.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				Uri uri = Uri.parse(CREATE_NEW_ACCOUNT_URL);				
-				Intent i = new Intent("android.intent.action.VIEW", uri);  
-				startActivity(i);				
-			}
-		});
-	}
+
+  private TogglWebApi webApi;
+
+  private EditText emailEditText;
+  private EditText passwordEditText;
+  private TextView createNewAccount;
+  private Button loginButton;
+  private Toggl app;
+
+  private static final String TAG = "Login";
+  private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
+
+  /** Called when the activity is first created. */
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.login);
+
+    app = (Toggl) getApplication();
+    webApi = new TogglWebApi();
+    initViews();
+    attachEvents();
+  }
+
+  protected void initViews() {
+    emailEditText = (EditText) findViewById(R.id.email);
+    passwordEditText = (EditText) findViewById(R.id.password);
+    loginButton = (Button) findViewById(R.id.login);
+    createNewAccount = (TextView) findViewById(R.id.create_account);
+  }
+
+  protected void attachEvents() {
+    loginButton.setOnClickListener(new View.OnClickListener() {
+
+      public void onClick(View v) {
+        String email = emailEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+        String response = webApi.AuthenticateWithCredentials(email, password);
+
+        Gson gson = new Gson();
+        User user = gson.fromJson(response, User.class);
+        Log.d(TAG, "user:" + user);
+
+        app.storeAPIToken(user.apiToken);
+      }
+    });
+
+    createNewAccount.setOnClickListener(new View.OnClickListener() {
+
+      public void onClick(View v) {
+        Uri uri = Uri.parse(CREATE_NEW_ACCOUNT_URL);
+        Intent i = new Intent("android.intent.action.VIEW", uri);
+        startActivity(i);
+      }
+    });
+  }
 }

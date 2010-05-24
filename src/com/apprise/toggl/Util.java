@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class Util {
-  
+
   public static String inputStreamToString(InputStream is) {
     StringBuilder out = new StringBuilder();
     try {
@@ -19,7 +19,7 @@ public class Util {
           out.append(buffer, 0, read);
         }
       } while (read >= 0);
-    } catch(IOException e) {
+    } catch (IOException e) {
       // ignore
     }
     return out.length() > 0 ? out.toString() : null;
