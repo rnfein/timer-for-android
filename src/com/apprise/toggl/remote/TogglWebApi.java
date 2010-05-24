@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -17,6 +18,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import com.apprise.toggl.Util;
+
 import android.util.Log;
 
 public class TogglWebApi {
@@ -27,7 +30,7 @@ public class TogglWebApi {
 
 	private static final String TAG = "TogglWebApi";
 	private static final String BASE_URL = "http://www.toggl.com";
-	private static final String API_URL = BASE_URL + "/api/v1/";
+	private static final String API_URL = BASE_URL + "/api/v1";
 	private static final String SESSIONS_URL = API_URL + "/sessions.json";
 	private static final String EMAIL = "email";
 	private static final String PASSWORD = "password";
@@ -46,8 +49,18 @@ public class TogglWebApi {
 		params.add(new BasicNameValuePair(PASSWORD, password));
 
 		HttpResponse response = executePostRequest(SESSIONS_URL, params);
+    
+    if(ok(response)) {
+      try {
+        String responseContent = Util.inputStreamToString(response.getEntity().getContent());
+        Log.d(TAG, "TogglWebApi#AuthenticateWithCredentials got a successful response body: " + responseContent);
+      } catch (IOException e) {
+        // TODO: Error handling
+      }
+    } else {
+      Log.e(TAG, "TogglWebApi#AuthenticateWithCredentials got a failed request: " + response.getStatusLine().getStatusCode());
+    }		
 
-		Log.d(TAG, "**sessions response:" + response);
 	}
 
 	public void AuthenticateWithToken(String api_token) {
@@ -101,4 +114,8 @@ public class TogglWebApi {
 		HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
 		ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);
 	}
+	
+  protected boolean ok(HttpResponse response) {
+    return response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+  }	
 }
