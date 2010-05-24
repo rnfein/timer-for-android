@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:text="E-mail:"/>
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/email"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@android:drawable/editbox_background"/>
@@ -20,20 +20,17 @@
         android:id="@+id/password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:password="true"        
         android:background="@android:drawable/editbox_background"/>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 	    <Button
-	        android:id="@+id/ok"
+	        android:id="@+id/login"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="10dip"
-	        android:text="OK" />
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="Cancel" />        
+	        android:text="Log in" />
     </LinearLayout>
 </LinearLayout>
