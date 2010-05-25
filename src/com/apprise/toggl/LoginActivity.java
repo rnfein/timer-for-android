@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class Login extends Activity {
+public class LoginActivity extends Activity {
 
   private TogglWebApi webApi;
 
