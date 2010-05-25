@@ -16,11 +16,17 @@ public class User {
   public String timeofday_format;
   public String email;
 
-  public User() {
-
+  private static User theInstance = new User();
+  
+  static public User getInstance() {
+    return theInstance;
+  }
+  
+  protected User() {
+    
   }
 
-  public User(String jqueryTimeofdayFormat, String apiToken,
+  protected User(String jqueryTimeofdayFormat, String apiToken,
       String taskRetentionDays, String jqueryDateFormat, String dateFormat,
       String defaultWorkspaceId, boolean newTasksStartAutomatically,
       String fullname, String language, long id, int beginningOfWeek,
