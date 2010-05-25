@@ -31,6 +31,8 @@ public class LoginActivity extends Activity {
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    
     app = (Toggl) getApplication();
     String apiToken = app.getAPIToken();
     webApi = new TogglWebApi(handler);
@@ -39,7 +41,6 @@ public class LoginActivity extends Activity {
     if (apiToken != null) {
       webApi.authenticateWithToken(apiToken);
     } else {
-      super.onCreate(savedInstanceState);
       setContentView(R.layout.login);
 
       initViews();
