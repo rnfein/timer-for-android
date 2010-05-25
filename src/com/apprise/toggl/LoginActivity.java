@@ -37,7 +37,7 @@ public class LoginActivity extends Activity {
     
     Log.d(TAG, "apiToken: " + apiToken);
     if (apiToken != null) {
-      webApi.AuthenticateWithToken(apiToken);
+      webApi.authenticateWithToken(apiToken);
     } else {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.login);
@@ -60,7 +60,7 @@ public class LoginActivity extends Activity {
       public void onClick(View v) {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-        webApi.AuthenticateWithCredentials(email, password);
+        webApi.authenticateWithCredentials(email, password);
       }
     });
 

@@ -56,7 +56,7 @@ public class TogglWebApi {
     createHttpClient();
   }
 
-  public void AuthenticateWithCredentials(final String email, final String password) {
+  public void authenticateWithCredentials(final String email, final String password) {
     runInBackground(new Runnable() {
       
       public void run() {
@@ -69,7 +69,7 @@ public class TogglWebApi {
     });
   }
 
-  public void AuthenticateWithToken(final String apiToken) {
+  public void authenticateWithToken(final String apiToken) {
     runInBackground(new Runnable() {
       
       public void run() {
