@@ -27,7 +27,7 @@ public class AccountActivity extends Activity {
 
   private static final String TAG = "Login";
   private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
-
+  
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class AccountActivity extends Activity {
       initViews();
       attachEvents();
     }
-  }
+  } 
 
   protected void initViews() {
     emailEditText = (EditText) findViewById(R.id.email);
