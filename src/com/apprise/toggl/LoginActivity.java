@@ -87,7 +87,7 @@ public class LoginActivity extends Activity {
       case TogglWebApi.HANDLER_AUTH_PASSED:
         User user = (User) msg.obj;
         Log.d(TAG, "user:" + user);
-        app.storeAPIToken(user.apiToken);
+        app.storeAPIToken(user.api_token);
         startTasksActivity();
       }
     }

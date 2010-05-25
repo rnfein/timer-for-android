@@ -93,7 +93,7 @@ public class TogglWebApi {
         Gson gson = new Gson();
         User user = gson.fromJson(responseContent, User.class);            
         Log.d(TAG,
-            "TogglWebApi#AuthenticateWithToken got a successful response body: "
+            "TogglWebApi#AuthenticationRequest got a successful response body: "
                 + responseContent);
         msg.obj = user;
         handler.sendMessage(msg);
@@ -121,7 +121,6 @@ public class TogglWebApi {
 
   protected HttpResponse executePostRequest(String url,
       ArrayList<NameValuePair> params) {
-    Log.d(TAG, "url:" + url + " params: " + params);
     HttpEntity entity = initEntity(params);
     HttpPost request = new HttpPost(url);
     request.addHeader(entity.getContentType());
