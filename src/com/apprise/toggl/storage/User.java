@@ -50,5 +50,9 @@ public class User {
   public String toString() {
     return this.email;
   }
+  
+  public static boolean isLoggedIn() {
+    return (theInstance.api_token != null);
+  }
 
 }
