@@ -32,6 +32,7 @@ public class TogglWebApi {
   private Handler handler;
   
   public static final int HANDLER_AUTH_PASSED = 1;
+  public static final int HANDLER_AUTH_FAILED = 2;
 
   private static final int CONNECTION_TIMEOUT = 30 * 1000; // ms
 
@@ -86,24 +87,24 @@ public class TogglWebApi {
     String responseContent = null;
 
     if (ok(response)) {
-      Message msg = Message.obtain();
+      Message msg = Message.obtain();      
       msg.what = HANDLER_AUTH_PASSED;          
       try {            
         responseContent = Util.inputStreamToString(response.getEntity().getContent());
         Gson gson = new Gson();
         User user = gson.fromJson(responseContent, User.class);            
-        Log.d(TAG,
-            "TogglWebApi#AuthenticationRequest got a successful response body: "
-                + responseContent);
+        Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response body: " + responseContent);
         msg.obj = user;
         handler.sendMessage(msg);
       } catch (IOException e) {
-        // TODO: Error handling
+        Log.d(TAG, "IOException when performing AuthenticationRequest", e);
       }
     } else {
-      Log.e(TAG,
-          "TogglWebApi#AuthenticateWithToken got a failed request: "
-              + response.getStatusLine().getStatusCode());
+      int statusCode = response.getStatusLine().getStatusCode();
+      Log.e(TAG, "TogglWebApi#AuthenticateWithToken got a failed request: " + statusCode);
+      if (statusCode == 403) {
+        handler.sendEmptyMessage(HANDLER_AUTH_FAILED);
+      }
     }
   }  
 

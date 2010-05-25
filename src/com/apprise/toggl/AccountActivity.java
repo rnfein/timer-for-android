@@ -4,6 +4,7 @@ import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.User;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AccountActivity extends Activity {
 
@@ -24,6 +26,7 @@ public class AccountActivity extends Activity {
   private TextView createNewAccount;
   private Button loginButton;
   private Toggl app;
+  private User user;
 
   private static final String TAG = "Login";
   private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
@@ -33,6 +36,7 @@ public class AccountActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     
+    app = (Toggl) getApplication();
     webApi = new TogglWebApi(handler);
     
     setContentView(R.layout.account);
@@ -67,17 +71,24 @@ public class AccountActivity extends Activity {
       }
     });
   }
-    
+  
   protected Handler handler = new Handler() {
 
     @Override
     public void handleMessage(Message msg) {
       switch(msg.what) {
       case TogglWebApi.HANDLER_AUTH_PASSED:
-        User user = (User) msg.obj;
+        user = (User) msg.obj;
         Log.d(TAG, "user:" + user);
         app.storeAPIToken(user.api_token);
         startActivity(new Intent(AccountActivity.this, TasksActivity.class));
+      case TogglWebApi.HANDLER_AUTH_FAILED:
+        Context context = getApplicationContext();
+        CharSequence text = "Authentication failed.";
+        int duration = Toast.LENGTH_SHORT;
+        
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();        
       }
     }
     
