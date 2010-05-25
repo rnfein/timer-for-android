@@ -33,19 +33,12 @@ public class AccountActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     
-    app = (Toggl) getApplication();
-    String apiToken = app.getAPIToken();
     webApi = new TogglWebApi(handler);
     
-    Log.d(TAG, "apiToken: " + apiToken);
-    if (apiToken != null) {
-      webApi.authenticateWithToken(apiToken);
-    } else {
-      setContentView(R.layout.login);
+    setContentView(R.layout.account);
 
-      initViews();
-      attachEvents();
-    }
+    initViews();
+    attachEvents();
   } 
 
   protected void initViews() {
@@ -74,12 +67,7 @@ public class AccountActivity extends Activity {
       }
     });
   }
-  
-  private void startTasksActivity() {
-    Intent i = new Intent(AccountActivity.this, TasksActivity.class);
-    startActivity(i);       
-  }
-  
+    
   protected Handler handler = new Handler() {
 
     @Override
@@ -89,7 +77,7 @@ public class AccountActivity extends Activity {
         User user = (User) msg.obj;
         Log.d(TAG, "user:" + user);
         app.storeAPIToken(user.api_token);
-        startTasksActivity();
+        startActivity(new Intent(AccountActivity.this, TasksActivity.class));
       }
     }
     
