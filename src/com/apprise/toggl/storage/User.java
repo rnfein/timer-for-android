@@ -54,5 +54,9 @@ public class User {
   public static boolean isLoggedIn() {
     return (theInstance.api_token != null);
   }
+  
+  public static void logOut() {
+    theInstance = new User();
+  }
 
 }

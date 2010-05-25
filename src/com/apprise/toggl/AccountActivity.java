@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +33,9 @@ public class AccountActivity extends Activity {
   private static final String TAG = "Login";
   private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
   
+  public static final int DEFAULT_CATEGORY = 0;
+  public static final int LOG_OUT_OPTION = Menu.FIRST;
+  
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,25 @@ public class AccountActivity extends Activity {
     attachEvents();
   } 
 
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    super.onCreateOptionsMenu(menu);
+    menu.add(DEFAULT_CATEGORY, LOG_OUT_OPTION, Menu.NONE, R.string.log_out).setIcon(android.R.drawable.ic_menu_preferences);
+    return true;
+  }   
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case LOG_OUT_OPTION:
+        User.logOut();
+        app.storeAPIToken(null);
+        startTasksActivity();
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }    
+  
   protected void initViews() {
     emailEditText = (EditText) findViewById(R.id.email);
     passwordEditText = (EditText) findViewById(R.id.password);
@@ -72,6 +96,10 @@ public class AccountActivity extends Activity {
     });
   }
   
+  public void startTasksActivity() {
+    startActivity(new Intent(AccountActivity.this, TasksActivity.class));
+  }
+  
   protected Handler handler = new Handler() {
 
     @Override
@@ -81,7 +109,7 @@ public class AccountActivity extends Activity {
         user = (User) msg.obj;
         Log.d(TAG, "user:" + user);
         app.storeAPIToken(user.api_token);
-        startActivity(new Intent(AccountActivity.this, TasksActivity.class));
+        startTasksActivity();
       case TogglWebApi.HANDLER_AUTH_FAILED:
         Context context = getApplicationContext();
         CharSequence text = "Authentication failed.";
