@@ -2,12 +2,13 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.User;
-import com.google.gson.Gson;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +35,7 @@ public class Login extends Activity {
     setContentView(R.layout.login);
 
     app = (Toggl) getApplication();
-    webApi = new TogglWebApi();
+    webApi = new TogglWebApi(handler);
     initViews();
     attachEvents();
   }
@@ -52,13 +53,8 @@ public class Login extends Activity {
       public void onClick(View v) {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-        String response = webApi.AuthenticateWithCredentials(email, password);
+        webApi.AuthenticateWithCredentials(email, password);
 
-        Gson gson = new Gson();
-        User user = gson.fromJson(response, User.class);
-        Log.d(TAG, "user:" + user);
-
-        app.storeAPIToken(user.apiToken);
       }
     });
 
@@ -71,4 +67,19 @@ public class Login extends Activity {
       }
     });
   }
+  
+  protected Handler handler = new Handler() {
+
+    @Override
+    public void handleMessage(Message msg) {
+      switch(msg.what) {
+      case TogglWebApi.HANDLER_AUTH_PASSED:
+        User user = (User) msg.obj;
+        Log.d(TAG, "user:" + user);
+
+        app.storeAPIToken(user.apiToken);
+      }
+    }
+    
+  };  
 }

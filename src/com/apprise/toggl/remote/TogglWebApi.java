@@ -19,12 +19,19 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import com.apprise.toggl.Util;
+import com.apprise.toggl.storage.User;
+import com.google.gson.Gson;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 public class TogglWebApi {
 
   private DefaultHttpClient httpClient;
+  private Handler handler;
+  
+  public static final int HANDLER_AUTH_PASSED = 1;
 
   private static final int CONNECTION_TIMEOUT = 30 * 1000; // ms
 
@@ -38,36 +45,49 @@ public class TogglWebApi {
   public TogglWebApi() {
     init();
   }
+  
+  public TogglWebApi(Handler handler) {
+    this.handler = handler;
+    init();
+  }
 
   protected void init() {
     createHttpClient();
   }
 
-  public String AuthenticateWithCredentials(String email, String password) {
-    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-    params.add(new BasicNameValuePair(EMAIL, email));
-    params.add(new BasicNameValuePair(PASSWORD, password));
+  public void AuthenticateWithCredentials(final String email, final String password) {
+    runInBackground(new Runnable() {
+      
+      public void run() {
+        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair(EMAIL, email));
+        params.add(new BasicNameValuePair(PASSWORD, password));
 
-    HttpResponse response = executePostRequest(SESSIONS_URL, params);
-    String responseContent = null;
+        HttpResponse response = executePostRequest(SESSIONS_URL, params);
+        String responseContent = null;
 
-    if (ok(response)) {
-      try {
-        responseContent = Util.inputStreamToString(response.getEntity()
-            .getContent());
-        Log.d(TAG,
-            "TogglWebApi#AuthenticateWithCredentials got a successful response body: "
-                + responseContent);
-      } catch (IOException e) {
-        // TODO: Error handling
+        if (ok(response)) {
+          Message msg = Message.obtain();
+          msg.what = HANDLER_AUTH_PASSED;          
+          try {            
+            responseContent = Util.inputStreamToString(response.getEntity().getContent());
+            Gson gson = new Gson();
+            User user = gson.fromJson(responseContent, User.class);            
+            Log.d(TAG,
+                "TogglWebApi#AuthenticateWithCredentials got a successful response body: "
+                    + responseContent);
+            msg.obj = user;
+            handler.sendMessage(msg);
+          } catch (IOException e) {
+            // TODO: Error handling
+          }
+        } else {
+          Log.e(TAG,
+              "TogglWebApi#AuthenticateWithCredentials got a failed request: "
+                  + response.getStatusLine().getStatusCode());
+        }
       }
-    } else {
-      Log.e(TAG,
-          "TogglWebApi#AuthenticateWithCredentials got a failed request: "
-              + response.getStatusLine().getStatusCode());
-    }
-
-    return responseContent;
+    });
   }
 
   public void AuthenticateWithToken(String api_token) {
@@ -88,6 +108,7 @@ public class TogglWebApi {
 
   protected HttpResponse executePostRequest(String url,
       ArrayList<NameValuePair> params) {
+    Log.d(TAG, "url:" + url + " params: " + params);
     HttpEntity entity = initEntity(params);
     HttpPost request = new HttpPost(url);
     request.addHeader(entity.getContentType());
@@ -121,6 +142,10 @@ public class TogglWebApi {
     HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
     ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);
   }
+  
+  protected void runInBackground(Runnable runnable) {
+    new Thread(runnable).start();
+  }  
 
   protected boolean ok(HttpResponse response) {
     return response != null
