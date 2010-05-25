@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo 'Removing old classes..'
+rm -r bin/classes
+echo 'Compiling and installing on device..'
+ant install && ant test

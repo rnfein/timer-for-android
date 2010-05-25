@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Removes old classes (cleanup), then comiles and injects compiled package to mounted device
+echo 'Removing old classes..'
+rm -r bin/classes
+echo 'compiling and installing on device..'
+ant install

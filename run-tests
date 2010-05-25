@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo 'Compiling and installing app..'
+./inject
+echo 'Installing, compiling and running tests..'
+cd test
+./compile-run
