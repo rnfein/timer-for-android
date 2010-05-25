@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class LoginActivity extends Activity {
+public class AccountActivity extends Activity {
 
   private TogglWebApi webApi;
 
@@ -76,7 +76,7 @@ public class LoginActivity extends Activity {
   }
   
   private void startTasksActivity() {
-    Intent i = new Intent(LoginActivity.this, TasksActivity.class);
+    Intent i = new Intent(AccountActivity.this, TasksActivity.class);
     startActivity(i);       
   }
   
