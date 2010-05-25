@@ -4,7 +4,6 @@ import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.User;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -111,12 +110,7 @@ public class AccountActivity extends Activity {
         app.storeAPIToken(user.api_token);
         startTasksActivity();
       case TogglWebApi.HANDLER_AUTH_FAILED:
-        Context context = getApplicationContext();
-        CharSequence text = "Authentication failed.";
-        int duration = Toast.LENGTH_SHORT;
-        
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();        
+        Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
       }
     }
     
