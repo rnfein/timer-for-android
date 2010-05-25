@@ -31,13 +31,20 @@ public class LoginActivity extends Activity {
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.login);
-
     app = (Toggl) getApplication();
+    String apiToken = app.getAPIToken();
     webApi = new TogglWebApi(handler);
-    initViews();
-    attachEvents();
+    
+    Log.d(TAG, "apiToken: " + apiToken);
+    if (apiToken != null) {
+      webApi.AuthenticateWithToken(apiToken);
+    } else {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.login);
+
+      initViews();
+      attachEvents();
+    }
   }
 
   protected void initViews() {
@@ -54,7 +61,6 @@ public class LoginActivity extends Activity {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
         webApi.AuthenticateWithCredentials(email, password);
-
       }
     });
 
@@ -68,6 +74,11 @@ public class LoginActivity extends Activity {
     });
   }
   
+  private void startTasksActivity() {
+    Intent i = new Intent(LoginActivity.this, TasksActivity.class);
+    startActivity(i);       
+  }
+  
   protected Handler handler = new Handler() {
 
     @Override
@@ -76,8 +87,8 @@ public class LoginActivity extends Activity {
       case TogglWebApi.HANDLER_AUTH_PASSED:
         User user = (User) msg.obj;
         Log.d(TAG, "user:" + user);
-
         app.storeAPIToken(user.apiToken);
+        startTasksActivity();
       }
     }
     
