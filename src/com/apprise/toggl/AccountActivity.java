@@ -2,7 +2,7 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.CurrentUser;
-import com.apprise.toggl.storage.User;
+import com.apprise.toggl.storage.models.User;
 
 import android.content.Intent;
 import android.net.Uri;

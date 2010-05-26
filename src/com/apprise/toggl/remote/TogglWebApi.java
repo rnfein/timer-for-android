@@ -20,7 +20,8 @@ import org.apache.http.params.HttpParams;
 
 import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.CurrentUser;
-import com.apprise.toggl.storage.User;
+import com.apprise.toggl.storage.Tasks;
+import com.apprise.toggl.storage.models.User;
 import com.google.gson.Gson;
 
 import android.os.Handler;
@@ -31,9 +32,11 @@ public class TogglWebApi {
 
   private DefaultHttpClient httpClient;
   private Handler handler;
+  public String apiToken;
   
   public static final int HANDLER_AUTH_PASSED = 1;
   public static final int HANDLER_AUTH_FAILED = 2;
+  public static final int HANDLER_TASKS_FETCHED = 3;
 
   private static final int CONNECTION_TIMEOUT = 30 * 1000; // ms
 
@@ -41,6 +44,7 @@ public class TogglWebApi {
   private static final String BASE_URL = "http://www.toggl.com";
   private static final String API_URL = BASE_URL + "/api/v1";
   private static final String SESSIONS_URL = API_URL + "/sessions.json";
+  private static final String TASKS_URL = API_URL + "/tasks.json";
   private static final String EMAIL = "email";
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
@@ -51,6 +55,12 @@ public class TogglWebApi {
   
   public TogglWebApi(Handler handler) {
     this.handler = handler;
+    init();
+  }
+  
+  public TogglWebApi(Handler handler, String apiToken) {
+    this.handler = handler;
+    this.apiToken = apiToken;
     init();
   }
 
@@ -108,7 +118,38 @@ public class TogglWebApi {
         handler.sendEmptyMessage(HANDLER_AUTH_FAILED);
       }
     }
-  }  
+  }
+  
+  public void fetchTasks() {
+    runInBackground(new Runnable() {
+      
+      public void run() {
+        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair(API_TOKEN, apiToken));
+
+        HttpResponse response = executeGetRequest(TASKS_URL, params);
+        String responseContent = null;
+
+        if (ok(response)) {
+          Message msg = Message.obtain();      
+          msg.what = HANDLER_TASKS_FETCHED;          
+          try {            
+            responseContent = Util.inputStreamToString(response.getEntity().getContent());
+            Gson gson = new Gson();
+            Tasks tasks = gson.fromJson(responseContent, Tasks.class);
+            Log.d(TAG, "TogglWebApi#fetchTasks got a successful response body: " + responseContent);
+            msg.obj = tasks;
+            handler.sendMessage(msg);
+          } catch (IOException e) {
+            Log.d(TAG, "IOException when performing fetchTasks", e);
+          }
+        } else {
+          int statusCode = response.getStatusLine().getStatusCode();
+          Log.e(TAG, "TogglWebApi#fetchTasks got a failed request: " + statusCode);
+        }
+      }
+    });    
+  }
 
   protected HttpResponse executeGetRequest(String url,
       ArrayList<NameValuePair> params) {

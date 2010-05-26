@@ -1,4 +1,4 @@
-package com.apprise.toggl.storage;
+package com.apprise.toggl.storage.models;
 
 public class User {
 

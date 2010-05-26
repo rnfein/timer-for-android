@@ -2,7 +2,7 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.CurrentUser;
-import com.apprise.toggl.storage.User;
+import com.apprise.toggl.storage.models.User;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,6 +53,8 @@ public class TasksActivity extends ApplicationActivity {
   
   public void populateList() {
     Log.d(TAG, "*** populateList");
+    webApi.apiToken = app.getAPIToken();
+    webApi.fetchTasks();
     //TODO: fetch and populate list
   }
   
@@ -87,6 +89,10 @@ public class TasksActivity extends ApplicationActivity {
         user = CurrentUser.getInstance();
         Log.d(TAG, "user:" + user);
         populateList();
+        break;
+      case TogglWebApi.HANDLER_TASKS_FETCHED:
+        Log.d(TAG, "" + msg.obj);
+        break;
       }
     }
   };  

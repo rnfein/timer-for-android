@@ -1,5 +1,7 @@
 package com.apprise.toggl.storage;
 
+import com.apprise.toggl.storage.models.User;
+
 public class CurrentUser {
 
   private static User currentUserInstance = new User(); 
