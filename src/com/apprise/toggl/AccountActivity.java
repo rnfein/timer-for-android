@@ -2,7 +2,6 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.CurrentUser;
-import com.apprise.toggl.storage.User;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -27,7 +26,6 @@ public class AccountActivity extends ApplicationActivity {
   private TextView createNewAccount;
   private Button loginButton;
   private Toggl app;
-  private User user;
 
   private static final String TAG = "Account";
   private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
@@ -85,8 +83,7 @@ public class AccountActivity extends ApplicationActivity {
   private void initFields() {
     passwordEditText.setText(null);
     if (CurrentUser.isLoggedIn()) {
-      User currentUser = CurrentUser.getInstance();
-      emailEditText.setText(currentUser.email);
+      emailEditText.setText(currentUser().email);
     } else {
       emailEditText.setText(null);      
     }
@@ -122,9 +119,8 @@ public class AccountActivity extends ApplicationActivity {
     public void handleMessage(Message msg) {
       switch(msg.what) {
       case TogglWebApi.HANDLER_AUTH_PASSED:
-        user = CurrentUser.getInstance();
-        Log.d(TAG, "user:" + user);
-        app.storeAPIToken(user.api_token);
+        Log.d(TAG, "user:" + currentUser());
+        app.storeAPIToken(currentUser().api_token);
         startTasksActivity();
         break;
       case TogglWebApi.HANDLER_AUTH_FAILED:
