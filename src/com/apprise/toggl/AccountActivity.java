@@ -49,6 +49,12 @@ public class AccountActivity extends ApplicationActivity {
     initFields();
     attachEvents();
   } 
+  
+  @Override
+  protected void onResume() {
+    super.onResume();
+    initFields();
+  }  
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
