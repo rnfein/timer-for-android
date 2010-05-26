@@ -79,7 +79,8 @@ public class AccountActivity extends ApplicationActivity {
   private void initFields() {
     passwordEditText.setText(null);
     if (CurrentUser.isLoggedIn()) {
-      emailEditText.setText(CurrentUser.getInstance().toString());
+      User currentUser = CurrentUser.getInstance();
+      emailEditText.setText(currentUser.email);
     } else {
       emailEditText.setText(null);      
     }
