@@ -46,6 +46,7 @@ public class AccountActivity extends ApplicationActivity {
     setContentView(R.layout.account);
 
     initViews();
+    initFields();
     attachEvents();
   } 
 
@@ -62,7 +63,7 @@ public class AccountActivity extends ApplicationActivity {
       case LOG_OUT_OPTION:
         CurrentUser.logOut();
         app.storeAPIToken(null);
-        startTasksActivity();
+        initFields();
         return true;
     }
     return super.onOptionsItemSelected(item);
@@ -74,6 +75,15 @@ public class AccountActivity extends ApplicationActivity {
     loginButton = (Button) findViewById(R.id.login);
     createNewAccount = (TextView) findViewById(R.id.create_account);
   }
+  
+  private void initFields() {
+    passwordEditText.setText(null);
+    if (CurrentUser.isLoggedIn()) {
+      emailEditText.setText(CurrentUser.getInstance().toString());
+    } else {
+      emailEditText.setText(null);      
+    }
+  }  
 
   protected void attachEvents() {
     loginButton.setOnClickListener(new View.OnClickListener() {
