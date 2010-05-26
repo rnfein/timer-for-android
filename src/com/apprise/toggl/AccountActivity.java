@@ -3,7 +3,6 @@ package com.apprise.toggl;
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.User;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -19,7 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AccountActivity extends Activity {
+public class AccountActivity extends ApplicationActivity {
 
   private TogglWebApi webApi;
 

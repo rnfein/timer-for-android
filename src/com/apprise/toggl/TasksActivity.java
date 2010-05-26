@@ -3,7 +3,6 @@ package com.apprise.toggl;
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.User;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,7 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class TasksActivity extends Activity {
+public class TasksActivity extends ApplicationActivity {
 
   private static final String TAG = "Tasks";
   

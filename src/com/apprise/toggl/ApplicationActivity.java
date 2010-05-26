@@ -1,0 +1,21 @@
+package com.apprise.toggl;
+
+import com.apprise.toggl.storage.User;
+
+import android.app.Activity;
+import android.util.Log;
+
+public class ApplicationActivity extends Activity {
+
+  private static final String TAG = "AppActivity";
+  
+  @Override
+  protected void onResume() {
+    Log.d(TAG, "***onResume***");
+    Log.d(TAG, "***User logged in: " + User.isLoggedIn());
+    super.onResume();
+  }
+
+  
+  
+}
