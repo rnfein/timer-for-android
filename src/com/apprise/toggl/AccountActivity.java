@@ -1,6 +1,7 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
+import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.User;
 
 import android.content.Intent;
@@ -28,7 +29,7 @@ public class AccountActivity extends ApplicationActivity {
   private Toggl app;
   private User user;
 
-  private static final String TAG = "Login";
+  private static final String TAG = "Account";
   private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
   
   public static final int DEFAULT_CATEGORY = 0;
@@ -59,7 +60,7 @@ public class AccountActivity extends ApplicationActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case LOG_OUT_OPTION:
-        User.logOut();
+        CurrentUser.logOut();
         app.storeAPIToken(null);
         startTasksActivity();
         return true;
@@ -104,12 +105,14 @@ public class AccountActivity extends ApplicationActivity {
     public void handleMessage(Message msg) {
       switch(msg.what) {
       case TogglWebApi.HANDLER_AUTH_PASSED:
-        user = (User) msg.obj;
+        user = CurrentUser.getInstance();
         Log.d(TAG, "user:" + user);
         app.storeAPIToken(user.api_token);
         startTasksActivity();
+        break;
       case TogglWebApi.HANDLER_AUTH_FAILED:
         Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
+        break;
       }
     }
     

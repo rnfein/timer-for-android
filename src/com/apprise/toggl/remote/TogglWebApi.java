@@ -19,6 +19,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import com.apprise.toggl.Util;
+import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.User;
 import com.google.gson.Gson;
 
@@ -65,7 +66,7 @@ public class TogglWebApi {
         params.add(new BasicNameValuePair(EMAIL, email));
         params.add(new BasicNameValuePair(PASSWORD, password));
 
-        userAuthenticationRequest(params);
+        userAuthentication(params);
       }
     });
   }
@@ -77,12 +78,12 @@ public class TogglWebApi {
         ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair(API_TOKEN, apiToken));
 
-        userAuthenticationRequest(params);
+        userAuthentication(params);
       }
     });
   }
   
-  private void userAuthenticationRequest(ArrayList<NameValuePair> params) {
+  private void userAuthentication(ArrayList<NameValuePair> params) {
     HttpResponse response = executePostRequest(SESSIONS_URL, params);
     String responseContent = null;
 
@@ -94,6 +95,7 @@ public class TogglWebApi {
         Gson gson = new Gson();
         User user = gson.fromJson(responseContent, User.class);            
         Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response body: " + responseContent);
+        CurrentUser.logIn(user);
         msg.obj = user;
         handler.sendMessage(msg);
       } catch (IOException e) {

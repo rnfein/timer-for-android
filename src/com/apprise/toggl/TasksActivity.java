@@ -1,6 +1,7 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
+import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.User;
 
 import android.content.Intent;
@@ -35,14 +36,17 @@ public class TasksActivity extends ApplicationActivity {
   }
   
   public void getUserAndPopulateList() {
-    if (User.isLoggedIn()) {
-      this.user = User.getInstance();
+    if (CurrentUser.isLoggedIn()) {
+      this.user = CurrentUser.getInstance();
+      Log.d(TAG, "***getUserAndPopulate: User is logged in");
       populateList();
     } else if (app.getAPIToken() != null) {
-      String apiToken = app.getAPIToken();      
+      String apiToken = app.getAPIToken();
+      Log.d(TAG, "***getUserAndPopulate: Token is provided");      
       webApi.authenticateWithToken(apiToken); //background thread
       //populateList is called in handler      
     } else {
+      Log.d(TAG, "***getUserAndPopulate: Redirect to login");      
       startActivity(new Intent(this, AccountActivity.class));      
     }
   }
@@ -80,7 +84,7 @@ public class TasksActivity extends ApplicationActivity {
     public void handleMessage(Message msg) {
       switch(msg.what) {
       case TogglWebApi.HANDLER_AUTH_PASSED:
-        user = (User) msg.obj;
+        user = CurrentUser.getInstance();
         Log.d(TAG, "user:" + user);
         populateList();
       }

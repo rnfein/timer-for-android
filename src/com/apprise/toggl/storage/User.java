@@ -15,18 +15,12 @@ public class User {
   public int beginning_of_week;
   public String timeofday_format;
   public String email;
-
-  private static User theInstance = new User();
   
-  static public User getInstance() {
-    return theInstance;
-  }
-  
-  protected User() {
+  public User() {
     
   }
 
-  protected User(String jqueryTimeofdayFormat, String apiToken,
+  public User(String jqueryTimeofdayFormat, String apiToken,
       String taskRetentionDays, String jqueryDateFormat, String dateFormat,
       String defaultWorkspaceId, boolean newTasksStartAutomatically,
       String fullname, String language, long id, int beginningOfWeek,
@@ -49,14 +43,6 @@ public class User {
   @Override
   public String toString() {
     return this.email;
-  }
-  
-  public static boolean isLoggedIn() {
-    return (theInstance.api_token != null);
-  }
-  
-  public static void logOut() {
-    theInstance = new User();
   }
 
 }
