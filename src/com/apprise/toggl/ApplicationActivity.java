@@ -1,6 +1,7 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.storage.CurrentUser;
+import com.apprise.toggl.storage.User;
 
 import android.app.Activity;
 import android.util.Log;
@@ -16,6 +17,8 @@ public class ApplicationActivity extends Activity {
     super.onResume();
   }
 
-  
+  protected User currentUser() {
+    return CurrentUser.getInstance();
+  }
   
 }
