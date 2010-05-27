@@ -18,4 +18,4 @@
       <activity
         android:name="AccountActivity"/>
   </application>
-</manifest> 
+</manifest>
