@@ -4,10 +4,10 @@ public class User {
 
   public String jquery_timeofday_format;
   public String api_token;
-  public String task_retention_days;
+  public int task_retention_days;
   public String jquery_date_format;
   public String date_format;
-  public String default_workspace_id;
+  public long default_workspace_id;
   public boolean new_tasks_start_automatically;
   public String fullname;
   public String language;
@@ -21,8 +21,8 @@ public class User {
   }
 
   public User(String jqueryTimeofdayFormat, String apiToken,
-      String taskRetentionDays, String jqueryDateFormat, String dateFormat,
-      String defaultWorkspaceId, boolean newTasksStartAutomatically,
+      int taskRetentionDays, String jqueryDateFormat, String dateFormat,
+      long defaultWorkspaceId, boolean newTasksStartAutomatically,
       String fullname, String language, long id, int beginningOfWeek,
       String timeofdayFormat, String email) {
     this.jquery_timeofday_format = jqueryTimeofdayFormat;

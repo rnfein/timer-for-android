@@ -2,8 +2,8 @@ package com.apprise.toggl.storage.models;
 
 public class Task {
 
-//  public Project project;
-//  public Workspace workspace;
+  public Project project;
+  public Workspace workspace;
   public long duration;
   public String start;
   public boolean billable;
