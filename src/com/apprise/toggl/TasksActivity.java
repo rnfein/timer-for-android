@@ -26,7 +26,7 @@ public class TasksActivity extends ApplicationActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     app = (Toggl) getApplication();
-    webApi = new TogglWebApi(handler);
+    webApi = new TogglWebApi(handler, currentUser().api_token);
     
     getUserAndPopulateList();
     
@@ -40,8 +40,7 @@ public class TasksActivity extends ApplicationActivity {
     } else if (app.getAPIToken() != null) {
       String apiToken = app.getAPIToken();
       Log.d(TAG, "***getUserAndPopulate: Token is provided");      
-      webApi.authenticateWithToken(apiToken); //background thread
-      //populateList is called in handler      
+      webApi.authenticateWithToken(apiToken); //background thread, populateList is called in handler      
     } else {
       Log.d(TAG, "***getUserAndPopulate: Redirect to login");      
       startActivity(new Intent(this, AccountActivity.class));      
@@ -91,6 +90,6 @@ public class TasksActivity extends ApplicationActivity {
         break;
       }
     }
-  };  
+  };
   
 }

@@ -2,12 +2,16 @@ package com.apprise.toggl.remote;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -20,9 +24,10 @@ import org.apache.http.params.HttpParams;
 
 import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.CurrentUser;
-import com.apprise.toggl.storage.Tasks;
+import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import android.os.Handler;
 import android.os.Message;
@@ -48,20 +53,12 @@ public class TogglWebApi {
   private static final String EMAIL = "email";
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
-
-  public TogglWebApi() {
-    init();
-  }
-  
-  public TogglWebApi(Handler handler) {
-    this.handler = handler;
-    init();
-  }
   
   public TogglWebApi(Handler handler, String apiToken) {
     this.handler = handler;
     this.apiToken = apiToken;
     init();
+    setUserPasswordCredentials();
   }
 
   protected void init() {
@@ -105,6 +102,8 @@ public class TogglWebApi {
         Gson gson = new Gson();
         User user = gson.fromJson(responseContent, User.class);            
         Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response body: " + responseContent);
+        this.apiToken = user.api_token;
+        setUserPasswordCredentials();
         CurrentUser.logIn(user);
         msg.obj = user;
         handler.sendMessage(msg);
@@ -136,7 +135,8 @@ public class TogglWebApi {
           try {            
             responseContent = Util.inputStreamToString(response.getEntity().getContent());
             Gson gson = new Gson();
-            Tasks tasks = gson.fromJson(responseContent, Tasks.class);
+            Type collectionType = new TypeToken<List<Task>>(){}.getType();            
+            List<Task> tasks = gson.fromJson(responseContent, collectionType);
             Log.d(TAG, "TogglWebApi#fetchTasks got a successful response body: " + responseContent);
             msg.obj = tasks;
             handler.sendMessage(msg);
@@ -190,6 +190,7 @@ public class TogglWebApi {
     }
   }
 
+  
   protected void createHttpClient() {
     httpClient = new DefaultHttpClient();
     final HttpParams params = httpClient.getParams();
@@ -198,6 +199,13 @@ public class TogglWebApi {
     HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
     ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);
   }
+
+  protected void setUserPasswordCredentials() {
+    if (apiToken != null) {
+      UsernamePasswordCredentials creds = new UsernamePasswordCredentials(apiToken, API_TOKEN);
+      httpClient.getCredentialsProvider().setCredentials(new AuthScope(BASE_URL, 80, AuthScope.ANY_REALM), creds);    
+    }
+  }  
   
   protected void runInBackground(Runnable runnable) {
     new Thread(runnable).start();

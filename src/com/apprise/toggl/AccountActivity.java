@@ -39,7 +39,7 @@ public class AccountActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     
     app = (Toggl) getApplication();
-    webApi = new TogglWebApi(handler);
+    webApi = new TogglWebApi(handler, currentUser().api_token);
     
     setContentView(R.layout.account);
 
