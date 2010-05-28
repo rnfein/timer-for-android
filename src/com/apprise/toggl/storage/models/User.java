@@ -2,6 +2,7 @@ package com.apprise.toggl.storage.models;
 
 public class User {
 
+  public long _id;
   public String jquery_timeofday_format;
   public String api_token;
   public int task_retention_days;
@@ -20,11 +21,12 @@ public class User {
     
   }
 
-  public User(String jqueryTimeofdayFormat, String apiToken,
+  public User(long _id, String jqueryTimeofdayFormat, String apiToken,
       int taskRetentionDays, String jqueryDateFormat, String dateFormat,
       long defaultWorkspaceId, boolean newTasksStartAutomatically,
-      String fullname, String language, long id, int beginningOfWeek,
+      String fullname, String language, long remote_id, int beginningOfWeek,
       String timeofdayFormat, String email) {
+    this._id = _id;
     this.jquery_timeofday_format = jqueryTimeofdayFormat;
     this.api_token = apiToken;
     this.task_retention_days = taskRetentionDays;
@@ -34,7 +36,7 @@ public class User {
     this.new_tasks_start_automatically = newTasksStartAutomatically;
     this.fullname = fullname;
     this.language = language;
-    this.id = id;
+    this.id = remote_id;
     this.beginning_of_week = beginningOfWeek;
     this.timeofday_format = timeofdayFormat;
     this.email = email;
