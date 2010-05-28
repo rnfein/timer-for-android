@@ -14,6 +14,8 @@ public class Project {
   public long id;
   public boolean sync_dirty;
   
+  public Project() {}
+  
   public Project(long _id, int fixedFee, long estimatedWorkhours,
       boolean isFixedFee, Workspace workspace, boolean billable,
       String clientProjectName, long hourlyRate, String name, long remote_id,
@@ -29,6 +31,23 @@ public class Project {
     this.name = name;
     this.id = remote_id;
     this.sync_dirty = syncDirty;
+  }
+  
+  public static Project dirty(int fixedFee, long estimatedWorkhours,
+      boolean isFixedFee, Workspace workspace, boolean billable,
+      String clientProjectName, long hourlyRate, String name, long remote_id) {
+    Project project = new Project();
+    project.fixed_fee = fixedFee;
+    project.estimated_workhours = estimatedWorkhours;
+    project.is_fixed_fee = isFixedFee;
+    project.workspace = workspace;
+    project.billable = billable;
+    project.client_project_name = clientProjectName;
+    project.hourly_rate = hourlyRate;
+    project.name = name;
+    project.id = remote_id;
+    project.sync_dirty = true;
+    return project;
   }
   
 }
