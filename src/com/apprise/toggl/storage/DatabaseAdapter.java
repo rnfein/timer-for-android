@@ -84,15 +84,16 @@ public class DatabaseAdapter {
     
     private static final String CREATE_PROJECTS_TABLE = "CREATE TABLE " + Projects.TABLE_NAME + " ("
       + Projects._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-      + Projects.FIXED_FEE + " INTEGER NOT NULL,"
-      + Projects.ESTIMATED_WORKHOURS + " INTEGER NOT NULL,"
+      + Projects.FIXED_FEE + " INTEGER,"
+      + Projects.ESTIMATED_WORKHOURS + " INTEGER,"
       + Projects.IS_FIXED_FEE + " INTEGER NOT NULL,"
       + Projects.WORKSPACE_REMOTE_ID + " INTEGER NOT NULL,"
       + Projects.BILLABLE + " INTEGER NOT NULL,"
       + Projects.CLIENT_PROJECT_NAME + " TEXT,"
       + Projects.HOURLY_RATE + " INTEGER NOT NULL,"
       + Projects.NAME + " TEXT,"
-      + Projects.REMOTE_ID + " INTEGER NOT NULL"
+      + Projects.REMOTE_ID + " INTEGER NOT NULL,"
+      + Projects.SYNC_DIRTY + " INTEGER NOT NULL"
       + ");";
 
     
@@ -172,6 +173,7 @@ public class DatabaseAdapter {
     public static final String HOURLY_RATE = "hourly_rate";
     public static final String NAME = "name";
     public static final String REMOTE_ID = "remote_id";
+    public static final String SYNC_DIRTY = "sync_dirty";    
   }
   
   public static final class Workspaces implements BaseColumns {
@@ -193,6 +195,7 @@ public class DatabaseAdapter {
     public static final String STOP = "stop";
     public static final String TAG_NAMES = "tag_names";
     public static final String REMOTE_ID = "remote_id";
+    public static final String SYNC_DIRTY = "sync_dirty";    
   }
   
   public static final class PlannedTasks implements BaseColumns {

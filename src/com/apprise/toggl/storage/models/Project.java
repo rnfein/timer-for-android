@@ -11,5 +11,6 @@ public class Project {
   public long hourly_rate;
   public String name;
   public long id;
+  public boolean sync_dirty;
   
 }

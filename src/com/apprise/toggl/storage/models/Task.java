@@ -11,5 +11,6 @@ public class Task {
   public String stop;
   public String[] tag_names;
   public long id;
+  public boolean sync_dirty;
   
 }
