@@ -1,8 +1,7 @@
 package com.apprise.toggl.storage.models;
 
-public class Task {
+public class Task extends Model {
 
-  public long _id;
   public Project project;
   public Workspace workspace;
   public long duration;
@@ -11,8 +10,6 @@ public class Task {
   public String description;
   public String stop;
   public String[] tag_names;
-  public long id;
-  public boolean sync_dirty;
 
   public Task() {}
   
@@ -47,6 +44,23 @@ public class Task {
     task.id = remote_id;
     task.sync_dirty = true;
     return task;
+  }
+
+  public boolean identicalTo(Syncable other) {
+    Task otherTask = (Task) other;
+    return description == otherTask.description;
+  }
+
+  public void updateAttributes(Syncable other) {
+    Task otherTask = (Task) other;
+    project = otherTask.project;
+    workspace = otherTask.workspace;
+    duration = otherTask.duration;
+    start = otherTask.start;
+    billable = otherTask.billable;
+    description = otherTask.description;
+    stop = otherTask.stop;
+    tag_names = otherTask.tag_names;
   }
     
 }

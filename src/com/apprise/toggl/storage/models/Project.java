@@ -1,8 +1,7 @@
 package com.apprise.toggl.storage.models;
 
-public class Project {
+public class Project extends Model {
 
-  public long _id;
   public int fixed_fee;
   public long estimated_workhours;
   public boolean is_fixed_fee;
@@ -11,8 +10,6 @@ public class Project {
   public String client_project_name;
   public long hourly_rate;
   public String name;
-  public long id;
-  public boolean sync_dirty;
   
   public Project() {}
   
@@ -48,6 +45,24 @@ public class Project {
     project.id = remote_id;
     project.sync_dirty = true;
     return project;
+  }
+
+  public boolean identicalTo(Syncable other) {
+    Project otherProject = (Project) other;
+    return name == otherProject.name;
+    // TODO: maybe a checksum?
+  }
+
+  public void updateAttributes(Syncable other) {
+    Project otherProject = (Project) other;
+    fixed_fee = otherProject.fixed_fee;
+    estimated_workhours = otherProject.estimated_workhours;
+    is_fixed_fee = otherProject.is_fixed_fee;
+    workspace = otherProject.workspace;
+    billable = otherProject.billable;
+    client_project_name = otherProject.client_project_name;
+    hourly_rate = otherProject.hourly_rate;
+    name = otherProject.name;
   }
   
 }
