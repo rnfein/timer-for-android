@@ -109,6 +109,11 @@ public class DatabaseAdapter {
       + Tasks.TAG_NAMES + " TEXT,"
       + Tasks.REMOTE_ID + " INTEGER NOT NULL"
       + ");";
+    
+    private static final String CREATE_DELETED_TASKS_TABLE = "CREATE TABLE " + DeletedTasks.TABLE_NAME + " ("
+    + DeletedTasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+    + DeletedTasks.TASK_ID + " INTEGER NOT NULL"
+    + ");";
 
     private static final String CREATE_WORKSPACES_TABLE = "CREATE TABLE " + Workspaces.TABLE_NAME + " ("
       + Workspaces._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -133,6 +138,7 @@ public class DatabaseAdapter {
       db.execSQL(CREATE_PROJECTS_TABLE);
       db.execSQL(CREATE_WORKSPACES_TABLE);
       db.execSQL(CREATE_TASKS_TABLE);
+      db.execSQL(CREATE_DELETED_TASKS_TABLE);
       db.execSQL(CREATE_PLANNED_TASKS_TABLE);
     }
 
@@ -196,6 +202,12 @@ public class DatabaseAdapter {
     public static final String TAG_NAMES = "tag_names";
     public static final String REMOTE_ID = "remote_id";
     public static final String SYNC_DIRTY = "sync_dirty";    
+  }
+  
+  public static final class DeletedTasks implements BaseColumns {
+    public static final String TABLE_NAME = "deleted_tasks";
+
+    public static final String TASK_ID = "task_id";
   }
   
   public static final class PlannedTasks implements BaseColumns {
