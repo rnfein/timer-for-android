@@ -48,7 +48,17 @@ public class Task extends Model {
 
   public boolean identicalTo(Syncable other) {
     Task otherTask = (Task) other;
-    return description == otherTask.description;
+
+    boolean diff = project.id == otherTask.project.id &&
+    workspace.id == otherTask.id &&
+    duration == otherTask.duration &&
+    start.equals(otherTask.start) &&
+    billable == otherTask.billable &&
+    description.equals(otherTask.description) &&
+    stop.equals(otherTask.description) &&
+    tag_names.equals(otherTask.tag_names);
+    
+    return diff;    
   }
 
   public void updateAttributes(Syncable other) {

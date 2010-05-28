@@ -49,8 +49,17 @@ public class Project extends Model {
 
   public boolean identicalTo(Syncable other) {
     Project otherProject = (Project) other;
-    return name == otherProject.name;
-    // TODO: maybe a checksum?
+    
+    boolean diff = fixed_fee == otherProject.fixed_fee && 
+    estimated_workhours == otherProject.estimated_workhours &&
+    is_fixed_fee == otherProject.is_fixed_fee &&
+    workspace.id == otherProject.workspace.id &&
+    billable == otherProject.billable &&
+    client_project_name.equals(otherProject.client_project_name) &&
+    hourly_rate == otherProject.hourly_rate &&
+    name.equals(otherProject.name);
+    
+    return diff;
   }
 
   public void updateAttributes(Syncable other) {
