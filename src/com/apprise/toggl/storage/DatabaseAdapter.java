@@ -168,7 +168,7 @@ public class DatabaseAdapter {
   }  
   
   public static final class Projects implements BaseColumns {
-    public static final String TABLE_NAME = "tasks";
+    public static final String TABLE_NAME = "projects";
     
     public static final String FIXED_FEE = "fixed_fee";
     public static final String ESTIMATED_WORKHOURS = "estimated_workhours";
