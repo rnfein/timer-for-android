@@ -1,5 +1,8 @@
 package com.apprise.toggl.storage;
 
+import com.apprise.toggl.storage.models.User;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -38,14 +41,76 @@ public class DatabaseAdapter {
     }
   }
 
-  
-  private Cursor getCursorById(String tableName, long id) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE _ID = ?", new String[] { String.valueOf(id) });
+  public User createUser(User user) {
+    ContentValues values = setUserValues(user);
     
+    long id = db.insert(Users.TABLE_NAME, Users.EMAIL, values);
+    return findUser(id);
+  }  
+  
+  public User findUser(long id) {
+    Cursor cursor = getMovedCursor(Users.TABLE_NAME, Users._ID, id);
+    User user = ORM.mapUser(cursor);
+    safeClose(cursor);
+    return user;
+  }
+  
+  public boolean updateUser(User user) {
+    ContentValues values = setUserValues(user);
+    
+    int affectedRows = db.update(Users.TABLE_NAME, values, Users._ID + " = " + user.id, null);
+    return affectedRows == 1;
+  }  
+  
+  public User findUserByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(Users.TABLE_NAME, Users.REMOTE_ID, remoteId);
+    User user = ORM.mapUser(cursor);
+    safeClose(cursor);
+    return user;
+  }  
+  
+  public Cursor findAllUsers() {
+    return db.query(Users.TABLE_NAME, null, null, null, null, null, null);
+  }  
+
+  public int deleteUser(long id) {
+    return delete(Users.TABLE_NAME, Users._ID, id);
+  }
+  
+  private ContentValues setUserValues(User user) {
+    ContentValues values = new ContentValues();
+    values.put(Users.JQUERY_TIMEOFDAY_FORMAT, user.jquery_timeofday_format);
+    values.put(Users.API_TOKEN, user.api_token);
+    values.put(Users.TASK_RETENTION_DAYS, user.task_retention_days);
+    values.put(Users.JQUERY_DATE_FORMAT, user.jquery_date_format);
+    values.put(Users.DATE_FORMAT, user.date_format);
+    values.put(Users.DEFAULT_WORKSPACE_ID, user.default_workspace_id);
+    values.put(Users.NEW_TASKS_START_AUTOMATICALLY, user.new_tasks_start_automatically);
+    values.put(Users.FULLNAME, user.fullname);
+    values.put(Users.LANGUAGE, user.language);
+    values.put(Users.REMOTE_ID, user.id);
+    values.put(Users.BEGINNING_OF_WEEK, user.beginning_of_week);
+    values.put(Users.TIMEODAY_FORMAT, user.timeofday_format);
+    values.put(Users.EMAIL, user.email);
+    
+    return values;
+  }
+
+  private Cursor getMovedCursor(String tableName, String columnName, long value) {
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { String.valueOf(value) });
+
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
       return null;
     }
     return cursor;
+  }
+  
+  private int delete(String tableName, String columnName, long value) {
+    return db.delete(tableName, columnName + " = ?", new String[] { String.valueOf(value) });
+  }
+  
+  private void safeClose(Cursor cursor) {
+    if(cursor != null) cursor.close();
   }
   
   public String getDatabaseName() {
@@ -58,6 +123,44 @@ public class DatabaseAdapter {
   public void setDatabaseName(String databaseName) {
     this.databaseName = databaseName; 
   }
+  
+  public static class ORM {
+
+    public static User mapUser(Cursor cursor) {
+      if(cursor == null) return null;
+
+      long _id = cursor.getLong(cursor.getColumnIndex(Users._ID));
+      String jqueryTimeofdayFormat = cursor.getString(cursor.getColumnIndex(Users.JQUERY_TIMEOFDAY_FORMAT));
+      String apiToken = cursor.getString(cursor.getColumnIndex(Users.API_TOKEN));
+      int taskRetentionDays = cursor.getInt(cursor.getColumnIndex(Users.TASK_RETENTION_DAYS));
+      String jqueryDateFormat = cursor.getString(cursor.getColumnIndex(Users.JQUERY_DATE_FORMAT));
+      String dateFormat = cursor.getString(cursor.getColumnIndex(Users.DATE_FORMAT));
+      long defaultWorkspaceId = cursor.getLong(cursor.getColumnIndex(Users.DEFAULT_WORKSPACE_ID));
+      boolean newTasksStartAutomatically = (cursor.getInt(cursor.getColumnIndex(Users.NEW_TASKS_START_AUTOMATICALLY)) == 1);
+      String fullname = cursor.getString(cursor.getColumnIndex(Users.FULLNAME));
+      String language = cursor.getString(cursor.getColumnIndex(Users.LANGUAGE));
+      long remote_id = cursor.getLong(cursor.getColumnIndex(Users.REMOTE_ID));
+      int beginningOfWeek = cursor.getInt(cursor.getColumnIndex(Users.BEGINNING_OF_WEEK));
+      String timeofdayFormat = cursor.getString(cursor.getColumnIndex(Users.TIMEODAY_FORMAT));
+      String email = cursor.getString(cursor.getColumnIndex(Users.EMAIL));
+      
+      return new User(_id, 
+          jqueryTimeofdayFormat, 
+          apiToken, 
+          taskRetentionDays, 
+          jqueryDateFormat, 
+          dateFormat, 
+          defaultWorkspaceId, 
+          newTasksStartAutomatically, 
+          fullname, 
+          language, 
+          remote_id, 
+          beginningOfWeek, 
+          timeofdayFormat, 
+          email);      
+    }
+    
+  }  
   
   private static class DatabaseOpenHelper extends SQLiteOpenHelper {
 
