@@ -195,7 +195,9 @@ public class DatabaseAdapter {
     values.put(Projects.NAME, project.name);
     values.put(Projects.REMOTE_ID, project.id);
     values.put(Projects.SYNC_DIRTY, project.sync_dirty);
-    values.put(Projects.WORKSPACE_ID, project.workspace._id);
+    if (project.workspace != null) {
+      values.put(Projects.WORKSPACE_ID, project.workspace._id);
+    }
     
     return values;
   }
@@ -317,11 +319,11 @@ public class DatabaseAdapter {
       + Projects.SYNC_DIRTY + " INTEGER NOT NULL,"      
       + Projects.FIXED_FEE + " INTEGER,"
       + Projects.ESTIMATED_WORKHOURS + " INTEGER,"
-      + Projects.IS_FIXED_FEE + " INTEGER NOT NULL,"
-      + Projects.WORKSPACE_ID + " INTEGER NOT NULL,"
-      + Projects.BILLABLE + " INTEGER NOT NULL,"
+      + Projects.IS_FIXED_FEE + " INTEGER,"
+      + Projects.WORKSPACE_ID + " INTEGER,"
+      + Projects.BILLABLE + " INTEGER,"
       + Projects.CLIENT_PROJECT_NAME + " TEXT,"
-      + Projects.HOURLY_RATE + " INTEGER NOT NULL,"
+      + Projects.HOURLY_RATE + " INTEGER,"
       + Projects.NAME + " TEXT"
       + ");";
     

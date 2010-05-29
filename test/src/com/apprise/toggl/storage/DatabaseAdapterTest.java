@@ -1,6 +1,8 @@
 import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Users;
 import com.apprise.toggl.storage.DatabaseAdapter.Workspaces;
+import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
 
@@ -184,6 +186,82 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(workspace._id, deletedId);
     assertNull(dbAdapter.findWorkspace(workspace._id));
   }  
+  
+  public void testCreateProject() {
+    Project projectContents = new Project();
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    projectContents.name = "Big Project.";
+    projectContents.workspace = workspace;
+    Project createdProject = dbAdapter.createProject(projectContents);
+    
+    assertNotNull(createdProject);
+    assertEquals("Big Project.", createdProject.name);    
+    assertFalse(createdProject.sync_dirty);    
+    assertEquals(workspace._id, createdProject.workspace._id);    
+  }
+  
+  public void testCreateDirtyProject() {
+    Project dirtyProject = dbAdapter.createDirtyProject();
+    assertNotNull(dirtyProject);
+    assertTrue(dirtyProject.sync_dirty);
+  }
+  
+  public void testFindProject() {
+    Project project = new Project();
+    project.name = "Toggl Android Client";
+    Project createdProject = dbAdapter.createProject(project);
+
+    Project foundProject = dbAdapter.findProjectByRemoteId(createdProject.id);
+    assertNotNull(foundProject);
+    assertEquals(createdProject._id, foundProject._id);
+    assertEquals("Toggl Android Client", foundProject.name);
+  }
+  
+  public void testFindProjectByRemoteId() {
+    Project project = new Project();
+    project.name = "Toggl Android Client";
+    Project createdProject = dbAdapter.createProject(project);
+    
+    Project foundProject = dbAdapter.findProject(createdProject._id);
+    assertNotNull(foundProject);
+    assertEquals(createdProject._id, foundProject._id);
+    assertEquals("Toggl Android Client", foundProject.name);
+  }
+  
+  public void testFindAllProjects() {
+    Project project1 = dbAdapter.createProject(new Project());
+    Project project2 = dbAdapter.createProject(new Project());
+    
+    Cursor allProjects = dbAdapter.findAllProjects();
+    assertNotNull(allProjects);
+    assertEquals(2, allProjects.getCount());
+    allProjects.moveToFirst();
+    assertEquals(project1._id, allProjects.getLong(allProjects.getColumnIndex(Projects._ID)));
+    allProjects.moveToNext();
+    assertEquals(project2._id, allProjects.getLong(allProjects.getColumnIndex(Projects._ID)));
+  }
+  
+  public void testUpdateProject() {
+    Project project = dbAdapter.createProject(new Project());
+    assertEquals(0l, project.id);
+    assertEquals(null, project.name);
+    
+    project.id = 2;
+    project.name = "Painting the roof.";
+    dbAdapter.updateProject(project);
+    
+    Project foundProject = dbAdapter.findProject(project._id);
+    assertEquals(2, foundProject.id);
+    assertEquals("Painting the roof.", foundProject.name);
+  }   
+  
+  public void testDeleteProject() {
+    Project project = dbAdapter.createProject(new Project());
+    int deletedId = dbAdapter.deleteProject(project._id);
+    
+    assertEquals(project._id, deletedId);
+    assertNull(dbAdapter.findProject(project._id));
+  }   
 }
 
 
