@@ -6,6 +6,8 @@ public class Workspace {
   public String name;
   public long id;
   
+  public Workspace() {}
+  
   public Workspace(long _id, String name, long remote_id) {
     this._id = _id;
     this.name = name;

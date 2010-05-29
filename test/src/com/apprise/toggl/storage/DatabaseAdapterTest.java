@@ -1,6 +1,8 @@
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Users;
+import com.apprise.toggl.storage.DatabaseAdapter.Workspaces;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.storage.models.Workspace;
 
 import android.database.Cursor;
 import android.test.AndroidTestCase;
@@ -117,6 +119,71 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertNull(dbAdapter.findUser(user._id));
   }
   
+  public void testCreateWorkspace() {
+    Workspace workspaceContents = new Workspace();
+    workspaceContents.name = "work@space.com";
+    Workspace createdWorkspace = dbAdapter.createWorkspace(workspaceContents);
+    
+    assertNotNull(createdWorkspace);
+    assertEquals("work@space.com", createdWorkspace.name);
+  }
+  
+  public void testFindWorkspace() {
+    Workspace workspace = new Workspace();
+    workspace.name = "jaha@baha.fa";
+    Workspace createdWorkspace = dbAdapter.createWorkspace(workspace);
+
+    Workspace foundWorkspace = dbAdapter.findWorkspace(createdWorkspace._id);
+    assertNotNull(foundWorkspace);
+    assertEquals(createdWorkspace._id, foundWorkspace._id);
+    assertEquals("jaha@baha.fa", foundWorkspace.name);
+  }
+  
+  public void testFindWorkspaceByRemoteId() {
+    Workspace workspace = new Workspace();
+    workspace.name = "jaha@baha.fa";
+    Workspace createdWorkspace = dbAdapter.createWorkspace(workspace);
+    
+    Workspace foundWorkspace = dbAdapter.findWorkspaceByRemoteId(createdWorkspace.id);
+    assertNotNull(foundWorkspace);
+    assertEquals(createdWorkspace._id, foundWorkspace._id);
+    assertEquals("jaha@baha.fa", foundWorkspace.name);
+  }
+  
+  public void testFindAllWorkspaces() {
+    Workspace workspace1 = dbAdapter.createWorkspace(new Workspace());
+    Workspace workspace2 = dbAdapter.createWorkspace(new Workspace());
+    
+    Cursor allWorkspaces = dbAdapter.findAllWorkspaces();
+    assertNotNull(allWorkspaces);
+    assertEquals(2, allWorkspaces.getCount());
+    allWorkspaces.moveToFirst();
+    assertEquals(workspace1._id, allWorkspaces.getLong(allWorkspaces.getColumnIndex(Workspaces._ID)));
+    allWorkspaces.moveToNext();
+    assertEquals(workspace2._id, allWorkspaces.getLong(allWorkspaces.getColumnIndex(Workspaces._ID)));
+  }
+  
+  public void testUpdateWorkspace() {
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    assertEquals(0l, workspace.id);
+    assertEquals(null, workspace.name);
+    
+    workspace.id = 2;
+    workspace.name = "asd@asd.ee";
+    dbAdapter.updateWorkspace(workspace);
+    
+    Workspace foundWorkspace = dbAdapter.findWorkspace(workspace._id);
+    assertEquals(2, foundWorkspace.id);
+    assertEquals("asd@asd.ee", foundWorkspace.name);
+  }  
+  
+  public void testDeleteWorkspace() {
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    int deletedId = dbAdapter.deleteWorkspace(workspace._id);
+    
+    assertEquals(workspace._id, deletedId);
+    assertNull(dbAdapter.findWorkspace(workspace._id));
+  }  
 }
 
 
