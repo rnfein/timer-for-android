@@ -1,6 +1,7 @@
 package com.apprise.toggl.storage;
 
 import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
 
@@ -195,9 +196,80 @@ public class DatabaseAdapter {
     values.put(Projects.NAME, project.name);
     values.put(Projects.REMOTE_ID, project.id);
     values.put(Projects.SYNC_DIRTY, project.sync_dirty);
-    if (project.workspace != null) {
-      values.put(Projects.WORKSPACE_ID, project.workspace._id);
+
+    if (project.workspace != null) values.put(Projects.WORKSPACE_ID, project.workspace._id);
+    
+    return values;
+  }
+  
+  public Task createTask(Task task) {
+    ContentValues values = setTaskValues(task);
+    
+    long _id = db.insert(Tasks.TABLE_NAME, Tasks.DESCRIPTION, values);
+    return findTask(_id);
+  }
+  
+  public Task createDirtyTask(Task task) {
+    Task dirtyTask = new Task();
+    dirtyTask.sync_dirty = true;
+    return createTask(dirtyTask);
+  }
+  
+  public Task findTask(long _id) {
+    Cursor cursor = getMovedCursor(Tasks.TABLE_NAME, Tasks._ID, _id);
+    Task task = ORM.mapTask(cursor, this);
+    safeClose(cursor);
+    return task;
+  }
+  
+  public Task findTaskByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(Tasks.TABLE_NAME, Tasks.REMOTE_ID, remoteId);
+    Task task = ORM.mapTask(cursor, this);
+    safeClose(cursor);
+    return task;
+  }
+  
+  public Cursor findAllTasks() {
+    return db.query(Tasks.TABLE_NAME, null, null, null, null, null, null);        
+  }  
+  
+  public boolean updateTask(Task task) {
+    ContentValues values = setTaskValues(task);
+    
+    int affectedRows = db.update(Tasks.TABLE_NAME, values, Tasks._ID + " = " + task._id, null);
+    return affectedRows == 1;    
+  }   
+  
+  public void deleteTask(Task task) {
+    long remoteId = task.id;
+    int rowsAffected = deleteTaskHard(task._id);
+    if(rowsAffected > 0 && remoteId > 0) {
+      // if task was successfully deleted, create an entry in the deleted table
+      // with the remote id
+      ContentValues values = new ContentValues();
+      values.put(DeletedTasks.TASK_ID, remoteId);
+      db.insert(DeletedTasks.TABLE_NAME, null, values);
     }
+  }
+  
+  public int deleteTaskHard(long _id) {
+    return delete(Tasks.TABLE_NAME, Tasks._ID, _id);    
+  }
+    
+  private ContentValues setTaskValues(Task task) {
+    ContentValues values = new ContentValues();
+    values.put(Tasks._ID, task._id);
+    values.put(Tasks.BILLABLE, task.billable);
+    values.put(Tasks.DESCRIPTION, task.description);
+    values.put(Tasks.DURATION, task.duration);
+    values.put(Tasks.REMOTE_ID, task.id);
+    values.put(Tasks.START, task.start);
+    values.put(Tasks.STOP, task.stop);
+    values.put(Tasks.SYNC_DIRTY, task.sync_dirty);
+    //TODO: values.put(Tasks.TAG_NAMES, task.tag_names);
+
+    if (task.workspace != null) values.put(Tasks.WORKSPACE_ID, task.workspace._id);
+    if (task.project != null) values.put(Tasks.PROJECT_ID, task.project._id); 
     
     return values;
   }
@@ -280,6 +352,27 @@ public class DatabaseAdapter {
       boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Projects.SYNC_DIRTY)) == 1);
       
       return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspace(workspaceId), billable, clientProjectName, hourlyRate, name, remote_id, syncDirty);
+    }
+    
+    public static Task mapTask(Cursor cursor, DatabaseAdapter dbAdapter) {
+      if (cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(Tasks._ID));
+      boolean billable = (cursor.getInt(cursor.getColumnIndex(Tasks.BILLABLE)) == 1);
+      String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
+      long duration = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
+      long projectId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_ID));
+      long workspaceId = cursor.getLong(cursor.getColumnIndex(Tasks.WORKSPACE_ID));
+      String start = cursor.getString(cursor.getColumnIndex(Tasks.START));
+      String stop = cursor.getString(cursor.getColumnIndex(Tasks.STOP));
+      long remote_id = cursor.getLong(cursor.getColumnIndex(Tasks.REMOTE_ID));
+      boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Tasks.SYNC_DIRTY)) == 1);
+
+      //TODO: String tagNames = cursor.getString(cursor.getColumnIndex(Tasks.TAG_NAMES));
+      String[] tagNames = null;
+      
+      return new Task(_id, dbAdapter.findProject(projectId), dbAdapter.findWorkspace(workspaceId),
+          duration, start, billable, description, stop, tagNames, remote_id, syncDirty);
     }
     
   }
