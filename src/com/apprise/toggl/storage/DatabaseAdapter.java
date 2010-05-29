@@ -46,12 +46,12 @@ public class DatabaseAdapter {
   public User createUser(User user) {
     ContentValues values = setUserValues(user);
     
-    long id = db.insert(Users.TABLE_NAME, Users.EMAIL, values);
-    return findUser(id);
+    long _id = db.insert(Users.TABLE_NAME, Users.EMAIL, values);
+    return findUser(_id);
   }  
   
-  public User findUser(long id) {
-    Cursor cursor = getMovedCursor(Users.TABLE_NAME, Users._ID, id);
+  public User findUser(long _id) {
+    Cursor cursor = getMovedCursor(Users.TABLE_NAME, Users._ID, _id);
     User user = ORM.mapUser(cursor);
     safeClose(cursor);
     return user;
@@ -101,12 +101,12 @@ public class DatabaseAdapter {
   public Workspace createWorkspace(Workspace workspace) {
     ContentValues values = setWorkspaceValues(workspace);
 
-    long id = db.insert(Workspaces.TABLE_NAME, Workspaces.NAME, values);
-    return findWorkspace(id);
+    long _id = db.insert(Workspaces.TABLE_NAME, Workspaces.NAME, values);
+    return findWorkspace(_id);
   }
 
-  public Workspace findWorkspace(long id) {
-    Cursor cursor = getMovedCursor(Workspaces.TABLE_NAME, Workspaces._ID, id);
+  public Workspace findWorkspace(long _id) {
+    Cursor cursor = getMovedCursor(Workspaces.TABLE_NAME, Workspaces._ID, _id);
     Workspace workspace = ORM.mapWorkspace(cursor);
     safeClose(cursor);
     return workspace;
@@ -138,6 +138,64 @@ public class DatabaseAdapter {
     ContentValues values = new ContentValues();
     values.put(Workspaces.NAME, workspace.name);
     values.put(Workspaces.REMOTE_ID, workspace.id);
+    
+    return values;
+  }
+  
+  public Project createProject(Project project) {
+    ContentValues values = setProjectValues(project);
+    
+    long _id = db.insert(Projects.TABLE_NAME, Projects.NAME, values);
+    return findProject(_id);    
+  }
+  
+  public Project createDirtyProject() {
+    Project dirtyProject = new Project();
+    dirtyProject.sync_dirty = true;
+    return createProject(dirtyProject);
+  }
+  
+  public Project findProject(long _id) {
+    Cursor cursor = getMovedCursor(Projects.TABLE_NAME, Projects._ID, _id);
+    Project project = ORM.mapProject(cursor, this);
+    safeClose(cursor);
+    return project;
+  }
+  
+  public Project findProjectByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(Projects.TABLE_NAME, Projects.REMOTE_ID, remoteId);
+    Project project = ORM.mapProject(cursor, this);
+    safeClose(cursor);
+    return project;
+  }  
+  
+  public boolean updateProject(Project project) {
+    ContentValues values = setProjectValues(project);
+    
+    int affectedRows = db.update(Projects.TABLE_NAME, values, Projects._ID + " = " + project._id, null);
+    return affectedRows == 1;    
+  } 
+  
+  public Cursor findAllProjects() {
+    return db.query(Projects.TABLE_NAME, null, null, null, null, null, null);        
+  }
+  
+  public int deleteProject(long _id) {
+    return delete(Projects.TABLE_NAME, Projects._ID, _id);    
+  }
+  
+  private ContentValues setProjectValues(Project project) {
+    ContentValues values = new ContentValues();
+    values.put(Projects.BILLABLE, project.billable);
+    values.put(Projects.CLIENT_PROJECT_NAME, project.client_project_name);
+    values.put(Projects.ESTIMATED_WORKHOURS, project.estimated_workhours);
+    values.put(Projects.FIXED_FEE, project.fixed_fee);
+    values.put(Projects.HOURLY_RATE, project.hourly_rate);
+    values.put(Projects.IS_FIXED_FEE, project.is_fixed_fee);
+    values.put(Projects.NAME, project.name);
+    values.put(Projects.REMOTE_ID, project.id);
+    values.put(Projects.SYNC_DIRTY, project.sync_dirty);
+    values.put(Projects.WORKSPACE_ID, project.workspace._id);
     
     return values;
   }
