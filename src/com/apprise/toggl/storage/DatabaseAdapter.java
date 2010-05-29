@@ -58,7 +58,7 @@ public class DatabaseAdapter {
   public boolean updateUser(User user) {
     ContentValues values = setUserValues(user);
     
-    int affectedRows = db.update(Users.TABLE_NAME, values, Users._ID + " = " + user.id, null);
+    int affectedRows = db.update(Users.TABLE_NAME, values, Users._ID + " = " + user._id, null);
     return affectedRows == 1;
   }  
   
