@@ -1,6 +1,8 @@
 package com.apprise.toggl.storage;
 
+import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.storage.models.Workspace;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -73,8 +75,8 @@ public class DatabaseAdapter {
     return db.query(Users.TABLE_NAME, null, null, null, null, null, null);
   }  
 
-  public int deleteUser(long id) {
-    return delete(Users.TABLE_NAME, Users._ID, id);
+  public int deleteUser(long _id) {
+    return delete(Users.TABLE_NAME, Users._ID, _id);
   }
   
   private ContentValues setUserValues(User user) {
@@ -95,7 +97,51 @@ public class DatabaseAdapter {
     
     return values;
   }
+  
+  public Workspace createWorkspace(Workspace workspace) {
+    ContentValues values = setWorkspaceValues(workspace);
 
+    long id = db.insert(Workspaces.TABLE_NAME, Workspaces.NAME, values);
+    return findWorkspace(id);
+  }
+
+  public Workspace findWorkspace(long id) {
+    Cursor cursor = getMovedCursor(Workspaces.TABLE_NAME, Workspaces._ID, id);
+    Workspace workspace = ORM.mapWorkspace(cursor);
+    safeClose(cursor);
+    return workspace;
+  }
+  
+  public boolean updateWorkspace(Workspace workspace) {
+    ContentValues values = setWorkspaceValues(workspace);
+    
+    int affectedRows = db.update(Workspaces.TABLE_NAME, values, Workspaces._ID + " = " + workspace._id, null);
+    return affectedRows == 1;    
+  }
+  
+  public Workspace findWorkspaceByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(Workspaces.TABLE_NAME, Workspaces.REMOTE_ID, remoteId);
+    Workspace workspace = ORM.mapWorkspace(cursor);
+    safeClose(cursor);
+    return workspace;
+  }
+  
+  public Cursor findAllWorkspaces() {
+    return db.query(Workspaces.TABLE_NAME, null, null, null, null, null, null);    
+  }
+  
+  public int deleteWorkspace(long _id) {
+    return delete(Workspaces.TABLE_NAME, Workspaces._ID, _id);
+  }  
+
+  private ContentValues setWorkspaceValues(Workspace workspace) {
+    ContentValues values = new ContentValues();
+    values.put(Workspaces.NAME, workspace.name);
+    values.put(Workspaces.REMOTE_ID, workspace.id);
+    
+    return values;
+  }
+  
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
     Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { String.valueOf(value) });
 
@@ -144,23 +190,39 @@ public class DatabaseAdapter {
       String timeofdayFormat = cursor.getString(cursor.getColumnIndex(Users.TIMEODAY_FORMAT));
       String email = cursor.getString(cursor.getColumnIndex(Users.EMAIL));
       
-      return new User(_id, 
-          jqueryTimeofdayFormat, 
-          apiToken, 
-          taskRetentionDays, 
-          jqueryDateFormat, 
-          dateFormat, 
-          defaultWorkspaceId, 
-          newTasksStartAutomatically, 
-          fullname, 
-          language, 
-          remote_id, 
-          beginningOfWeek, 
-          timeofdayFormat, 
-          email);      
+      return new User(_id, jqueryTimeofdayFormat, apiToken, taskRetentionDays, jqueryDateFormat, dateFormat, defaultWorkspaceId, 
+          newTasksStartAutomatically, fullname, language, remote_id, beginningOfWeek, timeofdayFormat, email);      
     }
     
-  }  
+    public static Workspace mapWorkspace(Cursor cursor) {
+      if(cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(Workspaces._ID));
+      String name = cursor.getString(cursor.getColumnIndex(Workspaces.NAME));
+      long remote_id = cursor.getLong(cursor.getColumnIndex(Workspaces.REMOTE_ID));
+      
+      return new Workspace(_id, name, remote_id);      
+    }
+    
+    public static Project mapProject(Cursor cursor, DatabaseAdapter dbAdapter) {
+      if (cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(Projects._ID));
+      long fixedFee = cursor.getLong(cursor.getColumnIndex(Projects.FIXED_FEE));
+      boolean billable = (cursor.getInt(cursor.getColumnIndex(Projects.BILLABLE)) == 1);
+      String clientProjectName = cursor.getString(cursor.getColumnIndex(Projects.CLIENT_PROJECT_NAME));
+      long estimatedWorkhours = cursor.getLong(cursor.getColumnIndex(Projects.ESTIMATED_WORKHOURS));
+      boolean isFixedFee = (cursor.getLong(cursor.getColumnIndex(Projects.IS_FIXED_FEE)) == 1);
+      long hourlyRate = cursor.getLong(cursor.getColumnIndex(Projects.HOURLY_RATE));
+      String name = cursor.getString(cursor.getColumnIndex(Projects.NAME));
+      long remote_id = cursor.getLong(cursor.getColumnIndex(Projects.REMOTE_ID));
+      long workspaceId = cursor.getLong(cursor.getColumnIndex(Projects.WORKSPACE_ID));
+      boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Projects.SYNC_DIRTY)) == 1);
+      
+      return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspace(workspaceId), billable, clientProjectName, hourlyRate, name, remote_id, syncDirty);
+    }
+    
+  }
   
   private static class DatabaseOpenHelper extends SQLiteOpenHelper {
 

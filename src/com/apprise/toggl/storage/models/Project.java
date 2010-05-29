@@ -2,7 +2,7 @@ package com.apprise.toggl.storage.models;
 
 public class Project extends Model {
 
-  public int fixed_fee;
+  public long fixed_fee;
   public long estimated_workhours;
   public boolean is_fixed_fee;
   public Workspace workspace;
@@ -13,7 +13,7 @@ public class Project extends Model {
   
   public Project() {}
   
-  public Project(long _id, int fixedFee, long estimatedWorkhours,
+  public Project(long _id, long fixedFee, long estimatedWorkhours,
       boolean isFixedFee, Workspace workspace, boolean billable,
       String clientProjectName, long hourlyRate, String name, long remote_id,
       boolean syncDirty) {
@@ -30,7 +30,7 @@ public class Project extends Model {
     this.sync_dirty = syncDirty;
   }
   
-  public static Project dirty(int fixedFee, long estimatedWorkhours,
+  public static Project dirty(long fixedFee, long estimatedWorkhours,
       boolean isFixedFee, Workspace workspace, boolean billable,
       String clientProjectName, long hourlyRate, String name, long remote_id) {
     Project project = new Project();
