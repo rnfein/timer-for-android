@@ -124,36 +124,24 @@ public class TogglWebApi {
     }
   }
   
-  public void fetchTasks() {
-    runInBackground(new Runnable() {
-      
-      public void run() {
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair(API_TOKEN, apiToken));
-
-        HttpResponse response = executeGetRequest(TASKS_URL, params);
-        String responseContent = null;
-
-        if (ok(response)) {
-          Message msg = Message.obtain();      
-          msg.what = HANDLER_TASKS_FETCHED;          
-          try {            
-            responseContent = Util.inputStreamToString(response.getEntity().getContent());
-            Gson gson = new Gson();
-            Type collectionType = new TypeToken<List<Task>>(){}.getType();            
-            List<Task> tasks = gson.fromJson(responseContent, collectionType);
-            Log.d(TAG, "TogglWebApi#fetchTasks got a successful response body: " + responseContent);
-            msg.obj = tasks;
-            handler.sendMessage(msg);
-          } catch (IOException e) {
-            Log.d(TAG, "IOException when performing fetchTasks", e);
-          }
-        } else {
-          int statusCode = response.getStatusLine().getStatusCode();
-          Log.e(TAG, "TogglWebApi#fetchTasks got a failed request: " + statusCode);
-        }
-      }
-    });    
+  /**
+   * Fetches all tasks through the API.
+   * Returns a list of tasks if the request is successful,
+   * otherwise null.
+   * 
+   * Synchronous.
+   */
+  public List<Task> fetchTasks() {
+    HttpResponse response = executeGetRequest(TASKS_URL, paramsWithAuthToken());
+    
+    if(ok(response)) {
+        Gson gson = new Gson();
+        Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
+        return gson.fromJson(getResponseReader(response), collectionType);
+    } else {
+      Log.e(TAG, "TogglWebApi#fetchTasks got a failed request: " + response.getStatusLine().getStatusCode());
+      return null;
+    }
   }
 
   protected HttpResponse executeGetRequest(String url,
