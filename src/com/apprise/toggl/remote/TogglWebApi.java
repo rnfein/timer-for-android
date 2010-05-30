@@ -214,7 +214,13 @@ public class TogglWebApi {
   
   protected void runInBackground(Runnable runnable) {
     new Thread(runnable).start();
-  }  
+  }
+  
+  protected ArrayList<NameValuePair> paramsWithAuthToken() {
+    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+    params.add(new BasicNameValuePair(API_TOKEN, apiToken));
+    return params;
+  }
 
   protected boolean ok(HttpResponse response) {
     return response != null
