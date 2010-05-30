@@ -58,11 +58,16 @@ public class TogglWebApi {
     this.handler = handler;
     this.apiToken = apiToken;
     init();
-    setUserPasswordCredentials();
   }
 
+  public TogglWebApi(String apiToken) {
+    this.apiToken = apiToken;
+    init();
+  }
+  
   protected void init() {
     createHttpClient();
+    setUserPasswordCredentials();
   }
 
   public void authenticateWithCredentials(final String email, final String password) {
