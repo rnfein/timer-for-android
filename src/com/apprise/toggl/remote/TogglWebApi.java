@@ -186,6 +186,7 @@ public class TogglWebApi {
 
   protected HttpResponse execute(HttpRequestBase request) {
     try {
+      setUserPasswordCredentials();
       return httpClient.execute(request);
     } catch (final IOException e) {
       Log.d(TAG, "IOException when performing remote request", e);
