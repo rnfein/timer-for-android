@@ -2,16 +2,22 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.CurrentUser;
+import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
+import com.apprise.toggl.storage.models.User;
 
+import android.app.ListActivity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SimpleCursorAdapter;
 
-public class TasksActivity extends ApplicationActivity {
+public class TasksActivity extends ListActivity {
 
   private static final String TAG = "TasksActivity";
   
@@ -21,16 +27,19 @@ public class TasksActivity extends ApplicationActivity {
   
   private Toggl app;
   private TogglWebApi webApi;
+  private DatabaseAdapter dbAdapter;
+  private SimpleCursorAdapter cursorAdapter;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.tasks);
+
     app = (Toggl) getApplication();
     webApi = new TogglWebApi(handler, currentUser().api_token);
+    dbAdapter = new DatabaseAdapter(this);
     
     getUserAndPopulateList();
-    
-    setContentView(R.layout.tasks);
   }
   
   public void getUserAndPopulateList() {
@@ -49,9 +58,14 @@ public class TasksActivity extends ApplicationActivity {
   
   public void populateList() {
     Log.d(TAG, "*** populateList");
-    webApi.apiToken = app.getAPIToken();
-    webApi.fetchTasks();
-    //TODO: fetch and populate list
+    dbAdapter.open();
+    Cursor tasksCursor = dbAdapter.findAllTasks();
+    
+    String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
+    int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
+    
+    cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
+    setListAdapter(cursorAdapter);
   }
   
   @Override
@@ -91,5 +105,9 @@ public class TasksActivity extends ApplicationActivity {
       }
     }
   };
+  
+  protected User currentUser() {
+    return CurrentUser.getInstance();
+  }
   
 }
