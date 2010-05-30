@@ -1,9 +1,11 @@
 package com.apprise.toggl.remote;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -70,6 +72,10 @@ public class TogglWebApi {
     setUserPasswordCredentials();
   }
 
+  /**
+   * Asynchronous.
+   * Posts message through the handler when done.
+   */
   public void authenticateWithCredentials(final String email, final String password) {
     runInBackground(new Runnable() {
       
@@ -83,6 +89,10 @@ public class TogglWebApi {
     });
   }
 
+  /**
+  * Asynchronous.
+  * Posts message through the handler when done.
+  */
   public void authenticateWithToken(final String apiToken) {
     runInBackground(new Runnable() {
       
