@@ -1,3 +1,5 @@
+package com.apprise.toggl.storage;
+
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.DeletedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
