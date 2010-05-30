@@ -222,6 +222,15 @@ public class TogglWebApi {
     return params;
   }
 
+  protected InputStreamReader getResponseReader(HttpResponse response) {
+    try {
+      return new InputStreamReader(response.getEntity().getContent());      
+    } catch(IOException e) {
+      Log.e(TAG, "TogglWebApi#getResponseReader couldn't read response content.", e);
+      return null;
+    }
+  }
+
   protected boolean ok(HttpResponse response) {
     return response != null
         && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
