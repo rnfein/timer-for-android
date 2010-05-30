@@ -34,12 +34,12 @@
 		<link>
 			<name>app-gen</name>
 			<type>2</type>
-			<location>../gen</location>
+			<location>/home/kevin/Projects/Workspace/toggl-android/gen</location>
 		</link>
 		<link>
 			<name>app-src</name>
 			<type>2</type>
-			<location>../src</location>
+			<location>/home/kevin/Projects/Workspace/toggl-android/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>
