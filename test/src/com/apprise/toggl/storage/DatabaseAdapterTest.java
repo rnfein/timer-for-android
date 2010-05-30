@@ -2,7 +2,9 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Users;
 import com.apprise.toggl.storage.DatabaseAdapter.Workspaces;
+import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
 
@@ -211,7 +213,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     project.name = "Toggl Android Client";
     Project createdProject = dbAdapter.createProject(project);
 
-    Project foundProject = dbAdapter.findProjectByRemoteId(createdProject.id);
+    Project foundProject = dbAdapter.findProject(createdProject._id);
     assertNotNull(foundProject);
     assertEquals(createdProject._id, foundProject._id);
     assertEquals("Toggl Android Client", foundProject.name);
@@ -222,7 +224,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     project.name = "Toggl Android Client";
     Project createdProject = dbAdapter.createProject(project);
     
-    Project foundProject = dbAdapter.findProject(createdProject._id);
+    Project foundProject = dbAdapter.findProjectByRemoteId(createdProject.id);
     assertNotNull(foundProject);
     assertEquals(createdProject._id, foundProject._id);
     assertEquals("Toggl Android Client", foundProject.name);
@@ -243,25 +245,142 @@ public class DatabaseAdapterTest extends AndroidTestCase {
   
   public void testUpdateProject() {
     Project project = dbAdapter.createProject(new Project());
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
     assertEquals(0l, project.id);
     assertEquals(null, project.name);
     
     project.id = 2;
-    project.name = "Painting the roof.";
+    project.billable = true;
+    project.client_project_name = "Big Client - Supersystem";
+    project.estimated_workhours = 3200;
+    project.fixed_fee = 320000;
+    project.hourly_rate = 100;
+    project.is_fixed_fee = true;
+    project.name = "Supersystem";
+    project.workspace = workspace;
     dbAdapter.updateProject(project);
     
     Project foundProject = dbAdapter.findProject(project._id);
     assertEquals(2, foundProject.id);
-    assertEquals("Painting the roof.", foundProject.name);
+    assertTrue(foundProject.billable);
+    assertEquals("Big Client - Supersystem", foundProject.client_project_name);
+    assertEquals(3200, foundProject.estimated_workhours);
+    assertEquals(320000, foundProject.fixed_fee);
+    assertEquals(100, foundProject.hourly_rate);
+    assertEquals("Supersystem", foundProject.name);
+    assertTrue(foundProject.is_fixed_fee);
+    assertEquals(workspace._id, foundProject.workspace._id);
   }   
   
   public void testDeleteProject() {
     Project project = dbAdapter.createProject(new Project());
-    int deletedId = dbAdapter.deleteProject(project._id);
+    long deletedId = dbAdapter.deleteProject(project._id);
     
     assertEquals(project._id, deletedId);
     assertNull(dbAdapter.findProject(project._id));
-  }   
+  }
+  
+  public void testCreateTask() {
+    Task taskContents = new Task();
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    Project project = dbAdapter.createProject(new Project());
+    taskContents.id = 123;
+    taskContents.description = "download the internet";
+    taskContents.workspace = workspace;
+    taskContents.project = project;
+    Task createdTask = dbAdapter.createTask(taskContents);
+    
+    assertNotNull(createdTask);
+    assertEquals(123, createdTask.id);
+    assertEquals("download the internet", createdTask.description);
+    assertEquals(workspace._id, createdTask.workspace._id);
+    assertEquals(project._id, createdTask.project._id);
+  }
+  
+  public void testCreateDirtyTask() {
+    Task dirtyTask = dbAdapter.createDirtyTask();
+    
+    assertNotNull(dirtyTask);
+    assertTrue(dirtyTask.sync_dirty);
+  }
+  
+  public void testFindTask() {
+    Task task = new Task();
+    task.description = "do a backflip";
+    Task createdTask = dbAdapter.createTask(task);
+
+    Task foundTask = dbAdapter.findTask(createdTask._id);
+    assertNotNull(foundTask);
+    assertEquals(createdTask._id, foundTask._id);
+    assertEquals("do a backflip", foundTask.description);    
+  }
+  
+  public void testFindTaskByRemoteId() {
+    Task task = new Task();
+    task.description = "do a frontflip";
+    Task createdTask = dbAdapter.createTask(task);
+    
+    Task foundTask = dbAdapter.findTaskByRemoteId(createdTask.id);
+    assertNotNull(foundTask);
+    assertEquals(createdTask._id, foundTask._id);
+    assertEquals("do a frontflip", foundTask.description);    
+  }
+  
+  public void testFindAllTasks() {
+    Task task1 = dbAdapter.createTask(new Task());
+    Task task2 = dbAdapter.createTask(new Task());
+    
+    Cursor allTasks = dbAdapter.findAllTasks();
+    assertNotNull(allTasks);
+    assertEquals(2, allTasks.getCount());
+    allTasks.moveToFirst();
+    assertEquals(task1._id, allTasks.getLong(allTasks.getColumnIndex(Projects._ID)));
+    allTasks.moveToNext();
+    assertEquals(task2._id, allTasks.getLong(allTasks.getColumnIndex(Projects._ID)));
+  }
+  
+  public void testUpdateTask() {
+    Task task = dbAdapter.createTask(new Task());
+    Project project = dbAdapter.createProject(new Project());
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    assertEquals(0l, task.id);
+    assertEquals(null, task.description);
+    
+    task.id = 2;
+    task.billable = true;
+    task.description = "megatask";
+    task.duration = 10;
+    task.project = project;
+    task.start = "2010-02-12T16:19:45+02:00";
+    task.stop = null;
+    task.workspace = workspace;
+    //TODO task.tag_names
+    dbAdapter.updateTask(task);
+    
+    Task foundTask = dbAdapter.findTask(task._id);
+    assertEquals(2, foundTask.id);
+    assertTrue(foundTask.billable);
+    assertEquals("megatask", foundTask.description);
+    assertEquals(10, foundTask.duration);
+    assertEquals(project._id, foundTask.project._id);
+    assertEquals("2010-02-12T16:19:45+02:00", foundTask.start);
+    assertNull(foundTask.stop);
+    assertEquals(workspace._id, foundTask.workspace._id);
+  }
+  
+  public void testDeleteTask() {
+    Task taskContents = new Task(); 
+    taskContents.id = 456;
+    Task createdTask = dbAdapter.createTask(taskContents);
+    long remoteId = createdTask.id;
+    dbAdapter.deleteTask(createdTask);
+    
+    assertNull(dbAdapter.findTask(createdTask._id));
+
+    DeletedTask deletedTask = dbAdapter.findDeletedTaskByRemoteId(remoteId);
+    assertNotNull(deletedTask);
+    assertEquals(remoteId, deletedTask.taskRemoteId);
+  }
 }
 
 

@@ -1,5 +1,6 @@
 package com.apprise.toggl.storage;
 
+import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
@@ -209,7 +210,7 @@ public class DatabaseAdapter {
     return findTask(_id);
   }
   
-  public Task createDirtyTask(Task task) {
+  public Task createDirtyTask() {
     Task dirtyTask = new Task();
     dirtyTask.sync_dirty = true;
     return createTask(dirtyTask);
@@ -247,7 +248,7 @@ public class DatabaseAdapter {
       // if task was successfully deleted, create an entry in the deleted table
       // with the remote id
       ContentValues values = new ContentValues();
-      values.put(DeletedTasks.TASK_ID, remoteId);
+      values.put(DeletedTasks.TASK_REMOTE_ID, remoteId);
       db.insert(DeletedTasks.TABLE_NAME, null, values);
     }
   }
@@ -258,20 +259,33 @@ public class DatabaseAdapter {
     
   private ContentValues setTaskValues(Task task) {
     ContentValues values = new ContentValues();
-    values.put(Tasks._ID, task._id);
-    values.put(Tasks.BILLABLE, task.billable);
-    values.put(Tasks.DESCRIPTION, task.description);
-    values.put(Tasks.DURATION, task.duration);
     values.put(Tasks.REMOTE_ID, task.id);
+    values.put(Tasks.DESCRIPTION, task.description);    
+    values.put(Tasks.BILLABLE, task.billable);
+    values.put(Tasks.DURATION, task.duration);
     values.put(Tasks.START, task.start);
     values.put(Tasks.STOP, task.stop);
     values.put(Tasks.SYNC_DIRTY, task.sync_dirty);
-    //TODO: values.put(Tasks.TAG_NAMES, task.tag_names);
-
+//    values.put(Tasks.TAG_NAMES, "tag_names"); //TODO
+//
     if (task.workspace != null) values.put(Tasks.WORKSPACE_ID, task.workspace._id);
     if (task.project != null) values.put(Tasks.PROJECT_ID, task.project._id); 
     
     return values;
+  }
+  
+  public DeletedTask findDeletedTask(long _id) {
+    Cursor cursor = getMovedCursor(DeletedTasks.TABLE_NAME, DeletedTasks._ID, _id);
+    DeletedTask deletedTask = ORM.mapDeletedTask(cursor);
+    safeClose(cursor);
+    return deletedTask;
+  }
+  
+  public DeletedTask findDeletedTaskByRemoteId(long taskRemoteId) {
+    Cursor cursor = getMovedCursor(DeletedTasks.TABLE_NAME, DeletedTasks.TASK_REMOTE_ID, taskRemoteId);
+    DeletedTask deletedTask = ORM.mapDeletedTask(cursor);
+    safeClose(cursor);
+    return deletedTask;
   }
   
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
@@ -375,6 +389,15 @@ public class DatabaseAdapter {
           duration, start, billable, description, stop, tagNames, remote_id, syncDirty);
     }
     
+    public static DeletedTask mapDeletedTask(Cursor cursor) {
+      if (cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(DeletedTasks._ID));
+      long taskId = cursor.getLong(cursor.getColumnIndex(DeletedTasks.TASK_REMOTE_ID));
+      
+      return new DeletedTask(_id, taskId);
+    }
+    
   }
   
   private static class DatabaseOpenHelper extends SQLiteOpenHelper {
@@ -422,28 +445,29 @@ public class DatabaseAdapter {
     
     private static final String CREATE_TASKS_TABLE = "CREATE TABLE " + Tasks.TABLE_NAME + " ("
       + Tasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-      + Tasks.REMOTE_ID + " INTEGER NOT NULL,"      
-      + Tasks.PROJECT_ID + " INTEGER NOT NULL,"
-      + Tasks.WORKSPACE_ID + " INTEGER NOT NULL,"
-      + Tasks.DURATION + " INTEGER NOT NULL,"
+      + Tasks.REMOTE_ID + " INTEGER NOT NULL,"  
+      + Tasks.SYNC_DIRTY + " INTEGER NOT NULL,"  
+      + Tasks.PROJECT_ID + " INTEGER,"
+      + Tasks.WORKSPACE_ID + " INTEGER,"
+      + Tasks.DURATION + " INTEGER,"
       + Tasks.START + " TEXT,"
-      + Tasks.BILLABLE + " INTEGER NOT NULL,"
+      + Tasks.BILLABLE + " INTEGER,"
       + Tasks.DESCRIPTION + " TEXT,"
-      + Tasks.STOP + " TEXT,"
-      + Tasks.TAG_NAMES + " TEXT"
+      + Tasks.STOP + " TEXT"
+//      + Tasks.TAG_NAMES + " TEXT"
       + ");";
     
     private static final String CREATE_DELETED_TASKS_TABLE = "CREATE TABLE " + DeletedTasks.TABLE_NAME + " ("
     + DeletedTasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-    + DeletedTasks.TASK_ID + " INTEGER NOT NULL"
+    + DeletedTasks.TASK_REMOTE_ID + " INTEGER NOT NULL"
     + ");";
     
     private static final String CREATE_PLANNED_TASKS_TABLE = "CREATE TABLE " + PlannedTasks.TABLE_NAME + " ("
       + PlannedTasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
       + PlannedTasks.REMOTE_ID + " INTEGER NOT NULL,"      
       + PlannedTasks.NAME + " TEXT,"
-      + PlannedTasks.WORKSPACE_ID + " INTEGER NOT NULL,"
-      + PlannedTasks.PROJECT_ID + " INTEGER NOT NULL,"
+      + PlannedTasks.WORKSPACE_ID + " INTEGER,"
+      + PlannedTasks.PROJECT_ID + " INTEGER,"
       + PlannedTasks.USER_ID + " INTEGER NOT NULL,"
       + PlannedTasks.ESTIMATED_WORKHOURS + " INTEGER NOT NULL"
     + ");";
@@ -524,7 +548,7 @@ public class DatabaseAdapter {
   public static final class DeletedTasks implements BaseColumns {
     public static final String TABLE_NAME = "deleted_tasks";
 
-    public static final String TASK_ID = "task_id";
+    public static final String TASK_REMOTE_ID = "task_remote_id";
   }
   
   public static final class PlannedTasks implements BaseColumns {
