@@ -27,7 +27,7 @@ public class AccountActivity extends ApplicationActivity {
   private Button loginButton;
   private Toggl app;
 
-  private static final String TAG = "Account";
+  private static final String TAG = "AccountActivity";
   private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
   
   public static final int DEFAULT_CATEGORY = 0;

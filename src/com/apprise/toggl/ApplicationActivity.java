@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class ApplicationActivity extends Activity {
 
-  private static final String TAG = "AppActivity";
+  private static final String TAG = "ApplicationActivity";
   
   @Override
   protected void onResume() {

@@ -13,7 +13,7 @@ import android.view.MenuItem;
 
 public class TasksActivity extends ApplicationActivity {
 
-  private static final String TAG = "Tasks";
+  private static final String TAG = "TasksActivity";
   
   public static final int DEFAULT_CATEGORY = 0;
   public static final int REFRESH_TASKS_OPTION = Menu.FIRST;
