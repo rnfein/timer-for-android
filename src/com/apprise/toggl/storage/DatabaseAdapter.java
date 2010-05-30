@@ -1,6 +1,7 @@
 package com.apprise.toggl.storage;
 
 import com.apprise.toggl.storage.models.DeletedTask;
+import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
@@ -274,18 +275,68 @@ public class DatabaseAdapter {
     return values;
   }
   
-  public DeletedTask findDeletedTask(long _id) {
-    Cursor cursor = getMovedCursor(DeletedTasks.TABLE_NAME, DeletedTasks._ID, _id);
+  public DeletedTask findDeletedTask(long taskRemoteId) {
+    Cursor cursor = getMovedCursor(DeletedTasks.TABLE_NAME, DeletedTasks.TASK_REMOTE_ID, taskRemoteId);
     DeletedTask deletedTask = ORM.mapDeletedTask(cursor);
     safeClose(cursor);
     return deletedTask;
   }
   
-  public DeletedTask findDeletedTaskByRemoteId(long taskRemoteId) {
-    Cursor cursor = getMovedCursor(DeletedTasks.TABLE_NAME, DeletedTasks.TASK_REMOTE_ID, taskRemoteId);
-    DeletedTask deletedTask = ORM.mapDeletedTask(cursor);
+  public Cursor findAllDeletedTasks() {
+    return db.query(DeletedTasks.TABLE_NAME, null, null, null, null, null, null);     
+  }
+  
+  public void deleteDeletedTask(long _id) {
+    delete(DeletedTasks.TABLE_NAME, DeletedTasks._ID, _id);    
+  }
+  
+  public PlannedTask createPlannedTask(PlannedTask plannedTask) {
+    ContentValues values = setPlannedTaskValues(plannedTask);
+
+    long _id = db.insert(PlannedTasks.TABLE_NAME, PlannedTasks.NAME, values);
+    return findPlannedTask(_id);
+  }
+  
+  public PlannedTask findPlannedTask(long _id) {
+    Cursor cursor = getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks._ID, _id);
+    PlannedTask plannedTask = ORM.mapPlannedTask(cursor, this);
     safeClose(cursor);
-    return deletedTask;
+    return plannedTask;    
+  }
+  
+  public PlannedTask findPlannedTaskByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks.REMOTE_ID, remoteId);
+    PlannedTask plannedTask = ORM.mapPlannedTask(cursor, this);
+    safeClose(cursor);
+    return plannedTask;    
+  }
+  
+  public Cursor findAllPlannedTasks() {
+    return db.query(PlannedTasks.TABLE_NAME, null, null, null, null, null, null);     
+  }
+  
+  public boolean updatePlannedTask(PlannedTask plannedTask) {
+    ContentValues values = setPlannedTaskValues(plannedTask);
+    
+    int affectedRows = db.update(PlannedTasks.TABLE_NAME, values, PlannedTasks._ID + " = " + plannedTask._id, null);
+    return affectedRows == 1;    
+  } 
+  
+  public void deletePlannedTask(long _id) {
+    delete(PlannedTasks.TABLE_NAME, PlannedTasks._ID, _id);    
+  }  
+  
+  private ContentValues setPlannedTaskValues(PlannedTask plannedTask) {
+    ContentValues values = new ContentValues();
+    values.put(PlannedTasks.REMOTE_ID, plannedTask.id);
+    values.put(PlannedTasks.ESTIMATED_WORKHOURS, plannedTask.estimated_workhours);
+    values.put(PlannedTasks.NAME, plannedTask.name);
+    
+    if(plannedTask.project != null) values.put(PlannedTasks.PROJECT_ID, plannedTask.project._id);
+    if(plannedTask.workspace != null) values.put(PlannedTasks.WORKSPACE_ID, plannedTask.workspace._id);
+    if(plannedTask.user != null) values.put(PlannedTasks.USER_ID, plannedTask.user._id);
+
+    return values;
   }
   
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
@@ -398,6 +449,21 @@ public class DatabaseAdapter {
       return new DeletedTask(_id, taskId);
     }
     
+    public static PlannedTask mapPlannedTask(Cursor cursor, DatabaseAdapter dbAdapter) {
+      if(cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(PlannedTasks._ID));
+      long remote_id = cursor.getLong(cursor.getColumnIndex(PlannedTasks.REMOTE_ID));
+      String name = cursor.getString(cursor.getColumnIndex(PlannedTasks.NAME));
+      long workspaceId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.WORKSPACE_ID));
+      long projectId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.PROJECT_ID));
+      long userId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.USER_ID));
+      long estimatedWorkhours = cursor.getLong(cursor.getColumnIndex(PlannedTasks.ESTIMATED_WORKHOURS));
+
+      return new PlannedTask(_id, name, dbAdapter.findWorkspace(workspaceId), remote_id, 
+          dbAdapter.findProject(projectId), dbAdapter.findUser(userId), estimatedWorkhours);
+    }
+    
   }
   
   private static class DatabaseOpenHelper extends SQLiteOpenHelper {
@@ -468,8 +534,8 @@ public class DatabaseAdapter {
       + PlannedTasks.NAME + " TEXT,"
       + PlannedTasks.WORKSPACE_ID + " INTEGER,"
       + PlannedTasks.PROJECT_ID + " INTEGER,"
-      + PlannedTasks.USER_ID + " INTEGER NOT NULL,"
-      + PlannedTasks.ESTIMATED_WORKHOURS + " INTEGER NOT NULL"
+      + PlannedTasks.USER_ID + " INTEGER,"
+      + PlannedTasks.ESTIMATED_WORKHOURS + " INTEGER"
     + ");";
 
 

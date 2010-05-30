@@ -8,10 +8,12 @@ public class PlannedTask {
   public long id;    
   public Project project;
   public User user;
-  public int estimated_workhours;
+  public long estimated_workhours;
+  
+  public PlannedTask() {}
   
   public PlannedTask(long _id, String name, Workspace workspace, long remote_id,
-      Project project, User user, int estimatedWorkhours) {
+      Project project, User user, long estimatedWorkhours) {
     this._id = _id;
     this.name = name;
     this.workspace = workspace;

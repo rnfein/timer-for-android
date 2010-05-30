@@ -1,8 +1,12 @@
 import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.DeletedTasks;
+import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
+import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Users;
 import com.apprise.toggl.storage.DatabaseAdapter.Workspaces;
 import com.apprise.toggl.storage.models.DeletedTask;
+import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
@@ -334,9 +338,9 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertNotNull(allTasks);
     assertEquals(2, allTasks.getCount());
     allTasks.moveToFirst();
-    assertEquals(task1._id, allTasks.getLong(allTasks.getColumnIndex(Projects._ID)));
+    assertEquals(task1._id, allTasks.getLong(allTasks.getColumnIndex(Tasks._ID)));
     allTasks.moveToNext();
-    assertEquals(task2._id, allTasks.getLong(allTasks.getColumnIndex(Projects._ID)));
+    assertEquals(task2._id, allTasks.getLong(allTasks.getColumnIndex(Tasks._ID)));
   }
   
   public void testUpdateTask() {
@@ -377,10 +381,125 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     
     assertNull(dbAdapter.findTask(createdTask._id));
 
-    DeletedTask deletedTask = dbAdapter.findDeletedTaskByRemoteId(remoteId);
+    DeletedTask deletedTask = dbAdapter.findDeletedTask(remoteId);
     assertNotNull(deletedTask);
     assertEquals(remoteId, deletedTask.taskRemoteId);
   }
+  
+  public void testDeleteDeletedTask() {
+    Task taskContents = new Task(); 
+    taskContents.id = 456;
+    Task createdTask = dbAdapter.createTask(taskContents);
+    dbAdapter.deleteTask(createdTask);
+
+    DeletedTask deletedTask = dbAdapter.findDeletedTask(createdTask.id);
+    assertNotNull(deletedTask);
+    dbAdapter.deleteDeletedTask(deletedTask._id);
+    assertNull(dbAdapter.findDeletedTask(deletedTask.taskRemoteId));
+  }
+  
+  public void testFindAllDeletedTasks() {
+    Task taskContents1 = new Task(); 
+    taskContents1.id = 456;
+    Task createdTask1 = dbAdapter.createTask(taskContents1);
+    dbAdapter.deleteTask(createdTask1);
+
+    Task taskContents2 = new Task(); 
+    taskContents2.id = 789;
+    Task createdTask2 = dbAdapter.createTask(taskContents2);
+    dbAdapter.deleteTask(createdTask2);
+    
+    Cursor allDeletedTasks = dbAdapter.findAllDeletedTasks();
+    assertNotNull(allDeletedTasks);
+    assertEquals(2, allDeletedTasks.getCount());
+    allDeletedTasks.moveToFirst();
+    assertEquals(createdTask1.id, allDeletedTasks.getLong(allDeletedTasks.getColumnIndex(DeletedTasks.TASK_REMOTE_ID)));
+    allDeletedTasks.moveToNext();
+    assertEquals(createdTask2.id, allDeletedTasks.getLong(allDeletedTasks.getColumnIndex(DeletedTasks.TASK_REMOTE_ID)));
+  }
+  
+  public void testCreatePlannedTask() {
+    PlannedTask plannedTaskContents = new PlannedTask();
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    Project project = dbAdapter.createProject(new Project());
+    plannedTaskContents.id = 123;
+    plannedTaskContents.workspace = workspace;
+    plannedTaskContents.project = project;
+    PlannedTask createdPlannedTask = dbAdapter.createPlannedTask(plannedTaskContents);
+    
+    assertNotNull(createdPlannedTask);
+    assertEquals(123, createdPlannedTask.id);
+    assertEquals(workspace._id, createdPlannedTask.workspace._id);
+    assertEquals(project._id, createdPlannedTask.project._id);    
+  }
+  
+  public void testFindPlannedTask() {
+    PlannedTask plannedTaskContents = new PlannedTask();
+    PlannedTask createdPlannedTask = dbAdapter.createPlannedTask(plannedTaskContents);
+    
+    PlannedTask foundPlannedTask = dbAdapter.findPlannedTask(createdPlannedTask._id);
+    assertNotNull(foundPlannedTask);
+    assertEquals(createdPlannedTask._id, foundPlannedTask._id);
+  }
+  
+  public void testFindPlannedTaskByRemoteId() {
+    PlannedTask plannedTaskContents = new PlannedTask();
+    plannedTaskContents.id = 321;
+    PlannedTask createdPlannedTask = dbAdapter.createPlannedTask(plannedTaskContents);
+    
+    PlannedTask foundPlannedTask = dbAdapter.findPlannedTaskByRemoteId(createdPlannedTask.id);
+    assertNotNull(foundPlannedTask);
+    assertEquals(createdPlannedTask._id, foundPlannedTask._id);
+    assertEquals(createdPlannedTask.id, foundPlannedTask.id);
+  }
+  
+  public void testFindAllPlannedTasks() {
+    PlannedTask plannedTask1 = dbAdapter.createPlannedTask(new PlannedTask());
+    PlannedTask plannedTask2 = dbAdapter.createPlannedTask(new PlannedTask());
+    
+    assertNotNull(plannedTask1);
+    assertNotNull(plannedTask2);
+    
+    Cursor allPlannedTasks = dbAdapter.findAllPlannedTasks();
+    assertNotNull(allPlannedTasks);
+    assertEquals(2, allPlannedTasks.getCount());
+    allPlannedTasks.moveToFirst();
+    assertEquals(plannedTask1._id, allPlannedTasks.getLong(allPlannedTasks.getColumnIndex(PlannedTasks._ID)));
+    allPlannedTasks.moveToNext();
+    assertEquals(plannedTask2._id, allPlannedTasks.getLong(allPlannedTasks.getColumnIndex(PlannedTasks._ID)));
+  }  
+
+  public void testUpdatePlannedTask() {
+    PlannedTask plannedTask = dbAdapter.createPlannedTask(new PlannedTask());
+    Project project = dbAdapter.createProject(new Project());
+    Workspace workspace = dbAdapter.createWorkspace(new Workspace());
+    User user = dbAdapter.createUser(new User());
+    assertEquals(0l, plannedTask.id);
+    
+    plannedTask.id = 2;
+    plannedTask.estimated_workhours = 120;
+    plannedTask.name = "refactoring";
+    plannedTask.project = project;
+    plannedTask.workspace = workspace;
+    plannedTask.user = user;
+   
+    dbAdapter.updatePlannedTask(plannedTask);
+    
+    PlannedTask foundPlannedTask = dbAdapter.findPlannedTask(plannedTask._id);
+    assertEquals(2, foundPlannedTask.id);
+    assertEquals(120, foundPlannedTask.estimated_workhours);
+    assertEquals("refactoring", foundPlannedTask.name);
+    assertEquals(project._id, foundPlannedTask.project._id);
+    assertEquals(workspace._id, foundPlannedTask.workspace._id);
+    assertEquals(user._id, foundPlannedTask.user._id);
+  }
+  
+  public void testDeletePlannedTask() {
+    PlannedTask createdPlannedTask = dbAdapter.createPlannedTask(new PlannedTask());
+    dbAdapter.deletePlannedTask(createdPlannedTask._id);
+    
+    assertNull(dbAdapter.findPlannedTask(createdPlannedTask._id));
+  }  
 }
 
 
