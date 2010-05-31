@@ -14,7 +14,7 @@
     <activity
       android:name="AccountActivity"
       android:label="@string/app_name"
-      android:screenOrientation="portrait">
+      android:screenOrientation="portrait"/>
     <activity
       android:name="WelcomeActivity"
       android:label="@string/app_name">
@@ -24,7 +24,6 @@
       </intent-filter>    
     </activity>
     <activity android:name="TasksActivity"/>
-    <activity android:name="AccountActivity"/>    
     <activity android:name="SignUpActivity"/>
     <service android:enabled="true" android:name=".remote.SyncService" />
   </application>
