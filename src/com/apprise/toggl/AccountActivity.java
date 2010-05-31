@@ -6,8 +6,6 @@ import com.apprise.toggl.storage.CurrentUser;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,8 +37,8 @@ public class AccountActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     
     app = (Toggl) getApplication();
-    webApi = new TogglWebApi(handler, currentUser().api_token);
-    
+    webApi = new TogglWebApi(currentUser().api_token);
+
     setContentView(R.layout.account);
 
     initViews();
@@ -93,9 +91,7 @@ public class AccountActivity extends ApplicationActivity {
     loginButton.setOnClickListener(new View.OnClickListener() {
 
       public void onClick(View v) {
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
-        webApi.authenticateWithCredentials(email, password);
+        new Thread(authenticateInBackground).start();
       }
     });
 
@@ -113,21 +109,21 @@ public class AccountActivity extends ApplicationActivity {
     startActivity(new Intent(AccountActivity.this, TasksActivity.class));
   }
   
-  protected Handler handler = new Handler() {
+  protected Runnable authenticateInBackground = new Runnable() {
+    
+    public void run() {
+      String email = emailEditText.getText().toString();
+      String password = passwordEditText.getText().toString();
+      boolean success = webApi.authenticateWithCredentials(email, password);
 
-    @Override
-    public void handleMessage(Message msg) {
-      switch(msg.what) {
-      case TogglWebApi.HANDLER_AUTH_PASSED:
-        Log.d(TAG, "user:" + currentUser());
+      if (success) {
+        Log.d(TAG, "CurrentUser: " + currentUser().toString());
         app.storeAPIToken(currentUser().api_token);
         startTasksActivity();
-        break;
-      case TogglWebApi.HANDLER_AUTH_FAILED:
-        Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
-        break;
+      } else {
+        Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();        
       }
     }
-    
-  };  
+  };
+  
 }
