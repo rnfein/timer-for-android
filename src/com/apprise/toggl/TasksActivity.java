@@ -22,11 +22,7 @@ import android.widget.SimpleCursorAdapter;
 
 public class TasksActivity extends ListActivity {
 
-  private static final String TAG = "TasksActivity";
-  
-  public static final int DEFAULT_CATEGORY = 0;
-  public static final int REFRESH_TASKS_OPTION = Menu.FIRST;
-  public static final int TO_ACCOUNT_OPTION = Menu.FIRST + 1; 
+  private static final String TAG = "TasksActivity"; 
   
   private Toggl app;
   private DatabaseAdapter dbAdapter;
@@ -99,20 +95,18 @@ public class TasksActivity extends ListActivity {
   
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    super.onCreateOptionsMenu(menu);
-    menu.add(DEFAULT_CATEGORY, REFRESH_TASKS_OPTION, Menu.NONE, R.string.refresh).setIcon(android.R.drawable.ic_menu_preferences);
-    menu.add(DEFAULT_CATEGORY, TO_ACCOUNT_OPTION, Menu.NONE, R.string.account).setIcon(android.R.drawable.ic_menu_preferences);
-    return true;
+    getMenuInflater().inflate(R.menu.tasks_menu, menu);
+    return super.onCreateOptionsMenu(menu);
   }   
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case REFRESH_TASKS_OPTION:
+      case R.id.tasks_menu_refresh:
         setProgressBarIndeterminateVisibility(true);
         new Thread(refreshTasksInBackgrond).start();
         return true;
-      case TO_ACCOUNT_OPTION:
+      case R.id.tasks_menu_account:
         startActivity(new Intent(this, AccountActivity.class));
         return true;
     }

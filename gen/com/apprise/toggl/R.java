@@ -17,18 +17,27 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int create_account=0x7f060000;
-        public static final int email=0x7f060001;
-        public static final int login=0x7f060003;
-        public static final int password=0x7f060002;
-        public static final int task_item_description=0x7f060005;
-        public static final int task_item_duration=0x7f060004;
+        public static final int account_menu_log_out=0x7f070006;
+        public static final int create_account=0x7f070000;
+        public static final int email=0x7f070001;
+        public static final int login=0x7f070003;
+        public static final int password=0x7f070002;
+        public static final int signup_menu_return=0x7f070007;
+        public static final int task_item_description=0x7f070005;
+        public static final int task_item_duration=0x7f070004;
+        public static final int tasks_menu_account=0x7f070009;
+        public static final int tasks_menu_refresh=0x7f070008;
     }
     public static final class layout {
         public static final int account=0x7f030000;
         public static final int main=0x7f030001;
         public static final int task_item=0x7f030002;
         public static final int tasks=0x7f030003;
+    }
+    public static final class menu {
+        public static final int account_menu=0x7f060000;
+        public static final int signup_menu=0x7f060001;
+        public static final int tasks_menu=0x7f060002;
     }
     public static final class string {
         public static final int account=0x7f050002;
