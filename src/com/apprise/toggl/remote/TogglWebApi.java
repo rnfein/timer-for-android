@@ -71,10 +71,8 @@ public class TogglWebApi {
   * If successful, then logs in the user and returns true. 
   */
   public boolean authenticateWithToken(final String apiToken) {
-    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-    params.add(new BasicNameValuePair(API_TOKEN, apiToken));
-
-    return userAuthentication(params);
+    this.apiToken = apiToken;
+    return userAuthentication(paramsWithApiToken());
   }
   
   private boolean userAuthentication(ArrayList<NameValuePair> params) {
@@ -104,7 +102,8 @@ public class TogglWebApi {
    * Synchronous.
    */
   public List<Task> fetchTasks() {
-    // TODO: generic maybe create auth: userAuthentication(paramsWithAuthToken());
+    // TODO: only authenticate when a session is missing, when cookies are not set
+    userAuthentication(paramsWithApiToken());
     HttpResponse response = executeGetRequest(TASKS_URL);
     
     if(ok(response)) {
@@ -159,7 +158,6 @@ public class TogglWebApi {
       return null;
     }
   }
-
   
   protected void createHttpClient() {
     httpClient = new DefaultHttpClient();
@@ -186,6 +184,12 @@ public class TogglWebApi {
     }
   }
 
+  protected ArrayList<NameValuePair> paramsWithApiToken() {
+    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+    params.add(new BasicNameValuePair(API_TOKEN, apiToken));
+    return params;
+  }
+  
   protected boolean ok(HttpResponse response) {
     return response != null
         && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
