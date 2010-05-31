@@ -14,7 +14,8 @@ public final class R {
         public static final int blue_text=0x7f040000;
     }
     public static final class drawable {
-        public static final int icon=0x7f020000;
+        public static final int bg=0x7f020000;
+        public static final int icon=0x7f020001;
     }
     public static final class id {
         public static final int account_menu_log_out=0x7f070006;
