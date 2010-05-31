@@ -46,7 +46,7 @@ public class Task extends Model {
     return task;
   }
 
-  public boolean identicalTo(Syncable other) {
+  public boolean identicalTo(Model other) {
     Task otherTask = (Task) other;
 
     boolean diff = project.id == otherTask.project.id &&
@@ -61,7 +61,7 @@ public class Task extends Model {
     return diff;    
   }
 
-  public void updateAttributes(Syncable other) {
+  public void updateAttributes(Model other) {
     Task otherTask = (Task) other;
     project = otherTask.project;
     workspace = otherTask.workspace;

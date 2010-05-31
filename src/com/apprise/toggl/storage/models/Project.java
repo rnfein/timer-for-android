@@ -47,7 +47,7 @@ public class Project extends Model {
     return project;
   }
 
-  public boolean identicalTo(Syncable other) {
+  public boolean identicalTo(Model other) {
     Project otherProject = (Project) other;
     
     boolean diff = fixed_fee == otherProject.fixed_fee && 
@@ -62,7 +62,7 @@ public class Project extends Model {
     return diff;
   }
 
-  public void updateAttributes(Syncable other) {
+  public void updateAttributes(Model other) {
     Project otherProject = (Project) other;
     fixed_fee = otherProject.fixed_fee;
     estimated_workhours = otherProject.estimated_workhours;
