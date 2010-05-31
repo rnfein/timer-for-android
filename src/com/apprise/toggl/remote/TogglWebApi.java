@@ -143,7 +143,7 @@ public class TogglWebApi {
    */
   public List<Task> fetchTasks() {
     // TODO: generic maybe create auth: userAuthentication(paramsWithAuthToken());
-    HttpResponse response = executeGetRequest(TASKS_URL, null);
+    HttpResponse response = executeGetRequest(TASKS_URL);
     
     if(ok(response)) {
         Gson gson = new Gson();
@@ -155,6 +155,10 @@ public class TogglWebApi {
     }
   }
 
+  protected HttpResponse executeGetRequest(String url) {
+    return executeGetRequest(url, new ArrayList<NameValuePair>());
+  }
+  
   protected HttpResponse executeGetRequest(String url,
       ArrayList<NameValuePair> params) {
     StringBuilder uriBuilder = new StringBuilder(url);
