@@ -1,17 +1,18 @@
 package com.apprise.toggl;
 
-import com.apprise.toggl.remote.TogglWebApi;
+import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
 
 import android.app.ListActivity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,9 +27,10 @@ public class TasksActivity extends ListActivity {
   public static final int TO_ACCOUNT_OPTION = Menu.FIRST + 1; 
   
   private Toggl app;
-  private TogglWebApi webApi;
   private DatabaseAdapter dbAdapter;
   private SimpleCursorAdapter cursorAdapter;
+  private Cursor tasksCursor;
+  private SyncService syncService;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -36,36 +38,45 @@ public class TasksActivity extends ListActivity {
     setContentView(R.layout.tasks);
 
     app = (Toggl) getApplication();
-    webApi = new TogglWebApi(handler, currentUser().api_token);
-    dbAdapter = new DatabaseAdapter(this);
-    
+
     getUserAndPopulateList();
+  }
+  
+  protected void init() {
+    dbAdapter = new DatabaseAdapter(this);
+    Intent intent = new Intent(this, SyncService.class);
+    bindService(intent, syncConnection, BIND_AUTO_CREATE);
+    populateList();
   }
   
   public void getUserAndPopulateList() {
     if (CurrentUser.isLoggedIn()) {
       Log.d(TAG, "***getUserAndPopulate: User is logged in");
-      populateList();
+      init();
     } else if (app.getAPIToken() != null) {
-      String apiToken = app.getAPIToken();
-      Log.d(TAG, "***getUserAndPopulate: Token is provided");      
-      webApi.authenticateWithToken(apiToken); //background thread, populateList is called in handler      
+      Log.d(TAG, "***getUserAndPopulate: Token is provided");
+      init();
     } else {
-      Log.d(TAG, "***getUserAndPopulate: Redirect to login");      
+      Log.d(TAG, "***getUserAndPopulate: Redirect to login");
       startActivity(new Intent(this, AccountActivity.class));      
     }
   }
   
   public void populateList() {
     Log.d(TAG, "*** populateList");
-    dbAdapter.open();
-    Cursor tasksCursor = dbAdapter.findAllTasks();
-    
-    String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
-    int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
-    
-    cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
-    setListAdapter(cursorAdapter);
+    if(tasksCursor == null) {
+      dbAdapter.open();
+      tasksCursor = dbAdapter.findAllTasks();
+      
+      String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
+      int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
+      
+      cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
+      setListAdapter(cursorAdapter);
+      dbAdapter.close();
+    } else {
+      cursorAdapter.notifyDataSetChanged();
+    }
   }
   
   @Override
@@ -80,7 +91,7 @@ public class TasksActivity extends ListActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case REFRESH_TASKS_OPTION:
-        //TODO: refresh tasks
+        new Thread(refreshTasksInBackgrond).start();
         return true;
       case TO_ACCOUNT_OPTION:
         startActivity(new Intent(this, AccountActivity.class));
@@ -89,23 +100,24 @@ public class TasksActivity extends ListActivity {
     return super.onOptionsItemSelected(item);
   }  
   
-  
-  protected Handler handler = new Handler() {
-
-    @Override
-    public void handleMessage(Message msg) {
-      switch(msg.what) {
-      case TogglWebApi.HANDLER_AUTH_PASSED:
-        Log.d(TAG, "user:" + currentUser());
-        populateList();
-        break;
-      case TogglWebApi.HANDLER_TASKS_FETCHED:
-        Log.d(TAG, "" + msg.obj);
-        break;
-      }
+  protected ServiceConnection syncConnection = new ServiceConnection() {
+    
+    public void onServiceDisconnected(ComponentName name) {}
+    
+    public void onServiceConnected(ComponentName name, IBinder serviceBinding) {
+      SyncService.SyncBinder binding = (SyncService.SyncBinder) serviceBinding;
+      syncService = binding.getService();
     }
+
   };
   
+  protected Runnable refreshTasksInBackgrond = new Runnable() {
+    
+    public void run() {
+      syncService.syncTasks();
+    }
+  };
+
   protected User currentUser() {
     return CurrentUser.getInstance();
   }
