@@ -37,10 +37,12 @@ import android.database.Cursor;
 import android.os.Binder;
 import android.os.IBinder;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 public class SyncService extends Service {
 
   public static final String SYNC_COMPLETED = "com.apprise.toggl.remote.SYNC_COMPLETED";
+  public static final String TAG = "SyncService";
   
   private Toggl app;
   private TogglWebApi api;
@@ -74,6 +76,7 @@ public class SyncService extends Service {
   }
   
   public void syncTasks() {
+    Log.d(TAG, "#syncTasks starting to sync.");
     dbAdapter.open();
 
     sync(dbAdapter.findAllTasks(), api.fetchTasks(), new SyncProxy() {
@@ -179,6 +182,7 @@ public class SyncService extends Service {
     }
 
     localCursor.close();
+    dbAdapter.close();
   }
   
 }
