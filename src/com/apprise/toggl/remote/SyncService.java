@@ -73,7 +73,7 @@ public class SyncService extends Service {
 
   }
   
-  public void syncTracks() {
+  public void syncTasks() {
     dbAdapter.open();
 
     sync(dbAdapter.findAllTasks(), api.fetchTasks(), new SyncProxy() {
