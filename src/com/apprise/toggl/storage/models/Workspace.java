@@ -1,6 +1,6 @@
 package com.apprise.toggl.storage.models;
 
-public class Workspace {
+public class Workspace extends Model {
 
   public long _id;
   public String name;
@@ -12,6 +12,13 @@ public class Workspace {
     this._id = _id;
     this.name = name;
     this.id = remote_id;
+  }
+
+  public boolean identicalTo(Model other) {
+    return false;
+  }
+
+  public void updateAttributes(Model other) {
   }
   
 }

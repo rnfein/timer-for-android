@@ -23,8 +23,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import com.apprise.toggl.storage.models.Model;
+import com.apprise.toggl.storage.models.PlannedTask;
+import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.storage.models.Workspace;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -39,6 +43,9 @@ public class TogglWebApi {
   private static final String API_URL = BASE_URL + "/api/v1";
   private static final String SESSIONS_URL = API_URL + "/sessions.json";
   private static final String TASKS_URL = API_URL + "/tasks.json";
+  private static final String WORKSPACES_URL = API_URL + "/workspaces.json";
+  private static final String PROJECTS_URL = API_URL + "/projects.json";
+  private static final String PLANNED_TASKS_URL = API_URL + "/planned_tasks.json";
   private static final String EMAIL = "email";
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
@@ -80,22 +87,36 @@ public class TogglWebApi {
     return null;
   }
   
-  /**
-   * Fetches all tasks through the API.
-   * Returns a list of tasks if the request is successful,
-   * otherwise null.
-   */
-  public List<Task> fetchTasks() {
-    if (getSession()) {
-      HttpResponse response = executeGetRequest(TASKS_URL);
+  public List<Workspace> fetchWorkspaces() {
+    Type collectionType = new TypeToken<LinkedList<Workspace>>() {}.getType();
+    return (List<Workspace>) makeApiGetRequest(collectionType, WORKSPACES_URL);    
+  }
+  
+  public List<Project> fetchProjects() {
+    Type collectionType = new TypeToken<LinkedList<Project>>() {}.getType();
+    return (List<Project>) makeApiGetRequest(collectionType, PLANNED_TASKS_URL);
+  }
+  
+  public List<PlannedTask> fetchPlannedTasks() {
+    Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
+    return (List<PlannedTask>) makeApiGetRequest(collectionType, PROJECTS_URL);
+  }
 
+  public List<Task> fetchTasks() {
+    Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
+    return (List<Task>) makeApiGetRequest(collectionType, TASKS_URL);    
+  }
+  
+  private List<? extends Model> makeApiGetRequest(Type collectionType, String url) {
+    if (getSession()) {
+      HttpResponse response = executeGetRequest(url);
+      
       if (ok(response)) {
         Gson gson = new Gson();
-        Type collectionType = new TypeToken<LinkedList<Task>>() {
-        }.getType();
+        Log.d(TAG, "TogglWebApi#fetchPlannedTasks got a successful response");
         return gson.fromJson(getResponseReader(response), collectionType);
       } else {
-        Log.e(TAG, "TogglWebApi#fetchTasks got a failed request: "
+        Log.e(TAG, "TogglWebApi#fetchProjects got a failed request: "
             + response.getStatusLine().getStatusCode());
         return null;
       }

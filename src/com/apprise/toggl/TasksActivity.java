@@ -24,7 +24,6 @@ public class TasksActivity extends ListActivity {
 
   private static final String TAG = "TasksActivity"; 
   
-  private Toggl app;
   private DatabaseAdapter dbAdapter;
   private SimpleCursorAdapter cursorAdapter;
   private Cursor tasksCursor;
@@ -36,8 +35,6 @@ public class TasksActivity extends ListActivity {
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
-
-    app = (Toggl) getApplication();
 
     init();
   }

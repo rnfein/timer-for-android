@@ -1,6 +1,6 @@
 package com.apprise.toggl.storage.models;
 
-public class PlannedTask {
+public class PlannedTask extends Model {
   
   public long _id;
   public String name;
@@ -22,5 +22,11 @@ public class PlannedTask {
     this.user = user;
     this.estimated_workhours = estimatedWorkhours;
   }
+
+  public boolean identicalTo(Model other) {
+    return false;
+  }
+
+  public void updateAttributes(Model other) { }
   
 }
