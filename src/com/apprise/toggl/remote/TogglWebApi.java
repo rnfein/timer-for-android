@@ -142,6 +142,7 @@ public class TogglWebApi {
    * Synchronous.
    */
   public List<Task> fetchTasks() {
+    // TODO: generic maybe create auth: userAuthentication(paramsWithAuthToken());
     HttpResponse response = executeGetRequest(TASKS_URL, paramsWithAuthToken());
     
     if(ok(response)) {
@@ -186,7 +187,6 @@ public class TogglWebApi {
 
   protected HttpResponse execute(HttpRequestBase request) {
     try {
-      setUserPasswordCredentials();
       return httpClient.execute(request);
     } catch (final IOException e) {
       Log.d(TAG, "IOException when performing remote request", e);
