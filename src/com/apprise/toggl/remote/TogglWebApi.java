@@ -143,7 +143,7 @@ public class TogglWebApi {
    */
   public List<Task> fetchTasks() {
     // TODO: generic maybe create auth: userAuthentication(paramsWithAuthToken());
-    HttpResponse response = executeGetRequest(TASKS_URL, paramsWithAuthToken());
+    HttpResponse response = executeGetRequest(TASKS_URL, null);
     
     if(ok(response)) {
         Gson gson = new Gson();
@@ -213,12 +213,6 @@ public class TogglWebApi {
   
   protected void runInBackground(Runnable runnable) {
     new Thread(runnable).start();
-  }
-  
-  protected ArrayList<NameValuePair> paramsWithAuthToken() {
-    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-    params.add(new BasicNameValuePair(API_TOKEN, apiToken));
-    return params;
   }
 
   protected InputStreamReader getResponseReader(HttpResponse response) {
