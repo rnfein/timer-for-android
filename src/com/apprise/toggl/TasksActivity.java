@@ -39,7 +39,7 @@ public class TasksActivity extends ListActivity {
 
     app = (Toggl) getApplication();
 
-    getUserAndPopulateList();
+    init();
   }
   
   @Override
@@ -60,19 +60,6 @@ public class TasksActivity extends ListActivity {
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);
     populateList();
-  }
-  
-  public void getUserAndPopulateList() {
-    if (app.getCurrentUser() != null) {
-      Log.d(TAG, "***getUserAndPopulate: User is logged in");
-      init();
-    } else if (app.getAPIToken() != null) {
-      Log.d(TAG, "***getUserAndPopulate: Token is provided");
-      init();
-    } else {
-      Log.d(TAG, "***getUserAndPopulate: Redirect to login");
-      startActivity(new Intent(this, AccountActivity.class));      
-    }
   }
   
   public void populateList() {
