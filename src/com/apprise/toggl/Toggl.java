@@ -1,5 +1,7 @@
 package com.apprise.toggl;
 
+import com.apprise.toggl.storage.models.User;
+
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -11,6 +13,7 @@ public class Toggl extends Application {
 
   private Toggl singleton;
   private SharedPreferences settings;
+  private User currentUser;
 
   public Toggl getInstance() {
     return singleton;
@@ -24,6 +27,18 @@ public class Toggl extends Application {
 
   public String getAPIToken() {
     return settings.getString(PREF_API_TOKEN, null);
+  }
+  
+  public User getCurrentUser() {
+    return currentUser;
+  }
+  
+  public void setCurrentUser(User user) {
+    currentUser = user;
+  }
+  
+  public void clearCurrentUser() {
+    currentUser = null;
   }
 
   @Override

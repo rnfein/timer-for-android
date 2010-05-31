@@ -8,14 +8,14 @@
     android:name="Toggl"
     android:icon="@drawable/icon" 
     android:label="@string/app_name">
-    <activity android:name="TasksActivity"
+    <activity android:name="TasksActivity"/>
+    <activity android:name="AccountActivity"
       android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
+      </intent-filter>    
     </activity>
-    <activity android:name="AccountActivity"/>
     <service android:enabled="true" android:name=".remote.SyncService" />
   </application>
 </manifest>

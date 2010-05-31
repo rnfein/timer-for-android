@@ -12,19 +12,17 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.google.gson.Gson;
@@ -51,14 +49,9 @@ public class TogglWebApi {
   public TogglWebApi(String apiToken) {
     this.apiToken = apiToken;
     createHttpClient();
-    setUserPasswordCredentials();
   }
 
-  /**
-   * Creates an authenticated session with username and password.
-   * If successful, then logs in the user and returns true. 
-   */
-  public boolean authenticateWithCredentials(final String email, final String password) {
+  public User authenticateWithCredentials(final String email, final String password) {
     ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
     params.add(new BasicNameValuePair(EMAIL, email));
     params.add(new BasicNameValuePair(PASSWORD, password));
@@ -66,16 +59,12 @@ public class TogglWebApi {
     return userAuthentication(params);
   }
 
-  /**
-  * Creates an authenticated session with the api token.
-  * If successful, then logs in the user and returns true. 
-  */
-  public boolean authenticateWithToken(final String apiToken) {
+  public User authenticateWithToken(final String apiToken) {
     this.apiToken = apiToken;
     return userAuthentication(paramsWithApiToken());
   }
   
-  private boolean userAuthentication(ArrayList<NameValuePair> params) {
+  private User userAuthentication(ArrayList<NameValuePair> params) {
     HttpResponse response = executePostRequest(SESSIONS_URL, params);
 
     if (ok(response)) {
@@ -83,37 +72,47 @@ public class TogglWebApi {
       User user = gson.fromJson(getResponseReader(response), User.class);            
       Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response for user: " + user.toString());
       this.apiToken = user.api_token;
-      // FIXME: if cookies are set, then user/password credentials are not needed
-      setUserPasswordCredentials();
-      CurrentUser.logIn(user);
-      return true;
+      return user;
     } else {
       int statusCode = response.getStatusLine().getStatusCode();
       Log.e(TAG, "TogglWebApi#AuthenticateWithToken got a failed request: " + statusCode);
     }
-    return false;
+    return null;
   }
   
   /**
    * Fetches all tasks through the API.
    * Returns a list of tasks if the request is successful,
    * otherwise null.
-   * 
-   * Synchronous.
    */
   public List<Task> fetchTasks() {
-    // TODO: only authenticate when a session is missing, when cookies are not set
-    userAuthentication(paramsWithApiToken());
-    HttpResponse response = executeGetRequest(TASKS_URL);
-    
-    if(ok(response)) {
+    if (getSession()) {
+      HttpResponse response = executeGetRequest(TASKS_URL);
+
+      if (ok(response)) {
         Gson gson = new Gson();
-        Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
+        Type collectionType = new TypeToken<LinkedList<Task>>() {
+        }.getType();
         return gson.fromJson(getResponseReader(response), collectionType);
+      } else {
+        Log.e(TAG, "TogglWebApi#fetchTasks got a failed request: "
+            + response.getStatusLine().getStatusCode());
+        return null;
+      }
     } else {
-      Log.e(TAG, "TogglWebApi#fetchTasks got a failed request: " + response.getStatusLine().getStatusCode());
       return null;
     }
+  }
+  
+  /*
+   * Authenticate if session cookies are missing
+   * */
+  private boolean getSession() {
+    for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
+      if (cookie.getName().equals("_toggl_session"))
+        return true;
+    }
+    return (userAuthentication(paramsWithApiToken()) != null);    
   }
 
   protected HttpResponse executeGetRequest(String url) {
@@ -167,13 +166,6 @@ public class TogglWebApi {
     HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
     ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);
   }
-
-  protected void setUserPasswordCredentials() {
-    if (apiToken != null) {
-      UsernamePasswordCredentials creds = new UsernamePasswordCredentials(apiToken, API_TOKEN);
-      httpClient.getCredentialsProvider().setCredentials(new AuthScope(BASE_URL, 80, AuthScope.ANY_REALM), creds);    
-    }
-  }  
   
   protected InputStreamReader getResponseReader(HttpResponse response) {
     try {
