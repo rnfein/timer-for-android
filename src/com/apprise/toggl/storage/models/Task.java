@@ -49,8 +49,9 @@ public class Task extends Model {
   public boolean identicalTo(Model other) {
     Task otherTask = (Task) other;
 
-    boolean diff = project.id == otherTask.project.id &&
-    workspace.id == otherTask.id &&
+    // TODO: add diffs for relations
+    boolean diff = /* project.id == otherTask.project.id && */
+    /* workspace.id == otherTask.id && */
     duration == otherTask.duration &&
     start.equals(otherTask.start) &&
     billable == otherTask.billable &&
