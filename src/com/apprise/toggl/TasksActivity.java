@@ -7,8 +7,11 @@ import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
 
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -40,6 +43,19 @@ public class TasksActivity extends ListActivity {
     app = (Toggl) getApplication();
 
     getUserAndPopulateList();
+  }
+  
+  @Override
+  protected void onResume() {
+    IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
+    registerReceiver(updateReceiver, filter);
+    super.onResume();
+  }
+  
+  @Override
+  protected void onPause() {
+    unregisterReceiver(updateReceiver);
+    super.onPause();
   }
   
   protected void init() {
@@ -115,6 +131,14 @@ public class TasksActivity extends ListActivity {
     
     public void run() {
       syncService.syncTasks();
+    }
+  };
+  
+  protected BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      populateList();
     }
   };
 

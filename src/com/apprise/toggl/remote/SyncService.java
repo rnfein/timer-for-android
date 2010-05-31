@@ -183,6 +183,12 @@ public class SyncService extends Service {
 
     localCursor.close();
     dbAdapter.close();
+    broadcastSyncCompleted();
+  }
+
+  private void broadcastSyncCompleted() {
+    Intent intent = new Intent(SYNC_COMPLETED);
+    sendBroadcast(intent);
   }
   
 }
