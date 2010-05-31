@@ -4,7 +4,6 @@ import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.CurrentUser;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,7 +25,6 @@ public class AccountActivity extends ApplicationActivity {
   private Toggl app;
 
   private static final String TAG = "AccountActivity";
-  private static final String CREATE_NEW_ACCOUNT_URL = "https://www.toggl.com/signup";
   
   public static final int DEFAULT_CATEGORY = 0;
   public static final int LOG_OUT_OPTION = Menu.FIRST;
@@ -98,9 +96,8 @@ public class AccountActivity extends ApplicationActivity {
     createNewAccount.setOnClickListener(new View.OnClickListener() {
 
       public void onClick(View v) {
-        Uri uri = Uri.parse(CREATE_NEW_ACCOUNT_URL);
-        Intent i = new Intent("android.intent.action.VIEW", uri);
-        startActivity(i);
+        Intent intent = new Intent(AccountActivity.this, SignUpActivity.class);
+        startActivity(intent);
       }
     });
   }
