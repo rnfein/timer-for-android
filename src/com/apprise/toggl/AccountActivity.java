@@ -1,7 +1,7 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
-import com.apprise.toggl.storage.CurrentUser;
+import com.apprise.toggl.storage.models.User;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,7 +35,7 @@ public class AccountActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     
     app = (Toggl) getApplication();
-    webApi = new TogglWebApi(currentUser().api_token);
+    webApi = new TogglWebApi(app.getAPIToken());
 
     setContentView(R.layout.account);
 
@@ -61,8 +61,7 @@ public class AccountActivity extends ApplicationActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case LOG_OUT_OPTION:
-        CurrentUser.logOut();
-        app.storeAPIToken(null);
+        app.logOut();
         initFields();
         return true;
     }
@@ -78,8 +77,8 @@ public class AccountActivity extends ApplicationActivity {
   
   private void initFields() {
     passwordEditText.setText(null);
-    if (CurrentUser.isLoggedIn()) {
-      emailEditText.setText(currentUser().email);
+    if (app.getCurrentUser() != null) {
+      emailEditText.setText(app.getCurrentUser().email);
     } else {
       emailEditText.setText(null);      
     }
@@ -111,11 +110,11 @@ public class AccountActivity extends ApplicationActivity {
     public void run() {
       String email = emailEditText.getText().toString();
       String password = passwordEditText.getText().toString();
-      boolean success = webApi.authenticateWithCredentials(email, password);
+      User user = webApi.authenticateWithCredentials(email, password);
 
-      if (success) {
-        Log.d(TAG, "CurrentUser: " + currentUser().toString());
-        app.storeAPIToken(currentUser().api_token);
+      if (user != null) {
+        app.logIn(user);
+        Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());        
         startTasksActivity();
       } else {
         Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();        
