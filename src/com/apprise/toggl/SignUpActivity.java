@@ -10,8 +10,6 @@ import android.webkit.WebView;
 public class SignUpActivity extends ApplicationActivity {
   
   private static final String SIGNUP_URL = "https://www.toggl.com/signup";
-  private static final int DEFAULT_CATEGORY = 0;
-  private static final int BACK_TO_ACCOUNT_OPTION = Menu.FIRST;
 
   private WebView webView;
   
@@ -27,14 +25,14 @@ public class SignUpActivity extends ApplicationActivity {
   
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    menu.add(DEFAULT_CATEGORY, BACK_TO_ACCOUNT_OPTION, Menu.NONE, R.string.account).setIcon(android.R.drawable.ic_menu_preferences);
+    getMenuInflater().inflate(R.menu.signup_menu, menu );
     return super.onCreateOptionsMenu(menu);
   }
 
   @Override
   public boolean onMenuItemSelected(int featureId, MenuItem item) {
     switch (item.getItemId()) {
-      case BACK_TO_ACCOUNT_OPTION:
+      case R.id.signup_menu_return:
         finish();
         return true;
     }

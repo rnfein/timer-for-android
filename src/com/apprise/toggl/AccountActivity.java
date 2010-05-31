@@ -26,10 +26,6 @@ public class AccountActivity extends ApplicationActivity {
 
   private static final String TAG = "AccountActivity";
   
-  public static final int DEFAULT_CATEGORY = 0;
-  public static final int LOG_OUT_OPTION = Menu.FIRST;
-  
-  /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -52,15 +48,14 @@ public class AccountActivity extends ApplicationActivity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    super.onCreateOptionsMenu(menu);
-    menu.add(DEFAULT_CATEGORY, LOG_OUT_OPTION, Menu.NONE, R.string.log_out).setIcon(android.R.drawable.ic_menu_preferences);
-    return true;
+    getMenuInflater().inflate(R.menu.account_menu, menu);
+    return super.onCreateOptionsMenu(menu);
   }   
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case LOG_OUT_OPTION:
+      case R.id.account_menu_log_out:
         app.logOut();
         initFields();
         return true;
