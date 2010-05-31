@@ -29,6 +29,8 @@ import android.test.suitebuilder.TestSuiteBuilder;
  */
 public class TogglTests extends TestSuite {
 
+  public static final String TEST_DATABASE_NAME = "toggl_test.db";
+  
   public static Test suite() {
     return new TestSuiteBuilder(TogglTests.class).includeAllPackagesUnderHere().build();
   }

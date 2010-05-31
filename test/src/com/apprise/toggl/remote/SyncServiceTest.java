@@ -2,6 +2,7 @@ package com.apprise.toggl.remote;
 
 import java.util.LinkedList;
 
+import com.apprise.toggl.TogglTests;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.DeletedModel;
 import com.apprise.toggl.storage.models.Model;
@@ -15,7 +16,6 @@ import android.util.Log;
 public class SyncServiceTest extends AndroidTestCase {
   
   private static final String TAG = "SyncServiceTest";
-  private final String TEST_DATABASE_NAME = "runner_test.db";
   private DatabaseAdapter dbAdapter;
   
   private SyncService service;
@@ -24,7 +24,7 @@ public class SyncServiceTest extends AndroidTestCase {
   protected void setUp() throws Exception {
     service = new SyncService();
     dbAdapter = new DatabaseAdapter(getContext());
-    dbAdapter.setDatabaseName(TEST_DATABASE_NAME);
+    dbAdapter.setDatabaseName(TogglTests.TEST_DATABASE_NAME);
     dbAdapter.open();
     super.setUp();
   }
@@ -32,7 +32,7 @@ public class SyncServiceTest extends AndroidTestCase {
   @Override
   protected void tearDown() throws Exception {
     dbAdapter.close();
-    getContext().deleteDatabase(TEST_DATABASE_NAME);
+    getContext().deleteDatabase(TogglTests.TEST_DATABASE_NAME);
     super.tearDown();
   }
   
