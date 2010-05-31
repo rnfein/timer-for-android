@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.SimpleCursorAdapter;
 
 public class TasksActivity extends ListActivity {
@@ -38,6 +39,8 @@ public class TasksActivity extends ListActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+    setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
 
     app = (Toggl) getApplication();
@@ -92,6 +95,7 @@ public class TasksActivity extends ListActivity {
       dbAdapter.close();
     } else {
       cursorAdapter.notifyDataSetChanged();
+      setProgressBarIndeterminateVisibility(false);
     }
   }
   
@@ -107,6 +111,7 @@ public class TasksActivity extends ListActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case REFRESH_TASKS_OPTION:
+        setProgressBarIndeterminateVisibility(true);
         new Thread(refreshTasksInBackgrond).start();
         return true;
       case TO_ACCOUNT_OPTION:
