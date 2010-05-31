@@ -26,10 +26,11 @@ public class SignUpActivity extends ApplicationActivity {
     
     webView.setWebChromeClient(new WebChromeClient() {
       public void onProgressChanged(WebView view, int progress) {
-        // progress measures 0 - 10000
-        SignUpActivity.this.setProgress(progress * 1000);
+        // progress measures don't match web client progress measures
+        SignUpActivity.this.setProgress(progress * 100);
       }
     });
+    
     webView.loadUrl(SIGNUP_URL);
   }
 
