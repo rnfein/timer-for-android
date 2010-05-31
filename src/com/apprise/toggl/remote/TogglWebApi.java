@@ -24,26 +24,15 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 public class TogglWebApi {
-
-  private DefaultHttpClient httpClient;
-  private Handler handler;
-  public String apiToken;
-  
-  public static final int HANDLER_AUTH_PASSED = 1;
-  public static final int HANDLER_AUTH_FAILED = 2;
-  public static final int HANDLER_TASKS_FETCHED = 3;
 
   private static final int CONNECTION_TIMEOUT = 30 * 1000; // ms
 
@@ -55,83 +44,56 @@ public class TogglWebApi {
   private static final String EMAIL = "email";
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
-  
-  public TogglWebApi(Handler handler, String apiToken) {
-    this.handler = handler;
-    this.apiToken = apiToken;
-    init();
-  }
 
+  private DefaultHttpClient httpClient;
+  public String apiToken;
+  
   public TogglWebApi(String apiToken) {
     this.apiToken = apiToken;
-    init();
-  }
-  
-  protected void init() {
     createHttpClient();
     setUserPasswordCredentials();
   }
 
   /**
-   * Asynchronous.
-   * Posts message through the handler when done.
+   * Creates an authenticated session with username and password.
+   * If successful, then logs in the user and returns true. 
    */
-  public void authenticateWithCredentials(final String email, final String password) {
-    runInBackground(new Runnable() {
-      
-      public void run() {
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair(EMAIL, email));
-        params.add(new BasicNameValuePair(PASSWORD, password));
+  public boolean authenticateWithCredentials(final String email, final String password) {
+    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+    params.add(new BasicNameValuePair(EMAIL, email));
+    params.add(new BasicNameValuePair(PASSWORD, password));
 
-        userAuthentication(params);
-      }
-    });
+    return userAuthentication(params);
   }
 
   /**
-  * Asynchronous.
-  * Posts message through the handler when done.
+  * Creates an authenticated session with the api token.
+  * If successful, then logs in the user and returns true. 
   */
-  public void authenticateWithToken(final String apiToken) {
-    runInBackground(new Runnable() {
-      
-      public void run() {
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair(API_TOKEN, apiToken));
+  public boolean authenticateWithToken(final String apiToken) {
+    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+    params.add(new BasicNameValuePair(API_TOKEN, apiToken));
 
-        userAuthentication(params);
-      }
-    });
+    return userAuthentication(params);
   }
   
-  private void userAuthentication(ArrayList<NameValuePair> params) {
+  private boolean userAuthentication(ArrayList<NameValuePair> params) {
     HttpResponse response = executePostRequest(SESSIONS_URL, params);
-    String responseContent = null;
 
     if (ok(response)) {
-      Message msg = Message.obtain();      
-      msg.what = HANDLER_AUTH_PASSED;          
-      try {            
-        responseContent = Util.inputStreamToString(response.getEntity().getContent());
-        Gson gson = new Gson();
-        User user = gson.fromJson(responseContent, User.class);            
-        Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response body: " + responseContent);
-        this.apiToken = user.api_token;
-        setUserPasswordCredentials();
-        CurrentUser.logIn(user);
-        msg.obj = user;
-        handler.sendMessage(msg);
-      } catch (IOException e) {
-        Log.d(TAG, "IOException when performing AuthenticationRequest", e);
-      }
+      Gson gson = new Gson();
+      User user = gson.fromJson(getResponseReader(response), User.class);            
+      Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response for user: " + user.toString());
+      this.apiToken = user.api_token;
+      // FIXME: if cookies are set, then user/password credentials are not needed
+      setUserPasswordCredentials();
+      CurrentUser.logIn(user);
+      return true;
     } else {
       int statusCode = response.getStatusLine().getStatusCode();
       Log.e(TAG, "TogglWebApi#AuthenticateWithToken got a failed request: " + statusCode);
-      if (statusCode == 403) {
-        handler.sendEmptyMessage(HANDLER_AUTH_FAILED);
-      }
     }
+    return false;
   }
   
   /**
@@ -215,10 +177,6 @@ public class TogglWebApi {
     }
   }  
   
-  protected void runInBackground(Runnable runnable) {
-    new Thread(runnable).start();
-  }
-
   protected InputStreamReader getResponseReader(HttpResponse response) {
     try {
       return new InputStreamReader(response.getEntity().getContent());      
