@@ -1,10 +1,8 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.SyncService;
-import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
-import com.apprise.toggl.storage.models.User;
 
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -69,7 +67,7 @@ public class TasksActivity extends ListActivity {
   }
   
   public void getUserAndPopulateList() {
-    if (CurrentUser.isLoggedIn()) {
+    if (app.getCurrentUser() != null) {
       Log.d(TAG, "***getUserAndPopulate: User is logged in");
       init();
     } else if (app.getAPIToken() != null) {
@@ -146,9 +144,5 @@ public class TasksActivity extends ListActivity {
       populateList();
     }
   };
-
-  protected User currentUser() {
-    return CurrentUser.getInstance();
-  }
   
 }

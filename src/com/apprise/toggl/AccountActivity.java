@@ -1,7 +1,6 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
-import com.apprise.toggl.storage.CurrentUser;
 import com.apprise.toggl.storage.models.User;
 
 import android.content.Intent;
@@ -64,8 +63,7 @@ public class AccountActivity extends ApplicationActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case LOG_OUT_OPTION:
-        CurrentUser.logOut();
-        app.storeAPIToken(null);
+        app.logOut();
         initFields();
         return true;
     }
@@ -81,7 +79,7 @@ public class AccountActivity extends ApplicationActivity {
   
   private void initFields() {
     passwordEditText.setText(null);
-    if (CurrentUser.isLoggedIn()) {
+    if (app.getCurrentUser() != null) {
       emailEditText.setText(app.getCurrentUser().email);
     } else {
       emailEditText.setText(null);      
@@ -118,8 +116,7 @@ public class AccountActivity extends ApplicationActivity {
       User user = webApi.authenticateWithCredentials(email, password);
 
       if (user != null) {
-        app.storeAPIToken(user.api_token);
-        app.setCurrentUser(user);
+        app.logIn(user);
         Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());        
         startTasksActivity();
       } else {

@@ -40,6 +40,16 @@ public class Toggl extends Application {
   public void clearCurrentUser() {
     currentUser = null;
   }
+  
+  public void logIn(User user) {
+    setCurrentUser(user);
+    storeAPIToken(user.api_token);
+  }
+  
+  public void logOut() {
+    clearCurrentUser();
+    storeAPIToken(null);
+  }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
