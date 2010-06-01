@@ -1,9 +1,10 @@
 package com.apprise.toggl;
 
+import com.apprise.toggl.remote.SyncServiceTest;
+import com.apprise.toggl.storage.DatabaseAdapterTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import android.test.suitebuilder.TestSuiteBuilder;
 
 /**
  * A test suite containing all tests for runner.
@@ -32,6 +33,10 @@ public class TogglTests extends TestSuite {
   public static final String TEST_DATABASE_NAME = "toggl_test.db";
   
   public static Test suite() {
-    return new TestSuiteBuilder(TogglTests.class).includeAllPackagesUnderHere().build();
+    TestSuite suite = new TestSuite();
+    suite.addTestSuite(DatabaseAdapterTest.class);
+    suite.addTestSuite(SyncServiceTest.class);
+    suite.addTestSuite(AccountActivityTests.class);
+    return suite;
   }
 }
