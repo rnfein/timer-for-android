@@ -343,6 +343,7 @@ public class DatabaseAdapter {
     Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { String.valueOf(value) });
 
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
+      cursor.close();
       return null;
     }
     return cursor;
