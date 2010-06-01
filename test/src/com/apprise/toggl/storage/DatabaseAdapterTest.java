@@ -120,6 +120,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(user1._id, allUsers.getLong(allUsers.getColumnIndex(Users._ID)));
     allUsers.moveToNext();
     assertEquals(user2._id, allUsers.getLong(allUsers.getColumnIndex(Users._ID)));
+    allUsers.close();
   }
   
   public void testDeleteUser() {
@@ -172,6 +173,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(workspace1._id, allWorkspaces.getLong(allWorkspaces.getColumnIndex(Workspaces._ID)));
     allWorkspaces.moveToNext();
     assertEquals(workspace2._id, allWorkspaces.getLong(allWorkspaces.getColumnIndex(Workspaces._ID)));
+    allWorkspaces.close();
   }
   
   public void testUpdateWorkspace() {
@@ -248,6 +250,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(project1._id, allProjects.getLong(allProjects.getColumnIndex(Projects._ID)));
     allProjects.moveToNext();
     assertEquals(project2._id, allProjects.getLong(allProjects.getColumnIndex(Projects._ID)));
+    allProjects.close();
   }
   
   public void testUpdateProject() {
@@ -344,6 +347,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(task1._id, allTasks.getLong(allTasks.getColumnIndex(Tasks._ID)));
     allTasks.moveToNext();
     assertEquals(task2._id, allTasks.getLong(allTasks.getColumnIndex(Tasks._ID)));
+    allTasks.close();
   }
   
   public void testUpdateTask() {
@@ -419,6 +423,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(createdTask1.id, allDeletedTasks.getLong(allDeletedTasks.getColumnIndex(DeletedTasks.TASK_REMOTE_ID)));
     allDeletedTasks.moveToNext();
     assertEquals(createdTask2.id, allDeletedTasks.getLong(allDeletedTasks.getColumnIndex(DeletedTasks.TASK_REMOTE_ID)));
+    allDeletedTasks.close();
   }
   
   public void testCreatePlannedTask() {
@@ -470,6 +475,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(plannedTask1._id, allPlannedTasks.getLong(allPlannedTasks.getColumnIndex(PlannedTasks._ID)));
     allPlannedTasks.moveToNext();
     assertEquals(plannedTask2._id, allPlannedTasks.getLong(allPlannedTasks.getColumnIndex(PlannedTasks._ID)));
+    allPlannedTasks.close();
   }  
 
   public void testUpdatePlannedTask() {
