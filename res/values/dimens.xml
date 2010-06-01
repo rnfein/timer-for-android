@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="label_text_size">15dp</dimen>
+  <dimen name="label_padding_top">11dp</dimen>
+  <dimen name="label_padding_left">10dp</dimen>
+  
+  <dimen name="login_edittext_size">15dp</dimen>
+  <dimen name="login_edittext_padding_right">8dp</dimen>
+</resources>

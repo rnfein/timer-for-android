@@ -3,7 +3,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="@drawable/bg">
+    android:background="@drawable/bg"
+    android:paddingTop="25dp"
+    android:paddingRight="15dp"
+    android:paddingBottom="15dp"
+    android:paddingLeft="20dp" >
     <LinearLayout
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -12,43 +16,99 @@
       <TextView
         android:layout_height="fill_parent"
         android:layout_width="wrap_content"
-        android:text="Log in or "/>
+        android:textColor="@color/heading_red"
+        android:text="@string/account"/>
+    </LinearLayout>      
+    <LinearLayout
+      android:orientation="vertical"
+      android:paddingTop="30dp"         
+      android:layout_width="fill_parent"           
+      android:layout_height="wrap_content">
+      <LinearLayout
+        android:background="@drawable/txt_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+	      <TextView
+	          android:layout_width="30dp"
+	          android:layout_height="fill_parent"
+	          android:layout_weight="1"
+            android:textStyle="bold"	          
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/label_padding_left"
+            android:textSize="@dimen/label_text_size"           
+	          android:textColor="@color/black"
+	          android:text="@string/email"/>
+	      <EditText
+	          android:id="@+id/email"
+	          android:layout_width="fill_parent"
+	          android:layout_height="fill_parent"
+	          android:layout_weight="3"
+            android:gravity="center"
+            android:maxWidth="97dp"
+            android:singleLine="true"
+            android:textSize="@dimen/login_edittext_size"
+	          android:background="@color/transparent"
+	          android:paddingRight="@dimen/login_edittext_padding_right"/>        
+      </LinearLayout>      
+      <LinearLayout
+        android:background="@drawable/txt_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+	      <TextView
+            android:layout_width="50dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="@dimen/label_text_size"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/label_padding_left"           
+	          android:textColor="@color/black"          
+	          android:text="@string/password"/>
+	      <EditText
+	          android:id="@+id/password"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:maxWidth="80dp"
+            android:singleLine="true"
+	          android:password="true"
+            android:textSize="@dimen/login_edittext_size"
+            android:paddingRight="@dimen/login_edittext_padding_right"
+	          android:background="@color/transparent"/>        
+      </LinearLayout>
+	    <Button
+	        android:id="@+id/login"
+          android:layout_marginTop="10dp"	        
+	        android:layout_marginRight="4dp"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+          android:textColor="@color/black"	
+	        android:text="@string/log_in" />
+    </LinearLayout>
+    <LinearLayout
+      android:layout_marginTop="60dp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:orientation="horizontal">
       <TextView
         android:layout_height="fill_parent"
         android:layout_width="wrap_content"
-        android:textColor="@color/blue_text"        
-        android:id="@+id/create_account"
-        android:text="Create a new account"/>
-    </LinearLayout>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="E-mail:"/>
-    <EditText
-        android:id="@+id/email"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/editbox_background"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Password:"/>
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:password="true"        
-        android:background="@android:drawable/editbox_background"/>
-    <LinearLayout
-        android:orientation="horizontal"
+        android:textColor="@color/black"
+        android:textStyle="bold"    
+        android:text="@string/log_in"/>
+      <TextView
+        android:layout_height="fill_parent"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-	    <Button
-	        android:id="@+id/login"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-          android:textColor="@color/blue_text"	        
-	        android:layout_marginLeft="10dip"
-	        android:text="Log in" />
-    </LinearLayout>
+        android:textColor="@color/black"        
+        android:text=" or "/>        
+      <TextView
+        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:textColor="@color/light_blue"  
+        android:textStyle="bold"      
+        android:id="@+id/create_account"
+        android:text="@string/create_account"/>
+    </LinearLayout>    
 </LinearLayout>
