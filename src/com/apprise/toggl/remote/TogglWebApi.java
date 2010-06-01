@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -87,27 +86,27 @@ public class TogglWebApi {
     return null;
   }
   
-  public List<Workspace> fetchWorkspaces() {
+  public LinkedList<Workspace> fetchWorkspaces() {
     Type collectionType = new TypeToken<LinkedList<Workspace>>() {}.getType();
-    return (List<Workspace>) makeApiGetRequest(collectionType, WORKSPACES_URL);    
+    return (LinkedList<Workspace>) makeApiGetRequest(collectionType, WORKSPACES_URL);    
   }
   
-  public List<Project> fetchProjects() {
+  public LinkedList<Project> fetchProjects() {
     Type collectionType = new TypeToken<LinkedList<Project>>() {}.getType();
-    return (List<Project>) makeApiGetRequest(collectionType, PLANNED_TASKS_URL);
+    return (LinkedList<Project>) makeApiGetRequest(collectionType, PLANNED_TASKS_URL);
   }
   
-  public List<PlannedTask> fetchPlannedTasks() {
+  public LinkedList<PlannedTask> fetchPlannedTasks() {
     Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
-    return (List<PlannedTask>) makeApiGetRequest(collectionType, PROJECTS_URL);
+    return (LinkedList<PlannedTask>) makeApiGetRequest(collectionType, PROJECTS_URL);
   }
 
-  public List<Task> fetchTasks() {
+  public LinkedList<Task> fetchTasks() {
     Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
-    return (List<Task>) makeApiGetRequest(collectionType, TASKS_URL);    
+    return (LinkedList<Task>) makeApiGetRequest(collectionType, TASKS_URL);    
   }
   
-  private List<? extends Model> makeApiGetRequest(Type collectionType, String url) {
+  private LinkedList<? extends Model> makeApiGetRequest(Type collectionType, String url) {
     if (getSession()) {
       HttpResponse response = executeGetRequest(url);
       
