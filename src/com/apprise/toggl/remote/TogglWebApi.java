@@ -86,21 +86,25 @@ public class TogglWebApi {
     return null;
   }
   
+  @SuppressWarnings("unchecked")
   public LinkedList<Workspace> fetchWorkspaces() {
     Type collectionType = new TypeToken<LinkedList<Workspace>>() {}.getType();
     return (LinkedList<Workspace>) fetchCollection(collectionType, WORKSPACES_URL);    
   }
   
+  @SuppressWarnings("unchecked")
   public LinkedList<Project> fetchProjects() {
     Type collectionType = new TypeToken<LinkedList<Project>>() {}.getType();
     return (LinkedList<Project>) fetchCollection(collectionType, PLANNED_TASKS_URL);
   }
   
+  @SuppressWarnings("unchecked")
   public LinkedList<PlannedTask> fetchPlannedTasks() {
     Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
     return (LinkedList<PlannedTask>) fetchCollection(collectionType, PROJECTS_URL);
   }
 
+  @SuppressWarnings("unchecked")
   public LinkedList<Task> fetchTasks() {
     Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
     return (LinkedList<Task>) fetchCollection(collectionType, TASKS_URL);    
