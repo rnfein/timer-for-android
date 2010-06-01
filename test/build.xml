@@ -71,6 +71,9 @@
             <arg value="am"/>
             <arg value="instrument"/>
             <arg value="-w"/>
+            <arg value="-e"/>
+            <arg value="class"/>
+            <arg value="com.apprise.toggl.TogglTests"/>
             <arg value="com.apprise.toggl.tests/android.test.InstrumentationTestRunner"/>
         </exec>
     </target>
