@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -87,36 +86,40 @@ public class TogglWebApi {
     return null;
   }
   
-  public List<Workspace> fetchWorkspaces() {
+  @SuppressWarnings("unchecked")
+  public LinkedList<Workspace> fetchWorkspaces() {
     Type collectionType = new TypeToken<LinkedList<Workspace>>() {}.getType();
-    return (List<Workspace>) makeApiGetRequest(collectionType, WORKSPACES_URL);    
+    return (LinkedList<Workspace>) fetchCollection(collectionType, WORKSPACES_URL);    
   }
   
-  public List<Project> fetchProjects() {
+  @SuppressWarnings("unchecked")
+  public LinkedList<Project> fetchProjects() {
     Type collectionType = new TypeToken<LinkedList<Project>>() {}.getType();
-    return (List<Project>) makeApiGetRequest(collectionType, PLANNED_TASKS_URL);
+    return (LinkedList<Project>) fetchCollection(collectionType, PLANNED_TASKS_URL);
   }
   
-  public List<PlannedTask> fetchPlannedTasks() {
+  @SuppressWarnings("unchecked")
+  public LinkedList<PlannedTask> fetchPlannedTasks() {
     Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
-    return (List<PlannedTask>) makeApiGetRequest(collectionType, PROJECTS_URL);
+    return (LinkedList<PlannedTask>) fetchCollection(collectionType, PROJECTS_URL);
   }
 
-  public List<Task> fetchTasks() {
+  @SuppressWarnings("unchecked")
+  public LinkedList<Task> fetchTasks() {
     Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
-    return (List<Task>) makeApiGetRequest(collectionType, TASKS_URL);    
+    return (LinkedList<Task>) fetchCollection(collectionType, TASKS_URL);    
   }
   
-  private List<? extends Model> makeApiGetRequest(Type collectionType, String url) {
+  private LinkedList<? extends Model> fetchCollection(Type collectionType, String url) {
     if (getSession()) {
       HttpResponse response = executeGetRequest(url);
       
       if (ok(response)) {
         Gson gson = new Gson();
-        Log.d(TAG, "TogglWebApi#fetchPlannedTasks got a successful response");
+        Log.d(TAG, "TogglWebApi#fetchCollection got a successful response");
         return gson.fromJson(getResponseReader(response), collectionType);
       } else {
-        Log.e(TAG, "TogglWebApi#fetchProjects got a failed request: "
+        Log.e(TAG, "TogglWebApi#fetchCollection got a failed request: "
             + response.getStatusLine().getStatusCode());
         return null;
       }
