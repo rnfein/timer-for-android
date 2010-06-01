@@ -4,6 +4,7 @@
     
     <string name="refresh">Refresh</string>
     <string name="account">Account</string>
+    <string name="tasks">Tasks</string>
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
 
