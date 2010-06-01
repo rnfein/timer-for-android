@@ -52,6 +52,12 @@ public class TasksActivity extends ListActivity {
     super.onPause();
   }
   
+  @Override
+  protected void onDestroy() {
+    unbindService(syncConnection);
+    super.onDestroy();
+  }
+
   protected void init() {
     dbAdapter = new DatabaseAdapter(this);
     Intent intent = new Intent(this, SyncService.class);
