@@ -88,34 +88,34 @@ public class TogglWebApi {
   
   public LinkedList<Workspace> fetchWorkspaces() {
     Type collectionType = new TypeToken<LinkedList<Workspace>>() {}.getType();
-    return (LinkedList<Workspace>) makeApiGetRequest(collectionType, WORKSPACES_URL);    
+    return (LinkedList<Workspace>) fetchCollection(collectionType, WORKSPACES_URL);    
   }
   
   public LinkedList<Project> fetchProjects() {
     Type collectionType = new TypeToken<LinkedList<Project>>() {}.getType();
-    return (LinkedList<Project>) makeApiGetRequest(collectionType, PLANNED_TASKS_URL);
+    return (LinkedList<Project>) fetchCollection(collectionType, PLANNED_TASKS_URL);
   }
   
   public LinkedList<PlannedTask> fetchPlannedTasks() {
     Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
-    return (LinkedList<PlannedTask>) makeApiGetRequest(collectionType, PROJECTS_URL);
+    return (LinkedList<PlannedTask>) fetchCollection(collectionType, PROJECTS_URL);
   }
 
   public LinkedList<Task> fetchTasks() {
     Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
-    return (LinkedList<Task>) makeApiGetRequest(collectionType, TASKS_URL);    
+    return (LinkedList<Task>) fetchCollection(collectionType, TASKS_URL);    
   }
   
-  private LinkedList<? extends Model> makeApiGetRequest(Type collectionType, String url) {
+  private LinkedList<? extends Model> fetchCollection(Type collectionType, String url) {
     if (getSession()) {
       HttpResponse response = executeGetRequest(url);
       
       if (ok(response)) {
         Gson gson = new Gson();
-        Log.d(TAG, "TogglWebApi#fetchPlannedTasks got a successful response");
+        Log.d(TAG, "TogglWebApi#fetchCollection got a successful response");
         return gson.fromJson(getResponseReader(response), collectionType);
       } else {
-        Log.e(TAG, "TogglWebApi#fetchProjects got a failed request: "
+        Log.e(TAG, "TogglWebApi#fetchCollection got a failed request: "
             + response.getStatusLine().getStatusCode());
         return null;
       }
