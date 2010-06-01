@@ -2,19 +2,25 @@ package com.apprise.toggl.remote;
 
 import java.util.LinkedList;
 
+import com.apprise.toggl.Toggl;
 import com.apprise.toggl.TogglTests;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.DeletedModel;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.Task;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.test.AndroidTestCase;
+import android.test.ServiceTestCase;
 import android.util.Log;
 
-public class SyncServiceTest extends AndroidTestCase {
+public class SyncServiceTest extends ServiceTestCase<SyncService> {
   
+  public SyncServiceTest() {
+    super(SyncService.class);
+  }
+
   private static final String TAG = "SyncServiceTest";
   private DatabaseAdapter dbAdapter;
   
@@ -22,7 +28,11 @@ public class SyncServiceTest extends AndroidTestCase {
   
   @Override
   protected void setUp() throws Exception {
-    service = new SyncService();
+    setApplication(new MockToggl());
+    
+    SyncService.SyncBinder binder = (SyncService.SyncBinder) bindService(new Intent(getContext(), SyncService.class));
+    service = binder.getService();
+
     dbAdapter = new DatabaseAdapter(getContext());
     dbAdapter.setDatabaseName(TogglTests.TEST_DATABASE_NAME);
     dbAdapter.open();
@@ -494,6 +504,14 @@ public class SyncServiceTest extends AndroidTestCase {
 
     }
 
+  }
+
+  private class MockToggl extends Toggl {
+    
+    public String getAPIToken() {
+      return null;
+    }
+    
   }
   
 }
