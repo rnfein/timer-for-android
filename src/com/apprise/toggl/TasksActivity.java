@@ -78,37 +78,25 @@ public class TasksActivity extends ListActivity {
   }
   
   public void populateList() {
-    Log.d(TAG, "*** populateList");
-
     int taskRetentionDays = currentUser.task_retention_days;
-
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
-
     String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
     int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
+    String date;
+    
+    dbAdapter.open();
 
-    if (tasksCursor == null) {
-      dbAdapter.open();
-
-      for (int i = 0; i < taskRetentionDays; i++) {
-
-        queryCal.add(Calendar.DATE, -1);
-        tasksCursor = dbAdapter.findTasksByDate(queryCal.getTime());
-
-        cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
-            tasksCursor, fieldsToShow, viewsToFill);
-
-        adapter.addSection("BAA", cursorAdapter);
-        setListAdapter(adapter);
-
-        dbAdapter.close();
-
-      }
-    } else {
-      adapter.notifyDataSetChanged();
-      setProgressBarIndeterminateVisibility(false);
-
+    for (int i = 0; i < taskRetentionDays; i++) {
+      queryCal.add(Calendar.DATE, -1);
+      tasksCursor = dbAdapter.findTasksByDate(queryCal.getTime());
+      cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
+          tasksCursor, fieldsToShow, viewsToFill);
+          date = Util.smallDateString(queryCal.getTime());
+      adapter.addSection(date, cursorAdapter);
     }
+    
+    setListAdapter(adapter);
+    dbAdapter.close();
   }
   
   @Override

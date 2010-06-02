@@ -39,7 +39,7 @@ public class Util {
     return date;
   }
 
-  public static String parseDateToString(Date date) {
+  public static String formatDateToString(Date date) {
     SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     String s = null;
     String dateString = null;
@@ -47,6 +47,11 @@ public class Util {
     //FIXME: hax to get the timezone from "+0300" to "+03:00"
     dateString = s.substring(0, s.length() - 2) + ":" + s.substring(s.length() - 2, s.length());
     return dateString;
+  }
+  
+  public static String smallDateString(Date date) {
+    SimpleDateFormat smallFormat = new SimpleDateFormat("dd. MMM, EEE");    
+    return smallFormat.format(date);
   }
   
   public static Date currentDate() {

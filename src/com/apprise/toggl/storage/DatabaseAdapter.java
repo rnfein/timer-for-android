@@ -235,14 +235,10 @@ public class DatabaseAdapter {
   }
   
   public Cursor findTasksByDate(Date date) {
-    String dateString = Util.parseDateToString(date); 
+    String dateString = Util.formatDateToString(date); 
     Cursor cursor = db.rawQuery("SELECT * FROM " + Tasks.TABLE_NAME + 
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ") = strftime('%Y-%m-%d', ?) ORDER BY start", new String[] { String.valueOf(dateString) });
-    
-    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
-      cursor.close();
-      return null;
-    }
+
     return cursor;
   }  
   

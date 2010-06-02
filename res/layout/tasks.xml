@@ -6,12 +6,11 @@
   android:layout_height="fill_parent"
   android:background="@drawable/bg" 
   android:paddingTop="@dimen/layout_padding_top"
-  android:paddingRight="@dimen/layout_padding_right"
   android:paddingBottom="@dimen/layout_padding_bottom"
   android:paddingLeft="@dimen/layout_padding_left">
   <LinearLayout
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="wrap_content"    
     android:layout_gravity="center_horizontal"
     android:orientation="horizontal">
     <TextView
@@ -23,6 +22,7 @@
   </LinearLayout>
   <LinearLayout
     android:background="@drawable/divider"
+    android:layout_marginRight="20dp"    
     android:layout_marginLeft="10dp"
     android:layout_width="fill_parent"
     android:layout_height="1dp"/> 
@@ -34,8 +34,7 @@
       android:id="@android:id/list"
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
-      android:divider="@drawable/divider"
-      android:dividerHeight="1px"
+      android:divider="@color/transparent"
       android:cacheColorHint="#00000000"/>  
   </LinearLayout>
 </LinearLayout>
