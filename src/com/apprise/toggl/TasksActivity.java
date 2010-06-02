@@ -1,8 +1,12 @@
 package com.apprise.toggl;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
+import com.apprise.toggl.storage.models.User;
 
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -32,6 +36,8 @@ public class TasksActivity extends ListActivity {
   private SimpleCursorAdapter cursorAdapter;
   private Cursor tasksCursor;
   private SyncService syncService;
+  private Toggl app;
+  private User currentUser;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +45,7 @@ public class TasksActivity extends ListActivity {
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
-
+    
     init();
   }
   
@@ -64,6 +70,8 @@ public class TasksActivity extends ListActivity {
 
   protected void init() {
     dbAdapter = new DatabaseAdapter(this);
+    app = (Toggl) getApplication();
+    currentUser = app.getCurrentUser();
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);
     populateList();
@@ -71,22 +79,35 @@ public class TasksActivity extends ListActivity {
   
   public void populateList() {
     Log.d(TAG, "*** populateList");
-    if(tasksCursor == null) {
+
+    int taskRetentionDays = currentUser.task_retention_days;
+
+    Calendar queryCal = (Calendar) Calendar.getInstance().clone();
+
+    String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
+    int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
+
+    if (tasksCursor == null) {
       dbAdapter.open();
-      tasksCursor = dbAdapter.findAllTasks();
-      
-      String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
-      int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
-      
-      cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
-     
-      adapter.addSection("BAA", cursorAdapter);
-      setListAdapter(adapter);
-      
-      dbAdapter.close();
+
+      for (int i = 0; i < taskRetentionDays; i++) {
+
+        queryCal.add(Calendar.DATE, -1);
+        tasksCursor = dbAdapter.findTasksByDate(queryCal.getTime());
+
+        cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
+            tasksCursor, fieldsToShow, viewsToFill);
+
+        adapter.addSection("BAA", cursorAdapter);
+        setListAdapter(adapter);
+
+        dbAdapter.close();
+
+      }
     } else {
       adapter.notifyDataSetChanged();
       setProgressBarIndeterminateVisibility(false);
+
     }
   }
   
