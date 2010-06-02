@@ -7,24 +7,40 @@
   <LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="42dp">
-	  <TextView 
-	    android:id="@+id/task_item_description"
-	    android:layout_width="120dp"
-	    android:layout_height="fill_parent"
-	    android:layout_weight="2"
-	    android:textColor="@color/black"
-	    android:textStyle="bold"       
-	    android:gravity="center_vertical"
-	    android:paddingLeft="@dimen/listitem_padding_left"
-	    android:textSize="@dimen/listitem_text_size"     
-	    android:background="@color/transparent"/>  
+    <LinearLayout
+      android:layout_width="120dp"
+      android:layout_weight="2"      
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:gravity="center_vertical">
+		  <TextView 
+		    android:id="@+id/task_item_description"
+		    android:layout_width="fill_parent"
+		    android:layout_height="24dp"
+		    android:textColor="@color/black"
+		    android:textStyle="bold"       
+		    android:gravity="center_vertical"
+		    android:paddingLeft="@dimen/listitem_padding_left"
+		    android:textSize="@dimen/listitem_text_size"     
+		    android:background="@color/transparent"/>  
+		  <TextView 
+		    android:text="Apprise - Toggl Android"
+		    android:id="@+id/task_item_client_project_name"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/light_gray"
+		    android:gravity="center_vertical"
+		    android:paddingLeft="@dimen/listitem_padding_left"
+		    android:textSize="@dimen/listitem_note_text_size"     
+		    android:background="@color/transparent"/>  
+    </LinearLayout>	    
 		<TextView 
 			android:id="@+id/task_item_duration"
 			android:layout_width="20dp"
 			android:layout_height="fill_parent"
 			android:layout_weight="1"	  
 			android:gravity="center"
-			android:textSize="@dimen/task_time_text_size"
+			android:textSize="@dimen/listitem_note_text_size"
 			android:textColor="@color/light_gray"
 			android:background="@color/transparent"/>
 		<ImageView

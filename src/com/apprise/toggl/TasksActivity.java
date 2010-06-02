@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
 
@@ -79,8 +80,8 @@ public class TasksActivity extends ListActivity {
     Cursor tasksCursor;    
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
-    String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
-    int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
+    String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION, Projects.CLIENT_PROJECT_NAME };
+    int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description, R.id.task_item_client_project_name };
     String date;
     String header_text;
     long duration_total = 0;
@@ -89,7 +90,7 @@ public class TasksActivity extends ListActivity {
 
     for (int i = 0; i < taskRetentionDays; i++) {
       queryCal.add(Calendar.DATE, -1);
-      tasksCursor = dbAdapter.findTasksByDate(queryCal.getTime());
+      tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
       cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());

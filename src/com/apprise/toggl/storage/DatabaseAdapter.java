@@ -234,9 +234,15 @@ public class DatabaseAdapter {
     return task;
   }
   
-  public Cursor findTasksByDate(Date date) {
+  public Cursor findTasksForListByDate(Date date) {
     String dateString = Util.formatDateToString(date); 
-    Cursor cursor = db.rawQuery("SELECT * FROM " + Tasks.TABLE_NAME + 
+    Cursor cursor = db.rawQuery("SELECT " 
+        + Tasks.TABLE_NAME + "." + Tasks._ID + ", "
+        + Tasks.TABLE_NAME + "." + Tasks.DESCRIPTION + ", "
+        + Tasks.TABLE_NAME + "." + Tasks.DURATION + ", "
+        + Projects.TABLE_NAME + "." + Projects.CLIENT_PROJECT_NAME
+        + " FROM " + Tasks.TABLE_NAME 
+        + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + 
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ") = strftime('%Y-%m-%d', ?) ORDER BY start", new String[] { String.valueOf(dateString) });
 
     return cursor;

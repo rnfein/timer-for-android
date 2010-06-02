@@ -25,11 +25,11 @@ public final class R {
         public static final int layout_padding_left=0x7f050003;
         public static final int layout_padding_right=0x7f050001;
         public static final int layout_padding_top=0x7f050000;
+        public static final int listitem_note_text_size=0x7f050008;
         public static final int listitem_padding_left=0x7f050007;
         public static final int listitem_text_size=0x7f050006;
         public static final int login_edittext_padding_right=0x7f05000a;
         public static final int login_edittext_size=0x7f050009;
-        public static final int task_time_text_size=0x7f050008;
     }
     public static final class drawable {
         public static final int arrow=0x7f020000;
@@ -43,17 +43,18 @@ public final class R {
         public static final int txt_top=0x7f020008;
     }
     public static final class id {
-        public static final int account_menu_log_out=0x7f080007;
+        public static final int account_menu_log_out=0x7f080008;
         public static final int create_account=0x7f080003;
         public static final int email=0x7f080000;
         public static final int login=0x7f080002;
         public static final int password=0x7f080001;
-        public static final int signup_menu_return=0x7f080008;
+        public static final int signup_menu_return=0x7f080009;
+        public static final int task_item_client_project_name=0x7f080005;
         public static final int task_item_description=0x7f080004;
-        public static final int task_item_duration=0x7f080005;
-        public static final int task_list_header_text=0x7f080006;
-        public static final int tasks_menu_account=0x7f08000a;
-        public static final int tasks_menu_refresh=0x7f080009;
+        public static final int task_item_duration=0x7f080006;
+        public static final int task_list_header_text=0x7f080007;
+        public static final int tasks_menu_account=0x7f08000b;
+        public static final int tasks_menu_refresh=0x7f08000a;
     }
     public static final class layout {
         public static final int account=0x7f030000;
