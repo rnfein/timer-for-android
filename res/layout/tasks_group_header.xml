@@ -9,7 +9,7 @@
     android:layout_height="wrap_content"
     android:gravity="right">  
 	  <TextView
-	    android:text="header"
+	    android:id="@+id/task_list_header_text" 
 	    android:background="@color/red"
 	    android:textColor="@color/white"
 	    android:gravity="center" 
