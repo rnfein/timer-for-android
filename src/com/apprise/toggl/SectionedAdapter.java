@@ -39,6 +39,10 @@ abstract public class SectionedAdapter extends BaseAdapter {
   public void addSection(String caption, Adapter adapter) {
     sections.add(new Section(caption, adapter));
   }
+  
+  public void clearSections() {
+    sections.clear();
+  }
 
   public Object getItem(int position) {
     for (Section section : this.sections) {

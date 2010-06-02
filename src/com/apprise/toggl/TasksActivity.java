@@ -1,7 +1,6 @@
 package com.apprise.toggl;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
@@ -33,8 +32,6 @@ public class TasksActivity extends ListActivity {
   private static final String TAG = "TasksActivity"; 
   
   private DatabaseAdapter dbAdapter;
-  private SimpleCursorAdapter cursorAdapter;
-  private Cursor tasksCursor;
   private SyncService syncService;
   private Toggl app;
   private User currentUser;
@@ -78,11 +75,15 @@ public class TasksActivity extends ListActivity {
   }
   
   public void populateList() {
+    SimpleCursorAdapter cursorAdapter;
+    Cursor tasksCursor;    
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
     String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION };
     int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
     String date;
+    String header_text;
+    long duration_total = 0;
     
     dbAdapter.open();
 
@@ -92,7 +93,13 @@ public class TasksActivity extends ListActivity {
       cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());
-      adapter.addSection(date, cursorAdapter);
+          
+      while (tasksCursor.moveToNext()) {
+        duration_total += tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));
+      }
+      
+      header_text = date + " (" + Util.secondsToHM(duration_total) + " h)";
+      adapter.addSection(header_text, cursorAdapter);
     }
     
     setListAdapter(adapter);
@@ -141,7 +148,9 @@ public class TasksActivity extends ListActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
+      adapter.clearSections();
       populateList();
+      setProgressBarIndeterminateVisibility(false);      
     }
   };
 

@@ -56,6 +56,14 @@ public class Util {
   
   public static Date currentDate() {
     return Calendar.getInstance().getTime();
+  } 
+  
+  public static String secondsToHM(long time){
+    int minutes = (int)((time/60) % 60);
+    int hours = (int)((time/3600) % 24);
+    String minutesStr = (minutes<10 ? "0" : "")+ minutes;
+    String hoursStr = (hours<10 ? "0" : "")+ hours;
+    return new String(hoursStr + ":" + minutesStr);
   }  
 
 }
