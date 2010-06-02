@@ -88,19 +88,19 @@ public class TasksActivity extends ListActivity {
     
     dbAdapter.open();
 
-    for (int i = 0; i < taskRetentionDays; i++) {
-      queryCal.add(Calendar.DATE, -1);
+    for (int i = 0; i <= taskRetentionDays; i++) {
       tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
       cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());
-          
+      
       while (tasksCursor.moveToNext()) {
         duration_total += tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));
       }
       
       header_text = date + " (" + Util.secondsToHM(duration_total) + " h)";
       adapter.addSection(header_text, cursorAdapter);
+      queryCal.add(Calendar.DATE, -1);      
     }
     
     setListAdapter(adapter);
