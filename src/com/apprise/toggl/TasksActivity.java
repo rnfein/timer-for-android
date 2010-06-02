@@ -17,8 +17,12 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 public class TasksActivity extends ListActivity {
 
@@ -75,7 +79,10 @@ public class TasksActivity extends ListActivity {
       int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description };
       
       cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
-      setListAdapter(cursorAdapter);
+     
+      adapter.addSection("BAA", cursorAdapter);
+      setListAdapter(adapter);
+      
       dbAdapter.close();
     } else {
       cursorAdapter.notifyDataSetChanged();
@@ -128,5 +135,20 @@ public class TasksActivity extends ListActivity {
       populateList();
     }
   };
-  
+
+  SectionedAdapter adapter = new SectionedAdapter() {
+    protected View getHeaderView(String caption, int index, View convertView, ViewGroup parent) {
+      LinearLayout result = (LinearLayout) convertView;
+
+      if (convertView == null) {
+        result = (LinearLayout) getLayoutInflater().inflate(
+            R.layout.tasks_group_header, null);
+      }
+
+//      result.setText(caption);
+
+      return (result);
+    }
+  };
+
 }
