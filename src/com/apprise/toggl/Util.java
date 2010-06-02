@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Util {
-  
+
   public static String inputStreamToString(InputStream is) {
     StringBuilder out = new StringBuilder();
     try {
@@ -26,9 +26,9 @@ public class Util {
     }
     return out.length() > 0 ? out.toString() : null;
   }
-  
+
   public static Date parseStringToDate(String dateString) {
-    SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     Date date = null;
     try {
       date = iso8601Format.parse(dateString);
@@ -37,11 +37,14 @@ public class Util {
     }
     return date;
   }
-  
+
   public static String parseDateToString(Date date) {
-    SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    String s = null;
     String dateString = null;
-    dateString = iso8601Format.format(date);
+    s = iso8601Format.format(date);
+    //FIXME: hax to get the timezone from "+0300" to "+03:00"
+    dateString = s.substring(0, s.length() - 2) + ":" + s.substring(s.length() - 2, s.length());
     return dateString;
   }
 
