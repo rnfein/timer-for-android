@@ -85,7 +85,7 @@ public class TasksActivity extends ListActivity {
       
       dbAdapter.close();
     } else {
-      cursorAdapter.notifyDataSetChanged();
+      adapter.notifyDataSetChanged();
       setProgressBarIndeterminateVisibility(false);
     }
   }
@@ -139,14 +139,14 @@ public class TasksActivity extends ListActivity {
   SectionedAdapter adapter = new SectionedAdapter() {
     protected View getHeaderView(String caption, int index, View convertView, ViewGroup parent) {
       LinearLayout result = (LinearLayout) convertView;
-      TextView header = (TextView) new TextView(getApplicationContext());
 
       if (convertView == null) {
         result = (LinearLayout) getLayoutInflater().inflate(
             R.layout.tasks_group_header, null);
-        header = (TextView) result.findViewById(R.id.task_list_header_text);
+
       }
 
+      TextView header = (TextView) result.findViewById(R.id.task_list_header_text);      
       header.setText(caption);
 
       return (result);
