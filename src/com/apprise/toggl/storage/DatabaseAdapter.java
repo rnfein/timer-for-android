@@ -1,5 +1,8 @@
 package com.apprise.toggl.storage;
 
+import java.util.Date;
+
+import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
@@ -230,6 +233,18 @@ public class DatabaseAdapter {
     safeClose(cursor);
     return task;
   }
+  
+  public Cursor findTasksByDate(Date date) {
+    String dateString = Util.parseDateToString(date); 
+    Cursor cursor = db.rawQuery("SELECT * FROM " + Tasks.TABLE_NAME + 
+        " WHERE strftime('%Y-%m-%d', " + Tasks.START + ") = strftime('%Y-%m-%d', ?) ORDER BY start", new String[] { String.valueOf(dateString) });
+    
+    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
+      cursor.close();
+      return null;
+    }
+    return cursor;
+  }  
   
   public Cursor findAllTasks() {
     return db.query(Tasks.TABLE_NAME, null, null, null, null, null, null);        

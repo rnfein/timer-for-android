@@ -1,5 +1,7 @@
 package com.apprise.toggl.storage;
 
+import java.util.Date;
+
 import com.apprise.toggl.TogglTests;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.DeletedTasks;
@@ -17,6 +19,7 @@ import com.apprise.toggl.storage.models.Workspace;
 
 import android.database.Cursor;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 
 public class DatabaseAdapterTest extends AndroidTestCase {
@@ -323,6 +326,36 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertNotNull(foundTask);
     assertEquals(createdTask._id, foundTask._id);
     assertEquals("do a backflip", foundTask.description);    
+  }
+  
+  public void testFindTasksByDate() {
+    Task task1 = new Task();
+    task1.start = "2010-05-12T06:19:45+02:00";
+    Task createdTask1 = dbAdapter.createTask(task1);
+
+    Task task2 = new Task();
+    task2.start = "2010-05-12T14:19:45+02:00";
+    Task createdTask2 = dbAdapter.createTask(task2);
+    
+    Task task3 = new Task();
+    task2.start = "2010-15-12T04:19:45+02:00";
+    Task createdTask3 = dbAdapter.createTask(task3);
+    
+    Date date = new Date();
+    date.setYear(110);
+    date.setMonth(04);
+    date.setDate(12);
+    
+    Log.d("DatabaseAdapterTest", "date: " + date);
+    
+    Cursor allTasks = dbAdapter.findTasksByDate(date);
+    assertNotNull(allTasks);
+    assertEquals(2, allTasks.getCount());
+    allTasks.moveToFirst();
+    assertEquals(createdTask1._id, allTasks.getLong(allTasks.getColumnIndex(Tasks._ID)));
+    allTasks.moveToNext();
+    assertEquals(createdTask2._id, allTasks.getLong(allTasks.getColumnIndex(Tasks._ID)));
+    allTasks.close();   
   }
   
   public void testFindTaskByRemoteId() {
