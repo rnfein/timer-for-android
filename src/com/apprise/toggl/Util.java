@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Util {
@@ -47,5 +48,9 @@ public class Util {
     dateString = s.substring(0, s.length() - 2) + ":" + s.substring(s.length() - 2, s.length());
     return dateString;
   }
+  
+  public static Date currentDate() {
+    return Calendar.getInstance().getTime();
+  }  
 
 }
