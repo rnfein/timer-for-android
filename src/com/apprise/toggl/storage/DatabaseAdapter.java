@@ -243,7 +243,7 @@ public class DatabaseAdapter {
         + Projects.TABLE_NAME + "." + Projects.CLIENT_PROJECT_NAME
         + " FROM " + Tasks.TABLE_NAME 
         + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + 
-        " WHERE strftime('%Y-%m-%d', " + Tasks.START + ") = strftime('%Y-%m-%d', ?) ORDER BY start", new String[] { String.valueOf(dateString) });
+        " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime') ORDER BY start", new String[] { String.valueOf(dateString) });
 
     return cursor;
   }  
