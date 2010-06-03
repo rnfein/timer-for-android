@@ -200,6 +200,10 @@ public class TasksActivity extends ListActivity {
       TextView descriprionView = (TextView) view.findViewById(R.id.task_item_description);
       String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
       descriprionView.setText(description);
+      
+      TextView clientProjectNameView = (TextView) view.findViewById(R.id.task_item_client_project_name);
+      String clientProjectName = cursor.getString(cursor.getColumnIndex(Projects.CLIENT_PROJECT_NAME));
+      clientProjectNameView.setText(clientProjectName);
     }
 
     @Override
