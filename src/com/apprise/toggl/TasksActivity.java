@@ -18,7 +18,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,7 +75,7 @@ public class TasksActivity extends ListActivity {
   }
   
   public void populateList() {
-    SimpleCursorAdapter cursorAdapter;
+    TasksCursorAdapter cursorAdapter;
     Cursor tasksCursor;    
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
@@ -90,7 +89,7 @@ public class TasksActivity extends ListActivity {
 
     for (int i = 0; i <= taskRetentionDays; i++) {
       tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
-      cursorAdapter = new SimpleCursorAdapter(this, R.layout.task_item,
+      cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());
       
@@ -171,5 +170,27 @@ public class TasksActivity extends ListActivity {
       return (result);
     }
   };
+  
+  public final class TasksCursorAdapter extends SimpleCursorAdapter {
+
+    public TasksCursorAdapter(Context context, int layout, Cursor c,
+        String[] from, int[] to) {
+      super(context, layout, c, from, to);
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+      TextView durationView = (TextView) view.findViewById(R.id.task_item_duration);
+      long seconds = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
+      durationView.setText(Util.secondsToHMS(seconds));
+    }
+
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+      View view = getLayoutInflater().inflate(R.layout.task_item, null);
+      bindView(view, context, cursor);
+      return view;
+    }
+  }  
 
 }

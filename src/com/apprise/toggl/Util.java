@@ -65,5 +65,15 @@ public class Util {
     String hoursStr = (hours<10 ? "0" : "")+ hours;
     return new String(hoursStr + ":" + minutesStr);
   }  
+  
+  public static String secondsToHMS(long time){
+    int seconds = (int)(time % 60);    
+    int minutes = (int)((time/60) % 60);
+    int hours = (int)((time/3600) % 24);
+    String secondsStr = (seconds<10 ? "0" : "")+ seconds;    
+    String minutesStr = (minutes<10 ? "0" : "")+ minutes;
+    String hoursStr = (hours<10 ? "0" : "")+ hours;
+    return new String(hoursStr + ":" + minutesStr + ":" + secondsStr);
+  }  
 
 }
