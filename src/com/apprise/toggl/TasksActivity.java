@@ -18,12 +18,14 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -107,6 +109,17 @@ public class TasksActivity extends ListActivity {
   }
   
   @Override
+  protected void onListItemClick(ListView l, View v, int position, long id) {
+    Intent intent = new Intent(TasksActivity.this, TaskActivity.class);
+
+    Cursor cursor = (Cursor) adapter.getItem(position);
+    long clickedTaskId = cursor.getLong(cursor.getColumnIndex(Tasks._ID));
+    
+    intent.putExtra(TaskActivity.TASK_ID, clickedTaskId);
+    startActivity(intent);    
+  }
+
+  @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.tasks_menu, menu);
     return super.onCreateOptionsMenu(menu);
@@ -183,6 +196,10 @@ public class TasksActivity extends ListActivity {
       TextView durationView = (TextView) view.findViewById(R.id.task_item_duration);
       long seconds = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
       durationView.setText(Util.secondsToHMS(seconds));
+
+      TextView descriprionView = (TextView) view.findViewById(R.id.task_item_description);
+      String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
+      descriprionView.setText(description);
     }
 
     @Override
