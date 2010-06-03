@@ -199,7 +199,12 @@ public class TasksActivity extends ListActivity {
 
       TextView descriprionView = (TextView) view.findViewById(R.id.task_item_description);
       String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
-      descriprionView.setText(description);
+      if (description == null) {
+        descriprionView.setText(R.string.no_description);
+        descriprionView.setTextColor(R.color.light_gray);
+      } else {
+        descriprionView.setText(description);  
+      }
       
       TextView clientProjectNameView = (TextView) view.findViewById(R.id.task_item_client_project_name);
       String clientProjectName = cursor.getString(cursor.getColumnIndex(Projects.CLIENT_PROJECT_NAME));

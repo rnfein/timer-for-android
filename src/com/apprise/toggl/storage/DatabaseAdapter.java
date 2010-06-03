@@ -328,6 +328,13 @@ public class DatabaseAdapter {
     return plannedTask;    
   }
   
+  /*
+   * finds planned tasks by project remote id
+   */
+  public Cursor findPlannedTasksByProjectId(long projectId) {
+    return getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks.PROJECT_ID, projectId);
+  }
+  
   public Cursor findAllPlannedTasks() {
     return db.query(PlannedTasks.TABLE_NAME, null, null, null, null, null, null);     
   }

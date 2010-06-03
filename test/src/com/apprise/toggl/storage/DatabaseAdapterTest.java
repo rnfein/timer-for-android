@@ -483,6 +483,10 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(createdPlannedTask._id, foundPlannedTask._id);
   }
   
+  public void testFindPlannedTasksByProjectId() {
+    //TODO
+  }
+  
   public void testFindPlannedTaskByRemoteId() {
     PlannedTask plannedTaskContents = new PlannedTask();
     plannedTaskContents.id = 321;

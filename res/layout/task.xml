@@ -31,26 +31,43 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="20dp">
-    <TextView
-      android:id="@+id/task_timer_duration"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textColor="@color/black"
-      android:textStyle="bold"
-      android:textSize="@dimen/task_timer_text_size"
-      android:text="00:30:54"/>  
+    android:padding="10dp">
+	  <Button
+	    android:id="@+id/timer_trigger"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/timer_trigger_button"/>  
+	  <LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+	    <TextView
+	      android:id="@+id/task_timer_duration"
+	      android:layout_width="wrap_content"
+	      android:layout_height="fill_parent"
+	      android:layout_weight="3"
+	      android:layout_marginLeft="10dp"
+	      android:textStyle="bold"
+	      android:gravity="center"
+	      android:textColor="@color/black"
+	      android:textSize="@dimen/task_timer_text_size"
+	      android:text="00:30:54"/>  
+	    <ImageView
+	      android:src="@drawable/arrow"
+	      android:layout_width="10dp"
+	      android:layout_height="wrap_content"
+	      android:layout_gravity="center"
+	      android:layout_weight="1"/>  
+    </LinearLayout>
   </LinearLayout>     
-  <TextView
+  <EditText
+      android:id="@+id/task_project_description"
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:layout_weight="1"
       android:padding="10dp"
       android:layout_marginBottom="5dp"
       android:background="@drawable/textfield"
-      android:textSize="@dimen/label_text_size"           
-      android:textColor="@color/black"
-      android:text="Project description"/>    
+      android:textColor="@color/black"/>    
   <LinearLayout
     android:background="@drawable/txt_top"
     android:layout_width="fill_parent"
@@ -61,19 +78,20 @@
         android:layout_weight="1"
         android:textStyle="bold"            
         android:gravity="center_vertical"
-        android:padding="@dimen/label_padding"
+        android:paddingLeft="@dimen/label_padding_left"
         android:textSize="@dimen/label_text_size"           
         android:textColor="@color/black"
         android:text="@string/project"/>
     <TextView
+        android:id="@+id/task_client_project_name"
         android:layout_width="30dp"
         android:layout_height="fill_parent"
         android:layout_weight="4"
-        android:paddingTop="@dimen/label_padding"
+        android:paddingTop="@dimen/label_padding_top"
         android:gravity="right"
         android:textSize="@dimen/label_text_size"           
         android:textColor="@color/black"
-        android:text="Big Client - Website"/>      
+        android:maxLines="1"/>      
     <ImageView
       android:src="@drawable/arrow"
       android:layout_width="10dp"
@@ -87,24 +105,24 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:layout_width="30dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:textStyle="bold"
-        android:textSize="@dimen/label_text_size"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/label_padding_left"           
-        android:textColor="@color/black"          
-        android:text="@string/date"/>
+       android:layout_width="30dp"
+       android:layout_height="fill_parent"
+       android:layout_weight="1"
+       android:textStyle="bold"
+       android:textSize="@dimen/label_text_size"
+       android:gravity="center_vertical"
+       android:paddingLeft="@dimen/label_padding_left"           
+       android:textColor="@color/black"          
+       android:text="@string/date"/>
     <TextView
-        android:layout_width="30dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="4"
-        android:gravity="right"
-        android:padding="@dimen/label_padding_left"
-        android:textSize="@dimen/label_text_size"           
-        android:textColor="@color/black"
-        android:text="12. mai, K"/>   
+       android:id="@+id/task_date"
+       android:layout_width="30dp"
+       android:layout_height="fill_parent"
+       android:layout_weight="4"
+       android:gravity="right"
+       android:paddingTop="@dimen/label_padding_top"        
+       android:textSize="@dimen/label_text_size"           
+       android:textColor="@color/black"/>   
     <ImageView
       android:src="@drawable/arrow"
       android:layout_width="10dp"
@@ -120,16 +138,21 @@
     <TextView
         android:layout_width="50dp"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:textStyle="bold"
         android:textSize="@dimen/label_text_size"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/label_padding_left"           
         android:textColor="@color/black"          
         android:text="@string/billable"/>
-     
+    <CheckBox
+      android:id="@+id/task_billable_cb"
+      android:layout_marginTop="2dp"
+      android:layout_width="34dp"
+      android:layout_height="34dp"/>     
   </LinearLayout>    
   <LinearLayout
+    android:id="@+id/task_planned_tasks_area"
     android:background="@drawable/txt_middle"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
@@ -148,7 +171,7 @@
         android:layout_height="fill_parent"
         android:layout_weight="4"
         android:gravity="right"
-        android:padding="@dimen/label_padding_left"
+        android:paddingTop="@dimen/label_padding_top"        
         android:textSize="@dimen/label_text_size"           
         android:textColor="@color/light_gray"
         android:text="(optional)"/>     
@@ -179,7 +202,7 @@
         android:layout_height="fill_parent"
         android:layout_weight="4"
         android:gravity="right"
-        android:padding="@dimen/label_padding_left"
+        android:paddingTop="@dimen/label_padding_top"
         android:textSize="@dimen/label_text_size"           
         android:textColor="@color/light_gray"/>          
     <ImageView
