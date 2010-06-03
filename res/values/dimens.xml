@@ -6,6 +6,7 @@
   <dimen name="layout_padding_left">20dp</dimen>
   
   <dimen name="label_text_size">15dp</dimen>
+  <dimen name="label_padding">10dp</dimen>
   <dimen name="label_padding_left">10dp</dimen>
   
   <dimen name="listitem_text_size">13dp</dimen>
@@ -14,4 +15,6 @@
   
   <dimen name="login_edittext_size">15dp</dimen>
   <dimen name="login_edittext_padding_right">8dp</dimen>
+  
+  <dimen name="task_timer_text_size">28dp</dimen>
 </resources>

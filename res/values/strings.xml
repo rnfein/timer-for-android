@@ -4,7 +4,13 @@
     
     <string name="refresh">Refresh</string>
     <string name="account">Account</string>
+    <string name="task">Task</string>
     <string name="tasks">Tasks</string>
+    <string name="date">Date</string>
+    <string name="billable">Billable</string>
+    <string name="planned">Planned</string>
+    <string name="tags">Tags</string>
+    <string name="project">Project</string>
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
 
