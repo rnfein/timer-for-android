@@ -63,6 +63,10 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals("cat@woman.com", foundUser.email);
   }
   
+  public void testFindUserByApiToken() {
+    //TODO
+  }
+  
   public void testFindUserByRemoteId() {
     User user = dbAdapter.createUser(new User());
     user.id = 345;
@@ -348,7 +352,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     
     Log.d("DatabaseAdapterTest", "date: " + date);
     
-    Cursor allTasks = dbAdapter.findTasksByDate(date);
+    Cursor allTasks = dbAdapter.findTasksForListByDate(date);
     assertNotNull(allTasks);
     assertEquals(2, allTasks.getCount());
     allTasks.moveToFirst();
