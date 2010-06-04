@@ -29,6 +29,7 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.ORM;
 import com.apprise.toggl.storage.models.DeletedModel;
 import com.apprise.toggl.storage.models.Model;
+import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 
 import android.app.Service;
@@ -42,6 +43,11 @@ import android.util.Log;
 public class SyncService extends Service {
 
   public static final String SYNC_COMPLETED = "com.apprise.toggl.remote.SYNC_COMPLETED";
+  public static final String COLLECTION = "collection";
+  public static final String ALL_COMPLETED = "all_completed";
+  public static final String PROJECTS_COMPLETED = "projects_completed";
+  public static final String TASKS_COMPLETED = "tasks_completed";
+  
   public static final String TAG = "SyncService";
   
   private Toggl app;
@@ -73,6 +79,15 @@ public class SyncService extends Service {
       return service;
     }
 
+  }
+  
+  public void syncAll() {
+    syncProjects();    
+    syncTasks();
+    
+    Intent intent = new Intent(SYNC_COMPLETED);
+    intent.putExtra(COLLECTION, ALL_COMPLETED);
+    sendBroadcast(intent);    
   }
   
   public void syncTasks() {
@@ -120,7 +135,67 @@ public class SyncService extends Service {
       public Model mapEntryFromCursor(Cursor cursor) {
         return ORM.mapTask(cursor, dbAdapter);
       }
+      
+      public void broadcastSyncCompleted() {
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, TASKS_COMPLETED);
+        sendBroadcast(intent);
+      }          
 
+    });
+    
+    dbAdapter.close();
+  }
+  
+  public void syncProjects() {
+    Log.d(TAG, "#syncProjects starting to sync.");
+    dbAdapter.open();
+    
+    sync(dbAdapter.findAllProjects(), api.fetchProjects(), new SyncProxy() {
+      
+      public void updateRemoteEntry(Model model) {
+        
+      }
+      
+      public void updateLocalEntry(Model model) {
+        dbAdapter.updateProject((Project) model);
+      }
+      
+      public Model getLocalEntry(long remoteId) {
+        return dbAdapter.findProjectByRemoteId(remoteId);
+      }
+      
+      public DeletedModel getLocalDeletedEntry(long remoteId) {
+        return null;
+      }
+      
+      public void deleteRemoteEntry(long id) { }
+      
+      public void deleteLocalEntry(long _id) {
+        dbAdapter.deleteProject(_id);
+      }
+      
+      public void deleteLocalDeletedEntry(long _id) { }
+      
+      public void createRemoteEntry(Model model) {
+        // TODO
+      }
+      
+      public Model createLocalEntry(Model model) {
+        Log.d(TAG, "creating local entry: " + ((Project) model).client_project_name);
+        return dbAdapter.createProject((Project) model);
+      }
+      
+      public Model mapEntryFromCursor(Cursor cursor) {
+        return ORM.mapProject(cursor, dbAdapter);
+      }
+      
+      public void broadcastSyncCompleted() {
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, PROJECTS_COMPLETED);
+        sendBroadcast(intent);
+      }      
+      
     });
     
     dbAdapter.close();
@@ -184,12 +259,7 @@ public class SyncService extends Service {
     }
 
     localCursor.close();
-    broadcastSyncCompleted();
-  }
-
-  private void broadcastSyncCompleted() {
-    Intent intent = new Intent(SYNC_COMPLETED);
-    sendBroadcast(intent);
+    proxy.broadcastSyncCompleted();
   }
   
 }

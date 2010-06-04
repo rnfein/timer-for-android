@@ -21,4 +21,6 @@ public interface SyncProxy {
   abstract void createRemoteEntry(Model model);
  
   abstract Model mapEntryFromCursor(Cursor cursor);
+  
+  abstract void broadcastSyncCompleted();
 }
