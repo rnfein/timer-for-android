@@ -111,6 +111,10 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
         model._id = 5l;
         return model;
       }
+      
+      public void broadcastSyncCompleted() {
+        Log.d(TAG, "SyncServiceTest#SyncProxy#broadcastSyncCompleted invoked.");        
+      };
     });
     
     assertEquals(1, steps[0]);
@@ -186,6 +190,10 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
         Log.d(TAG, "SyncServiceTest#SyncProxy#createLocalEntry invoked.");
         return null;
       }
+      
+      public void broadcastSyncCompleted() {
+        Log.d(TAG, "SyncServiceTest#SyncProxy#broadcastSyncCompleted invoked.");        
+      };      
     });
     
     assertEquals(1, steps[0]);
@@ -258,6 +266,10 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
         Log.d(TAG, "SyncServiceTest#SyncProxy#createLocalEntry invoked.");
         return null;
       }
+      
+      public void broadcastSyncCompleted() {
+        Log.d(TAG, "SyncServiceTest#SyncProxy#broadcastSyncCompleted invoked.");        
+      };      
     });
     
     assertEquals(1, steps[0]);
@@ -336,6 +348,10 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
         Log.d(TAG, "SyncServiceTest#SyncProxy#createLocalEntry invoked.");
         return null;
       }
+      
+      public void broadcastSyncCompleted() {
+        Log.d(TAG, "SyncServiceTest#SyncProxy#broadcastSyncCompleted invoked.");        
+      };      
     });
     
     assertEquals(1, steps[0]);
@@ -413,6 +429,10 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
         Log.d(TAG, "SyncServiceTest#SyncProxy#createLocalEntry invoked.");
         return null;
       }
+      
+      public void broadcastSyncCompleted() {
+        Log.d(TAG, "SyncServiceTest#SyncProxy#broadcastSyncCompleted invoked.");        
+      };      
     });
     
     assertEquals(1, steps[0]);
@@ -487,6 +507,10 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
         Log.d(TAG, "SyncServiceTest#SyncProxy#createLocalEntry invoked.");
         return null;
       }
+      
+      public void broadcastSyncCompleted() {
+        Log.d(TAG, "SyncServiceTest#SyncProxy#broadcastSyncCompleted invoked.");        
+      };      
     });
     
     assertEquals(1, steps[0]);
