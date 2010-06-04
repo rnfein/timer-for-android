@@ -77,6 +77,13 @@ public class DatabaseAdapter {
     return user;
   }  
   
+  public User findUserByApiToken(String apiToken) {
+    Cursor cursor = getMovedCursorByString(Users.TABLE_NAME, Users.API_TOKEN, apiToken);
+    User user = ORM.mapUser(cursor);
+    safeClose(cursor);
+    return user;
+  }  
+  
   public Cursor findAllUsers() {
     return db.query(Users.TABLE_NAME, null, null, null, null, null, null);
   }  
@@ -366,6 +373,16 @@ public class DatabaseAdapter {
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
     Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { String.valueOf(value) });
 
+    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
+      cursor.close();
+      return null;
+    }
+    return cursor;
+  }
+  
+  private Cursor getMovedCursorByString(String tableName, String columnName, String value) {
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { value });
+    
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
       cursor.close();
       return null;
