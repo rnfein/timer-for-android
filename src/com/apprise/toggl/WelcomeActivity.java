@@ -51,6 +51,7 @@ public class WelcomeActivity extends Activity {
     dbAdapter = new DatabaseAdapter(this);
     dbAdapter.open();
     currentUser = dbAdapter.findUserByApiToken(apiToken);
+    dbAdapter.close();
     Log.d(TAG, "fetched user: " + currentUser);
   }
   
