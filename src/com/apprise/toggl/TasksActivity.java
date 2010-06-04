@@ -85,7 +85,6 @@ public class TasksActivity extends ListActivity {
     int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description, R.id.task_item_client_project_name };
     String date;
     String header_text;
-    long duration_total = 0;
     
     dbAdapter.open();
 
@@ -95,17 +94,24 @@ public class TasksActivity extends ListActivity {
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());
       
-      while (tasksCursor.moveToNext()) {
-        duration_total += tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));
-      }
-      
-      header_text = date + " (" + Util.secondsToHM(duration_total) + " h)";
+      header_text = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
       adapter.addSection(header_text, cursorAdapter);
-      queryCal.add(Calendar.DATE, -1);      
+      queryCal.add(Calendar.DATE, -1); 
     }
     
     setListAdapter(adapter);
     dbAdapter.close();
+  }
+
+  private long getDurationTotal(Cursor tasksCursor) {
+    long duration_total = 0;
+    long duration;
+    while (tasksCursor.moveToNext()) {
+      duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));
+      if (duration > 0) duration_total += duration; 
+    }
+    duration = 0;
+    return duration_total;
   }
   
   @Override
