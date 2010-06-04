@@ -42,7 +42,7 @@ public class UtilTest extends AndroidTestCase {
     
     String expectedDateString = "2010-05-20T10:25:30+03:00"; // +xx:xx depends on timezone
     
-    String parsedDateString = Util.parseDateToString(date); 
+    String parsedDateString = Util.formatDateToString(date); 
     
     Log.d("UtilTest", "************");
     Log.d("UtilTest", "expectedDateString" + expectedDateString);
@@ -52,6 +52,16 @@ public class UtilTest extends AndroidTestCase {
     assertNotNull(parsedDateString);
     assertEquals(expectedDateString, parsedDateString);
   }  
+  
+  public void testSecondsToHM() {
+    assertEquals("00:35", Util.secondsToHM(2135));
+    assertEquals("03:21", Util.secondsToHM(12114));
+  }
+  
+  public void testSecondsToHMS() {
+    assertEquals("00:35:35", Util.secondsToHMS(2135));
+    assertEquals("03:21:54", Util.secondsToHMS(12114));
+  }
 }
 
 
