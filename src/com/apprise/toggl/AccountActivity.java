@@ -187,6 +187,7 @@ public class AccountActivity extends ApplicationActivity {
   protected Runnable syncAllInBackground = new Runnable() {
     
     public void run() {
+      syncService.setApiToken(app.getAPIToken());
       syncService.syncAll();
     }
   };  

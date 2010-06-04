@@ -81,6 +81,10 @@ public class SyncService extends Service {
 
   }
   
+  public void setApiToken(String apiToken) {
+    api.apiToken = apiToken;
+  }
+  
   public void syncAll() {
     syncProjects();    
     syncTasks();
