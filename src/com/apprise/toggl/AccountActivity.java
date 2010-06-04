@@ -1,6 +1,7 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.TogglWebApi;
+import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
 
 import android.content.Intent;
@@ -100,6 +101,19 @@ public class AccountActivity extends ApplicationActivity {
     startActivity(new Intent(AccountActivity.this, TasksActivity.class));
   }
   
+  public void saveCurrentUser(User user) {
+    DatabaseAdapter dbAdapter = new DatabaseAdapter(this);
+    dbAdapter.open();
+    User fetchedUser = dbAdapter.findUserByRemoteId(user.id);
+    if(fetchedUser == null) {
+      dbAdapter.createUser(user); 
+    } else {
+      user._id = fetchedUser._id;
+      dbAdapter.updateUser(user);
+    }
+    dbAdapter.close();
+  }
+  
   protected Runnable authenticateInBackground = new Runnable() {
     
     public void run() {
@@ -109,6 +123,7 @@ public class AccountActivity extends ApplicationActivity {
 
       if (user != null) {
         app.logIn(user);
+        saveCurrentUser(user);
         Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());        
         startTasksActivity();
       } else {
