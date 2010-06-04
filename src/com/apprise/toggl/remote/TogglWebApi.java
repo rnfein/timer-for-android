@@ -95,13 +95,13 @@ public class TogglWebApi {
   @SuppressWarnings("unchecked")
   public LinkedList<Project> fetchProjects() {
     Type collectionType = new TypeToken<LinkedList<Project>>() {}.getType();
-    return (LinkedList<Project>) fetchCollection(collectionType, PLANNED_TASKS_URL);
+    return (LinkedList<Project>) fetchCollection(collectionType, PROJECTS_URL);
   }
   
   @SuppressWarnings("unchecked")
   public LinkedList<PlannedTask> fetchPlannedTasks() {
     Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
-    return (LinkedList<PlannedTask>) fetchCollection(collectionType, PROJECTS_URL);
+    return (LinkedList<PlannedTask>) fetchCollection(collectionType, PLANNED_TASKS_URL);
   }
 
   @SuppressWarnings("unchecked")
