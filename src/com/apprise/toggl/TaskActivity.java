@@ -36,9 +36,7 @@ public class TaskActivity extends ApplicationActivity {
     dbAdapter = new DatabaseAdapter(this);
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
-    Log.d(TAG, "extra _id: " + _id);
     task = dbAdapter.findTask(_id);
-    Log.d(TAG, "" + task);
   }
 
   protected void initViews() {
@@ -61,7 +59,6 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   private void initPlannedTasks() {
-    Log.d(TAG, "initPlannedTasks");
     if (task.project != null) {
       long project_remote_id = task.project.id;
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
