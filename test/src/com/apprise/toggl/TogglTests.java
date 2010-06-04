@@ -35,6 +35,7 @@ public class TogglTests extends TestSuite {
   public static Test suite() {
     TestSuite suite = new TestSuite();
     suite.addTestSuite(UtilTest.class);
+    suite.addTestSuite(ModelTest.class);
     suite.addTestSuite(DatabaseAdapterTest.class);
     suite.addTestSuite(SyncServiceTest.class);
     suite.addTestSuite(AccountActivityTests.class);

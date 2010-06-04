@@ -1,7 +1,7 @@
 package com.apprise.toggl.storage.models;
 
 public class Project extends Model {
-
+  
   public long fixed_fee;
   public long estimated_workhours;
   public boolean is_fixed_fee;
@@ -46,20 +46,28 @@ public class Project extends Model {
     project.sync_dirty = true;
     return project;
   }
+  
+  public String toString() {
+    Long workspace_id = null;
+    
+    if (workspace != null)
+      workspace_id = new Long(workspace._id);
+    
+    return "workspace_id: " + workspace_id
+      + ", fixed_fee: " + fixed_fee
+      + ", estimated_workhours: " + estimated_workhours
+      + ", is_fixed_fee: " + is_fixed_fee
+      + ", billable: " + billable
+      + ", client_project_name: " + client_project_name
+      + ", hourly_rate: " + hourly_rate
+      + ", name: " + name
+      + ", remote_id: " + id; 
+  }
 
   public boolean identicalTo(Model other) {
     Project otherProject = (Project) other;
     
-    boolean diff = fixed_fee == otherProject.fixed_fee && 
-    estimated_workhours == otherProject.estimated_workhours &&
-    is_fixed_fee == otherProject.is_fixed_fee &&
-    workspace.id == otherProject.workspace.id &&
-    billable == otherProject.billable &&
-    client_project_name.equals(otherProject.client_project_name) &&
-    hourly_rate == otherProject.hourly_rate &&
-    name.equals(otherProject.name);
-    
-    return diff;
+    return this.toString().equals(otherProject.toString());
   }
 
   public void updateAttributes(Model other) {

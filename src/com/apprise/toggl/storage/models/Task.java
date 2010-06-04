@@ -1,5 +1,6 @@
 package com.apprise.toggl.storage.models;
 
+
 public class Task extends Model {
 
   public Project project;
@@ -45,23 +46,33 @@ public class Task extends Model {
     task.sync_dirty = true;
     return task;
   }
+  
+  public String toString() {
+    Long project_id = null;
+    Long workspace_id = null;
+    
+    if (project != null)
+      project_id = new Long(project._id);
+    if (workspace != null)
+      workspace_id = new Long(workspace._id);
+    
+    return "project_id: " + project_id
+      + ", workspace_id: " + workspace_id
+      + ", duration: " + duration
+      + ", start: " + start
+      + ", billable: " + billable
+      + ", description: " + description
+      + ", remote_id: " + id
+      + ", stop: " + stop;
+    // TODO: + tag_names;
+  }
 
   public boolean identicalTo(Model other) {
     Task otherTask = (Task) other;
-
-    // TODO: add diffs for relations
-    boolean diff = /* project.id == otherTask.project.id && */
-    /* workspace.id == otherTask.id && */
-    duration == otherTask.duration &&
-    start.equals(otherTask.start) &&
-    billable == otherTask.billable &&
-    description.equals(otherTask.description) &&
-    stop.equals(otherTask.description) &&
-    tag_names.equals(otherTask.tag_names);
     
-    return diff;    
+    return this.toString().equals(otherTask.toString());
   }
-
+    
   public void updateAttributes(Model other) {
     Task otherTask = (Task) other;
     project = otherTask.project;
