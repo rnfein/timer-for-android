@@ -1,11 +1,18 @@
 package com.apprise.toggl;
 
+import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +25,7 @@ import android.widget.Toast;
 public class AccountActivity extends ApplicationActivity {
 
   private TogglWebApi webApi;
+  private SyncService syncService;
 
   private EditText emailEditText;
   private EditText passwordEditText;
@@ -30,12 +38,11 @@ public class AccountActivity extends ApplicationActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    
-    app = (Toggl) getApplication();
-    webApi = new TogglWebApi(app.getAPIToken());
+
+    init();
 
     setContentView(R.layout.account);
-
+    
     initViews();
     initFields();
     attachEvents();
@@ -43,8 +50,22 @@ public class AccountActivity extends ApplicationActivity {
   
   @Override
   protected void onResume() {
+    IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
+    registerReceiver(updateReceiver, filter);    
     super.onResume();
     initFields();
+  }  
+  
+  @Override
+  protected void onPause() {
+    unregisterReceiver(updateReceiver);
+    super.onPause();
+  }
+  
+  @Override
+  protected void onDestroy() {
+    unbindService(syncConnection);
+    super.onDestroy();
   }  
 
   @Override
@@ -63,6 +84,13 @@ public class AccountActivity extends ApplicationActivity {
     }
     return super.onOptionsItemSelected(item);
   }    
+  
+  protected void init() {    
+    app = (Toggl) getApplication();
+    webApi = new TogglWebApi(app.getAPIToken());
+    Intent intent = new Intent(this, SyncService.class);
+    bindService(intent, syncConnection, BIND_AUTO_CREATE);     
+  }
   
   protected void initViews() {
     emailEditText = (EditText) findViewById(R.id.email);
@@ -84,6 +112,7 @@ public class AccountActivity extends ApplicationActivity {
     loginButton.setOnClickListener(new View.OnClickListener() {
 
       public void onClick(View v) {
+        setProgressBarIndeterminateVisibility(true);
         new Thread(authenticateInBackground).start();
       }
     });
@@ -123,13 +152,43 @@ public class AccountActivity extends ApplicationActivity {
 
       if (user != null) {
         app.logIn(user);
+        webApi.apiToken = user.api_token;
         saveCurrentUser(user);
-        Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());        
-        startTasksActivity();
+        Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());
+        new Thread(syncAllInBackground).start();        
       } else {
         Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();        
       }
     }
   };
+  
+  protected BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      Log.d(TAG, "sync completed on: " + intent.getStringExtra(SyncService.COLLECTION));
+      if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED))
+        setProgressBarIndeterminateVisibility(false);        
+        startTasksActivity();      
+    }
+  };  
+  
+  protected ServiceConnection syncConnection = new ServiceConnection() {
+    
+    public void onServiceDisconnected(ComponentName name) {}
+    
+    public void onServiceConnected(ComponentName name, IBinder serviceBinding) {
+      SyncService.SyncBinder binding = (SyncService.SyncBinder) serviceBinding;
+      syncService = binding.getService();
+    }
+
+  };
+  
+  protected Runnable syncAllInBackground = new Runnable() {
+    
+    public void run() {
+      syncService.syncAll();
+    }
+  };  
   
 }
