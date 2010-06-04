@@ -27,12 +27,13 @@ public final class R {
         public static final int layout_padding_left=0x7f050003;
         public static final int layout_padding_right=0x7f050001;
         public static final int layout_padding_top=0x7f050000;
-        public static final int listitem_note_text_size=0x7f05000a;
-        public static final int listitem_padding_left=0x7f050009;
+        public static final int listitem_margin_right=0x7f050009;
+        public static final int listitem_note_text_size=0x7f05000b;
+        public static final int listitem_padding_left=0x7f05000a;
         public static final int listitem_text_size=0x7f050008;
-        public static final int login_edittext_padding_right=0x7f05000c;
-        public static final int login_edittext_size=0x7f05000b;
-        public static final int task_timer_text_size=0x7f05000d;
+        public static final int login_edittext_padding_right=0x7f05000d;
+        public static final int login_edittext_size=0x7f05000c;
+        public static final int task_timer_text_size=0x7f05000e;
     }
     public static final class drawable {
         public static final int arrow=0x7f020000;
