@@ -38,6 +38,16 @@ public class Util {
     }
     return date;
   }
+  
+  public static Calendar parseStringToCalendar(String string) {
+    Date date = parseStringToDate(string);
+    Calendar cal = (Calendar) Calendar.getInstance().clone();
+    cal.set(Calendar.YEAR, date.getYear() + 1900);
+    cal.set(Calendar.MONTH, date.getMonth());
+    cal.set(Calendar.DATE, date.getDate());
+    
+    return cal;
+  }
 
   public static String formatDateToString(Date date) {
     SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
