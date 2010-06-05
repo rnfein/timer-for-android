@@ -5,6 +5,7 @@ import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,7 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AccountActivity extends ApplicationActivity {
+public class AccountActivity extends Activity {
 
   private TogglWebApi webApi;
   private SyncService syncService;

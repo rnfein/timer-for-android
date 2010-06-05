@@ -29,7 +29,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-public class TasksActivity extends ListActivity {
+public class TasksActivity extends ApplicationListActivity {
 
   private static final String TAG = "TasksActivity"; 
   
@@ -53,6 +53,7 @@ public class TasksActivity extends ListActivity {
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
     super.onResume();
+    rebuildList();
   }
   
   @Override
@@ -73,7 +74,6 @@ public class TasksActivity extends ListActivity {
     currentUser = app.getCurrentUser();
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);
-    populateList();
   }
   
   public void populateList() {
@@ -102,6 +102,11 @@ public class TasksActivity extends ListActivity {
     
     setListAdapter(adapter);
     dbAdapter.close();
+  }
+  
+  private void rebuildList() {
+    adapter.clearSections();
+    populateList();    
   }
 
   private long getDurationTotal(Cursor tasksCursor) {
@@ -168,8 +173,7 @@ public class TasksActivity extends ListActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-      adapter.clearSections();
-      populateList();
+      rebuildList();
       setProgressBarIndeterminateVisibility(false);      
     }
   };
