@@ -95,7 +95,8 @@ public class TasksActivity extends ListActivity {
           date = Util.smallDateString(queryCal.getTime());
       
       header_text = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
-      adapter.addSection(header_text, cursorAdapter);
+      if (cursorAdapter.getCount() != 0)
+        adapter.addSection(header_text, cursorAdapter);
       queryCal.add(Calendar.DATE, -1); 
     }
     

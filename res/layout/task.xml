@@ -60,7 +60,7 @@
     </LinearLayout>
   </LinearLayout>     
   <EditText
-      android:id="@+id/task_project_description"
+      android:id="@+id/task_description"
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:layout_weight="1"
@@ -73,63 +73,75 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:textStyle="bold"            
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/label_padding_left"
-        android:textSize="@dimen/label_text_size"           
-        android:textColor="@color/black"
-        android:text="@string/project"/>
-    <TextView
-        android:id="@+id/task_client_project_name"
-        android:layout_width="30dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="4"
-        android:paddingTop="@dimen/label_padding_top"
-        android:gravity="right"
-        android:textSize="@dimen/label_text_size"           
-        android:textColor="@color/black"
-        android:maxLines="1"/>      
-    <ImageView
-      android:src="@drawable/arrow"
-      android:layout_width="10dp"
-      android:layout_height="wrap_content"
-      android:paddingLeft="20dp"
-      android:layout_gravity="center"
-      android:layout_weight="1"/>        
+      android:layout_width="50dp"
+      android:layout_height="fill_parent"
+      android:layout_weight="1"
+      android:textStyle="bold"            
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"
+      android:textSize="@dimen/label_text_size"           
+      android:textColor="@color/black"
+      android:text="@string/project"/>
+    <LinearLayout
+      android:id="@+id/task_project_area"
+      android:layout_height="fill_parent"
+      android:layout_width="50dp"
+      android:layout_weight="5">
+	    <TextView
+	      android:id="@+id/task_project"
+	      android:layout_width="30dp"
+	      android:layout_height="fill_parent"
+	      android:layout_weight="4"
+	      android:paddingTop="@dimen/label_padding_top"
+	      android:gravity="right"
+	      android:textSize="@dimen/label_text_size"           
+	      android:textColor="@color/black"
+	      android:maxLines="1"/>      
+	    <ImageView
+	      android:src="@drawable/arrow"
+	      android:layout_width="15dp"
+	      android:layout_height="wrap_content"
+	      android:paddingLeft="15dp"
+	      android:layout_gravity="center"
+	      android:layout_weight="1"/>  
+    </LinearLayout>      
   </LinearLayout>
   <LinearLayout
     android:background="@drawable/txt_middle"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TextView
-       android:layout_width="30dp"
-       android:layout_height="fill_parent"
-       android:layout_weight="1"
-       android:textStyle="bold"
-       android:textSize="@dimen/label_text_size"
-       android:gravity="center_vertical"
-       android:paddingLeft="@dimen/label_padding_left"           
-       android:textColor="@color/black"          
-       android:text="@string/date"/>
-    <TextView
-       android:id="@+id/task_date"
-       android:layout_width="30dp"
-       android:layout_height="fill_parent"
-       android:layout_weight="4"
-       android:gravity="right"
-       android:paddingTop="@dimen/label_padding_top"        
-       android:textSize="@dimen/label_text_size"           
-       android:textColor="@color/black"/>   
-    <ImageView
-      android:src="@drawable/arrow"
-      android:layout_width="10dp"
-      android:layout_height="wrap_content"
-      android:paddingLeft="20dp"
-      android:layout_gravity="center"
-      android:layout_weight="1"/>           
+      android:layout_width="50dp"
+      android:layout_height="fill_parent"
+      android:layout_weight="1"
+      android:textStyle="bold"
+      android:textSize="@dimen/label_text_size"
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"           
+      android:textColor="@color/black"          
+      android:text="@string/date"/>
+    <LinearLayout
+      android:id="@+id/task_date_area"
+      android:layout_height="fill_parent"
+      android:layout_width="50dp"
+      android:layout_weight="5">       
+	    <TextView
+	      android:id="@+id/task_date"
+	      android:layout_width="30dp"
+	      android:layout_height="fill_parent"
+	      android:layout_weight="4"
+	      android:gravity="right"
+	      android:paddingTop="@dimen/label_padding_top"        
+	      android:textSize="@dimen/label_text_size"           
+	      android:textColor="@color/black"/>   
+	    <ImageView
+		    android:src="@drawable/arrow"
+		    android:layout_width="15dp"
+		    android:layout_height="wrap_content"
+        android:paddingLeft="15dp"		    
+		    android:layout_gravity="center"
+		    android:layout_weight="1"/>   
+    </LinearLayout>        
   </LinearLayout>    
   <LinearLayout
     android:background="@drawable/txt_middle"
@@ -157,60 +169,74 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:textStyle="bold"
-        android:textSize="@dimen/label_text_size"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/label_padding_left"           
-        android:textColor="@color/black"          
-        android:text="@string/planned"/>
-    <TextView
-        android:layout_width="30dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="4"
-        android:gravity="right"
-        android:paddingTop="@dimen/label_padding_top"        
-        android:textSize="@dimen/label_text_size"           
-        android:textColor="@color/light_gray"
-        android:text="(optional)"/>     
-    <ImageView
-      android:src="@drawable/arrow"
-      android:layout_width="10dp"
-      android:layout_height="wrap_content"
-      android:paddingLeft="20dp"
-      android:layout_gravity="center"
-      android:layout_weight="1"/>         
+      android:layout_width="50dp"
+      android:layout_height="fill_parent"
+      android:layout_weight="1"
+      android:textStyle="bold"
+      android:textSize="@dimen/label_text_size"
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"           
+      android:textColor="@color/black"          
+      android:text="@string/planned"/>
+    <LinearLayout
+      android:id="@+id/task_planned_tasks_area"
+      android:layout_height="fill_parent"
+      android:layout_width="50dp"
+      android:layout_weight="5">      
+	    <TextView
+	      android:id="@+id/task_planned_tasks"
+	      android:layout_width="30dp"
+	      android:layout_height="fill_parent"
+	      android:layout_weight="4"
+	      android:gravity="right"
+	      android:paddingTop="@dimen/label_padding_top"        
+	      android:textSize="@dimen/label_text_size"           
+	      android:textColor="@color/light_gray"
+	      android:text="(optional)"/>     
+	    <ImageView
+	      android:src="@drawable/arrow"
+	      android:layout_width="15dp"
+	      android:layout_height="wrap_content"
+	      android:paddingLeft="15dp"
+	      android:layout_gravity="center"
+	      android:layout_weight="1"/>      
+    </LinearLayout>
   </LinearLayout>    
   <LinearLayout
     android:background="@drawable/txt_bottom"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:layout_width="50dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:textStyle="bold"
-        android:textSize="@dimen/label_text_size"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/label_padding_left"           
-        android:textColor="@color/black"          
-        android:text="@string/tags"/>
-    <TextView
-        android:layout_width="30dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="4"
-        android:gravity="right"
-        android:paddingTop="@dimen/label_padding_top"
-        android:textSize="@dimen/label_text_size"           
-        android:textColor="@color/light_gray"/>          
-    <ImageView
-      android:src="@drawable/arrow"
-      android:layout_width="10dp"
-      android:layout_height="wrap_content"
-      android:paddingLeft="20dp"
-      android:layout_gravity="center"
-      android:layout_weight="1"/>      
+	    android:layout_width="50dp"
+	    android:layout_height="fill_parent"
+	    android:layout_weight="1"
+	    android:textStyle="bold"
+	    android:textSize="@dimen/label_text_size"
+	    android:gravity="center_vertical"
+	    android:paddingLeft="@dimen/label_padding_left"           
+	    android:textColor="@color/black"          
+	    android:text="@string/tags"/>
+    <LinearLayout
+      android:id="@+id/task_tags_area"
+      android:layout_height="fill_parent"
+      android:layout_width="50dp"
+      android:layout_weight="5">
+	    <TextView
+		    android:id="@+id/task_tags"
+		    android:layout_width="30dp"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="4"
+		    android:gravity="right"
+		    android:paddingTop="@dimen/label_padding_top"
+		    android:textSize="@dimen/label_text_size"           
+		    android:textColor="@color/light_gray"/>          
+	    <ImageView
+	      android:src="@drawable/arrow"
+	      android:layout_width="15dp"
+	      android:layout_height="wrap_content"
+	      android:paddingLeft="15dp"
+	      android:layout_gravity="center"
+	      android:layout_weight="1"/>
+    </LinearLayout>
   </LinearLayout>    
 </LinearLayout>

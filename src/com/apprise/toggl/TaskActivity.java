@@ -6,6 +6,8 @@ import com.apprise.toggl.storage.models.Task;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,9 +20,12 @@ public class TaskActivity extends ApplicationActivity {
   DatabaseAdapter dbAdapter;
   Task task;
   EditText descriptionView;
-  TextView clientProjectNameView;
+  TextView projectView;
   TextView dateView;
+  TextView plannedTasksView;
+  TextView tagsView;
   LinearLayout plannedTasksArea;
+  CheckBox billableCheckBox;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +34,7 @@ public class TaskActivity extends ApplicationActivity {
     
     init();
     initViews();
-    
+    attachEvents();
   } 
   
   protected void init() {
@@ -40,19 +45,23 @@ public class TaskActivity extends ApplicationActivity {
   }
 
   protected void initViews() {
-    descriptionView = (EditText) findViewById(R.id.task_project_description);
+    descriptionView = (EditText) findViewById(R.id.task_description);
     dateView = (TextView) findViewById(R.id.task_date);
-    clientProjectNameView = (TextView) findViewById(R.id.task_client_project_name);    
+    projectView = (TextView) findViewById(R.id.task_project);    
     plannedTasksArea = (LinearLayout) findViewById(R.id.task_planned_tasks_area);
+    plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
+    tagsView = (TextView) findViewById(R.id.task_tags);
+    billableCheckBox = (CheckBox) findViewById(R.id.task_billable_cb);
     
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
     descriptionView.setText(task.description);
+    billableCheckBox.setChecked(task.billable);
     
     if(task.project != null) {
-      clientProjectNameView.setText(task.project.client_project_name); 
+      projectView.setText(task.project.client_project_name); 
     } else {
-      clientProjectNameView.setText(R.string.choose);
-      clientProjectNameView.setTextColor(R.color.light_gray);
+      projectView.setText(R.string.choose);
+      projectView.setTextColor(R.color.light_gray);
     }
     
     initPlannedTasks();
@@ -68,5 +77,50 @@ public class TaskActivity extends ApplicationActivity {
     } else {
       plannedTasksArea.setVisibility(LinearLayout.GONE);      
     }
+  }
+  
+  protected void attachEvents() {
+    findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked project name");        
+        //TODO: choose project
+      }
+    });
+    
+    findViewById(R.id.task_date_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked date");        
+        //TODO choose date
+      }
+    });
+    
+    billableCheckBox.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked billable cb");
+        task.billable = billableCheckBox.isChecked();
+        saveTask();
+      }
+    });
+    
+    findViewById(R.id.task_tags_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked tags");
+        //TODO: tags
+      }
+    });
+    
+    findViewById(R.id.task_planned_tasks_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked planned tasks");
+        //TODO: planned tasks
+      }
+    });
+  }
+  
+  protected void saveTask() {
+    Log.d(TAG, "saving task: " + task);
+    task.sync_dirty = true;
+    if (!dbAdapter.updateTask(task))
+      dbAdapter.createTask(task);
   }
 }

@@ -50,25 +50,30 @@ public final class R {
         public static final int txt_top=0x7f02000b;
     }
     public static final class id {
-        public static final int account_menu_log_out=0x7f080010;
+        public static final int account_menu_log_out=0x7f080015;
         public static final int create_account=0x7f080003;
         public static final int email=0x7f080000;
         public static final int login=0x7f080002;
         public static final int password=0x7f080001;
-        public static final int signup_menu_return=0x7f080011;
-        public static final int task_billable_cb=0x7f08000a;
-        public static final int task_client_project_name=0x7f080008;
-        public static final int task_date=0x7f080009;
-        public static final int task_item_client_project_name=0x7f08000d;
-        public static final int task_item_description=0x7f08000c;
-        public static final int task_item_duration=0x7f08000e;
-        public static final int task_list_header_text=0x7f08000f;
-        public static final int task_planned_tasks_area=0x7f08000b;
-        public static final int task_project_description=0x7f080007;
+        public static final int signup_menu_return=0x7f080016;
+        public static final int task_billable_cb=0x7f08000c;
+        public static final int task_date=0x7f08000b;
+        public static final int task_date_area=0x7f08000a;
+        public static final int task_description=0x7f080007;
+        public static final int task_item_client_project_name=0x7f080012;
+        public static final int task_item_description=0x7f080011;
+        public static final int task_item_duration=0x7f080013;
+        public static final int task_list_header_text=0x7f080014;
+        public static final int task_planned_tasks=0x7f08000e;
+        public static final int task_planned_tasks_area=0x7f08000d;
+        public static final int task_project=0x7f080009;
+        public static final int task_project_area=0x7f080008;
+        public static final int task_tags=0x7f080010;
+        public static final int task_tags_area=0x7f08000f;
         public static final int task_timer_area=0x7f080004;
         public static final int task_timer_duration=0x7f080006;
-        public static final int tasks_menu_account=0x7f080013;
-        public static final int tasks_menu_refresh=0x7f080012;
+        public static final int tasks_menu_account=0x7f080018;
+        public static final int tasks_menu_refresh=0x7f080017;
         public static final int timer_trigger=0x7f080005;
     }
     public static final class layout {
