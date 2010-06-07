@@ -8,7 +8,6 @@ import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
 
-import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -90,6 +89,8 @@ public class TasksActivity extends ApplicationListActivity {
 
     for (int i = 0; i <= taskRetentionDays; i++) {
       tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
+      Log.d(TAG, "cursor count: " + tasksCursor.getCount());
+      startManagingCursor(tasksCursor);
       cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());

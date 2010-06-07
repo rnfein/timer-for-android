@@ -47,7 +47,6 @@ public class WelcomeActivity extends Activity {
   }
 
   private void getCurrentUserFromDb() {
-    Log.d(TAG, "get user from db");
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
     currentUser = dbAdapter.findUserByApiToken(apiToken);

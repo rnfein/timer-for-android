@@ -248,6 +248,8 @@ public class DatabaseAdapter {
   
   public Cursor findTasksForListByDate(Date date) {
     String dateString = Util.formatDateToString(date); 
+    
+    Log.d(TAG, "current user: " + app.getCurrentUser()._id);
     Cursor cursor = db.rawQuery("SELECT " 
         + Tasks.TABLE_NAME + "." + Tasks._ID + ", "
         + Tasks.TABLE_NAME + "." + Tasks.DESCRIPTION + ", "
@@ -256,7 +258,7 @@ public class DatabaseAdapter {
         + " FROM " + Tasks.TABLE_NAME 
         + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + 
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
-        " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(dateString) });
+        " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
 
     return cursor;
   }  
