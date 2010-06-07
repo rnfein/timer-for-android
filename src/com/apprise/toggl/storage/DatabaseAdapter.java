@@ -248,8 +248,6 @@ public class DatabaseAdapter {
   
   public Cursor findTasksForListByDate(Date date) {
     String dateString = Util.formatDateToString(date); 
-    
-    Log.d(TAG, "current user: " + app.getCurrentUser()._id);
     Cursor cursor = db.rawQuery("SELECT " 
         + Tasks.TABLE_NAME + "." + Tasks._ID + ", "
         + Tasks.TABLE_NAME + "." + Tasks.DESCRIPTION + ", "
@@ -383,7 +381,7 @@ public class DatabaseAdapter {
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
     Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? AND " 
         + columnName + " = ?", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(value) });
-
+    
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
       cursor.close();
       return null;
@@ -394,17 +392,6 @@ public class DatabaseAdapter {
   private Cursor getMovedCursorWithoutOwner(String tableName, String columnName, long value) {
     Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " 
         + columnName + " = ?", new String[] { String.valueOf(value) });
-    
-    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
-      cursor.close();
-      return null;
-    }
-    return cursor;
-  }
-  
-  private Cursor getMovedCursorByString(String tableName, String columnName, String value) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? AND " 
-        + columnName + " = ?", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(value) });
     
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
       cursor.close();

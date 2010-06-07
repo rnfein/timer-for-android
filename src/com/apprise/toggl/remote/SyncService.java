@@ -82,7 +82,7 @@ public class SyncService extends Service {
   }
   
   public void setApiToken(String apiToken) {
-    api.apiToken = apiToken;
+    api.setApiToken(apiToken);
   }
   
   public void syncAll() {

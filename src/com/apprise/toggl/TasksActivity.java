@@ -49,9 +49,9 @@ public class TasksActivity extends ApplicationListActivity {
   
   @Override
   protected void onResume() {
+    super.onResume();    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
-    super.onResume();
     rebuildList();
   }
   
@@ -76,8 +76,8 @@ public class TasksActivity extends ApplicationListActivity {
   }
   
   public void populateList() {
+    Cursor tasksCursor;  
     TasksCursorAdapter cursorAdapter;
-    Cursor tasksCursor;    
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
     String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION, Projects.CLIENT_PROJECT_NAME };
@@ -89,7 +89,6 @@ public class TasksActivity extends ApplicationListActivity {
 
     for (int i = 0; i <= taskRetentionDays; i++) {
       tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
-      Log.d(TAG, "cursor count: " + tasksCursor.getCount());
       startManagingCursor(tasksCursor);
       cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
@@ -98,7 +97,7 @@ public class TasksActivity extends ApplicationListActivity {
       header_text = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
       if (cursorAdapter.getCount() != 0)
         adapter.addSection(header_text, cursorAdapter);
-      queryCal.add(Calendar.DATE, -1); 
+      queryCal.add(Calendar.DATE, -1);
     }
     
     setListAdapter(adapter);
