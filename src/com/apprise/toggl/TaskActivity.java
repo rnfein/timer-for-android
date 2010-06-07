@@ -4,10 +4,12 @@ import java.util.Date;
 import java.util.Calendar;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.Task;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -98,7 +100,8 @@ public class TaskActivity extends ApplicationActivity {
     findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked project name");        
-        //TODO: choose project
+        Intent intent = new Intent(TaskActivity.this, ProjectsActivity.class);
+        startActivity(intent); 
       }
     });
     
