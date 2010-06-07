@@ -256,7 +256,7 @@ public class DatabaseAdapter {
         + " FROM " + Tasks.TABLE_NAME 
         + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + 
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
-        " AND " + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(dateString) });
+        " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(dateString) });
 
     return cursor;
   }  
@@ -379,7 +379,7 @@ public class DatabaseAdapter {
   }
   
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? " 
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? AND " 
         + columnName + " = ?", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(value) });
 
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
@@ -401,7 +401,7 @@ public class DatabaseAdapter {
   }
   
   private Cursor getMovedCursorByString(String tableName, String columnName, String value) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? " 
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? AND " 
         + columnName + " = ?", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(value) });
     
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
