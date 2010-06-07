@@ -50,11 +50,17 @@ public class TogglWebApi {
   private static final String API_TOKEN = "api_token";
 
   private DefaultHttpClient httpClient;
-  public String apiToken;
+  private String apiToken;
+  private boolean restartSession = true; 
   
   public TogglWebApi(String apiToken) {
     this.apiToken = apiToken;
     createHttpClient();
+  }
+  
+  public void setApiToken(String apiToken) {
+    this.apiToken = apiToken;
+    this.restartSession = true;
   }
 
   public User authenticateWithCredentials(final String email, final String password) {
@@ -132,10 +138,14 @@ public class TogglWebApi {
    * Authenticate if session cookies are missing
    * */
   private boolean getSession() {
-    for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
-      if (cookie.getName().equals("_toggl_session"))
-        return true;
-    }
+    if (!restartSession) { 
+      for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
+        Log.d(TAG, "cookie: " + cookie.getName());
+        if (cookie.getName().equals("_toggl_session"))
+          return true;
+      }
+    } 
+    restartSession = false;
     return (userAuthentication(paramsWithApiToken()) != null);    
   }
 
