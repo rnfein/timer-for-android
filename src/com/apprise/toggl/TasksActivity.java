@@ -69,8 +69,8 @@ public class TasksActivity extends ApplicationListActivity {
   }
 
   protected void init() {
-    dbAdapter = new DatabaseAdapter(this);
-    app = (Toggl) getApplication();
+    app = (Toggl) getApplication();    
+    dbAdapter = new DatabaseAdapter(this, app);
     currentUser = app.getCurrentUser();
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);

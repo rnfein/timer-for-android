@@ -2,6 +2,7 @@ package com.apprise.toggl.storage;
 
 import java.util.Date;
 
+import com.apprise.toggl.Toggl;
 import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.PlannedTask;
@@ -30,9 +31,11 @@ public class DatabaseAdapter {
   private Context context;
   private DatabaseOpenHelper dbHelper;
   private String databaseName;
+  private Toggl app;
 
-  public DatabaseAdapter(Context context) {
+  public DatabaseAdapter(Context context, Toggl app) {
     this.context = context;
+    this.app = app; 
   }
   
   public void close() {

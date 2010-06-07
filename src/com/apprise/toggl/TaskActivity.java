@@ -48,7 +48,7 @@ public class TaskActivity extends ApplicationActivity {
   } 
   
   protected void init() {
-    dbAdapter = new DatabaseAdapter(this);
+    dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
     task = dbAdapter.findTask(_id);

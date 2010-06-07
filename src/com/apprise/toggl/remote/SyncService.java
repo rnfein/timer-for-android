@@ -59,7 +59,7 @@ public class SyncService extends Service {
     super.onCreate();
     app = (Toggl) getApplication();
     api = new TogglWebApi(app.getAPIToken());
-    dbAdapter = new DatabaseAdapter(this);
+    dbAdapter = new DatabaseAdapter(this, app);
   }
   
   @Override

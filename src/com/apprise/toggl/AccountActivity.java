@@ -132,7 +132,7 @@ public class AccountActivity extends Activity {
   }
   
   public void saveCurrentUser(User user) {
-    DatabaseAdapter dbAdapter = new DatabaseAdapter(this);
+    DatabaseAdapter dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
     User fetchedUser = dbAdapter.findUserByRemoteId(user.id);
     if(fetchedUser == null) {

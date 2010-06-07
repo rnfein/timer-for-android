@@ -11,6 +11,7 @@ import android.widget.SimpleCursorAdapter;
 public class ProjectsActivity extends ApplicationListActivity {
 
   DatabaseAdapter dbAdapter;
+  Toggl app;
   Cursor projectsCursor;
   
   @Override
@@ -23,7 +24,8 @@ public class ProjectsActivity extends ApplicationListActivity {
   }
 
   protected void init() {
-    dbAdapter = new DatabaseAdapter(this);
+    app = (Toggl) getApplication();
+    dbAdapter = new DatabaseAdapter(this, app);
   }
   
   private void populateList() {
