@@ -2,6 +2,7 @@ package com.apprise.toggl.storage;
 
 import java.util.Date;
 
+import com.apprise.toggl.Toggl;
 import com.apprise.toggl.TogglTests;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.DeletedTasks;
@@ -17,6 +18,7 @@ import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
 
+import android.app.Application;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -24,14 +26,22 @@ import android.util.Log;
 
 public class DatabaseAdapterTest extends AndroidTestCase {
   
-  
+  private Toggl app;
   private DatabaseAdapter dbAdapter;  
 
   @Override
   protected void setUp() throws Exception {
-    dbAdapter = new DatabaseAdapter(getContext());
+    app = Toggl.getInstance();
+    dbAdapter = new DatabaseAdapter(getContext(), app);
     dbAdapter.setDatabaseName(TogglTests.TEST_DATABASE_NAME);
     dbAdapter.open();
+    
+    User user = new User();
+    user.id = 123;
+    user.email = "user@toggl.com";
+    User createdUser = dbAdapter.createUser(user);
+    app.logIn(createdUser);
+    
     super.setUp();
   }
 

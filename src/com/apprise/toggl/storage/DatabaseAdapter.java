@@ -60,7 +60,7 @@ public class DatabaseAdapter {
   }  
   
   public User findUser(long _id) {
-    Cursor cursor = getMovedCursor(Users.TABLE_NAME, Users._ID, _id);
+    Cursor cursor = getMovedCursorWithoutOwner(Users.TABLE_NAME, Users._ID, _id);
     User user = ORM.mapUser(cursor);
     safeClose(cursor);
     return user;
@@ -74,14 +74,14 @@ public class DatabaseAdapter {
   }  
   
   public User findUserByRemoteId(long remoteId) {
-    Cursor cursor = getMovedCursor(Users.TABLE_NAME, Users.REMOTE_ID, remoteId);
+    Cursor cursor = getMovedCursorWithoutOwner(Users.TABLE_NAME, Users.REMOTE_ID, remoteId);
     User user = ORM.mapUser(cursor);
     safeClose(cursor);
     return user;
   }  
   
   public User findUserByApiToken(String apiToken) {
-    Cursor cursor = getMovedCursorByString(Users.TABLE_NAME, Users.API_TOKEN, apiToken);
+    Cursor cursor = getMovedCursorByStringWithoutOwner(Users.TABLE_NAME, Users.API_TOKEN, apiToken);
     User user = ORM.mapUser(cursor);
     safeClose(cursor);
     return user;
@@ -143,7 +143,7 @@ public class DatabaseAdapter {
   }
   
   public Cursor findAllWorkspaces() {
-    return db.query(Workspaces.TABLE_NAME, null, null, null, null, null, null);    
+    return db.query(Workspaces.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);    
   }
   
   public int deleteWorkspace(long _id) {
@@ -152,6 +152,7 @@ public class DatabaseAdapter {
 
   private ContentValues setWorkspaceValues(Workspace workspace) {
     ContentValues values = new ContentValues();
+    values.put(Workspaces.OWNER_USER_ID, app.getCurrentUser()._id);
     values.put(Workspaces.NAME, workspace.name);
     values.put(Workspaces.REMOTE_ID, workspace.id);
     
@@ -193,7 +194,7 @@ public class DatabaseAdapter {
   } 
   
   public Cursor findAllProjects() {
-    return db.query(Projects.TABLE_NAME, null, null, null, null, null, null);        
+    return db.query(Projects.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);        
   }
   
   public int deleteProject(long _id) {
@@ -202,6 +203,7 @@ public class DatabaseAdapter {
   
   private ContentValues setProjectValues(Project project) {
     ContentValues values = new ContentValues();
+    values.put(Projects.OWNER_USER_ID, app.getCurrentUser()._id);    
     values.put(Projects.BILLABLE, project.billable);
     values.put(Projects.CLIENT_PROJECT_NAME, project.client_project_name);
     values.put(Projects.ESTIMATED_WORKHOURS, project.estimated_workhours);
@@ -253,13 +255,14 @@ public class DatabaseAdapter {
         + Projects.TABLE_NAME + "." + Projects.CLIENT_PROJECT_NAME
         + " FROM " + Tasks.TABLE_NAME 
         + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + 
-        " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime') ORDER BY start", new String[] { String.valueOf(dateString) });
+        " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
+        " AND " + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(dateString) });
 
     return cursor;
   }  
   
   public Cursor findAllTasks() {
-    return db.query(Tasks.TABLE_NAME, null, null, null, null, null, null);        
+    return db.query(Tasks.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);        
   }  
   
   public boolean updateTask(Task task) {
@@ -287,6 +290,7 @@ public class DatabaseAdapter {
     
   private ContentValues setTaskValues(Task task) {
     ContentValues values = new ContentValues();
+    values.put(Tasks.OWNER_USER_ID, app.getCurrentUser()._id);    
     values.put(Tasks.REMOTE_ID, task.id);
     values.put(Tasks.DESCRIPTION, task.description);    
     values.put(Tasks.BILLABLE, task.billable);
@@ -310,7 +314,7 @@ public class DatabaseAdapter {
   }
   
   public Cursor findAllDeletedTasks() {
-    return db.query(DeletedTasks.TABLE_NAME, null, null, null, null, null, null);     
+    return db.query(DeletedTasks.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);     
   }
   
   public void deleteDeletedTask(long _id) {
@@ -346,7 +350,7 @@ public class DatabaseAdapter {
   }
   
   public Cursor findAllPlannedTasks() {
-    return db.query(PlannedTasks.TABLE_NAME, null, null, null, null, null, null);     
+    return db.query(PlannedTasks.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);     
   }
   
   public boolean updatePlannedTask(PlannedTask plannedTask) {
@@ -362,6 +366,7 @@ public class DatabaseAdapter {
   
   private ContentValues setPlannedTaskValues(PlannedTask plannedTask) {
     ContentValues values = new ContentValues();
+    values.put(PlannedTasks.OWNER_USER_ID, app.getCurrentUser()._id);    
     values.put(PlannedTasks.REMOTE_ID, plannedTask.id);
     values.put(PlannedTasks.ESTIMATED_WORKHOURS, plannedTask.estimated_workhours);
     values.put(PlannedTasks.NAME, plannedTask.name);
@@ -374,7 +379,8 @@ public class DatabaseAdapter {
   }
   
   private Cursor getMovedCursor(String tableName, String columnName, long value) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { String.valueOf(value) });
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? " 
+        + columnName + " = ?", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(value) });
 
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
       cursor.close();
@@ -383,8 +389,31 @@ public class DatabaseAdapter {
     return cursor;
   }
   
+  private Cursor getMovedCursorWithoutOwner(String tableName, String columnName, long value) {
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " 
+        + columnName + " = ?", new String[] { String.valueOf(value) });
+    
+    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
+      cursor.close();
+      return null;
+    }
+    return cursor;
+  }
+  
   private Cursor getMovedCursorByString(String tableName, String columnName, String value) {
-    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " + columnName + " = ?", new String[] { value });
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE owner_user_id = ? " 
+        + columnName + " = ?", new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(value) });
+    
+    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
+      cursor.close();
+      return null;
+    }
+    return cursor;
+  }
+  
+  private Cursor getMovedCursorByStringWithoutOwner(String tableName, String columnName, String value) {
+    Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE " 
+        + columnName + " = ?", new String[] { String.valueOf(value) });
     
     if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
       cursor.close();
@@ -536,12 +565,14 @@ public class DatabaseAdapter {
 
     private static final String CREATE_WORKSPACES_TABLE = "CREATE TABLE " + Workspaces.TABLE_NAME + " ("
       + Workspaces._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+      + Workspaces.OWNER_USER_ID + " INTEGER NOT NULL,"
       + Workspaces.REMOTE_ID + " INTEGER NOT NULL,"      
       + Workspaces.NAME + " TEXT"
       + ");";
     
     private static final String CREATE_PROJECTS_TABLE = "CREATE TABLE " + Projects.TABLE_NAME + " ("
       + Projects._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+      + Projects.OWNER_USER_ID + " INTEGER NOT NULL,"      
       + Projects.REMOTE_ID + " INTEGER NOT NULL,"
       + Projects.SYNC_DIRTY + " INTEGER NOT NULL,"      
       + Projects.FIXED_FEE + " INTEGER,"
@@ -556,6 +587,7 @@ public class DatabaseAdapter {
     
     private static final String CREATE_TASKS_TABLE = "CREATE TABLE " + Tasks.TABLE_NAME + " ("
       + Tasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+      + Tasks.OWNER_USER_ID + " INTEGER NOT NULL,"      
       + Tasks.REMOTE_ID + " INTEGER NOT NULL,"  
       + Tasks.SYNC_DIRTY + " INTEGER NOT NULL,"  
       + Tasks.PROJECT_ID + " INTEGER,"
@@ -570,11 +602,13 @@ public class DatabaseAdapter {
     
     private static final String CREATE_DELETED_TASKS_TABLE = "CREATE TABLE " + DeletedTasks.TABLE_NAME + " ("
     + DeletedTasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+    + DeletedTasks.OWNER_USER_ID + " INTEGER NOT NULL,"    
     + DeletedTasks.TASK_REMOTE_ID + " INTEGER NOT NULL"
     + ");";
     
     private static final String CREATE_PLANNED_TASKS_TABLE = "CREATE TABLE " + PlannedTasks.TABLE_NAME + " ("
       + PlannedTasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+      + PlannedTasks.OWNER_USER_ID + " INTEGER NOT NULL,"      
       + PlannedTasks.REMOTE_ID + " INTEGER NOT NULL,"      
       + PlannedTasks.NAME + " TEXT,"
       + PlannedTasks.WORKSPACE_ID + " INTEGER,"
@@ -622,6 +656,7 @@ public class DatabaseAdapter {
   public static final class Workspaces implements BaseColumns {
     public static final String TABLE_NAME = "workspaces";
     
+    public static final String OWNER_USER_ID = "owner_user_id";    
     public static final String REMOTE_ID = "remote_id";    
     public static final String NAME = "name";
   }
@@ -629,6 +664,7 @@ public class DatabaseAdapter {
   public static final class Projects implements BaseColumns {
     public static final String TABLE_NAME = "projects";
     
+    public static final String OWNER_USER_ID = "owner_user_id";    
     public static final String REMOTE_ID = "remote_id";
     public static final String SYNC_DIRTY = "sync_dirty";     
     public static final String FIXED_FEE = "fixed_fee";
@@ -644,6 +680,7 @@ public class DatabaseAdapter {
   public static final class Tasks implements BaseColumns {
     public static final String TABLE_NAME = "tasks";
 
+    public static final String OWNER_USER_ID = "owner_user_id";
     public static final String REMOTE_ID = "remote_id";
     public static final String SYNC_DIRTY = "sync_dirty";     
     public static final String PROJECT_ID = "project_id";
@@ -659,12 +696,14 @@ public class DatabaseAdapter {
   public static final class DeletedTasks implements BaseColumns {
     public static final String TABLE_NAME = "deleted_tasks";
 
+    public static final String OWNER_USER_ID = "owner_user_id";
     public static final String TASK_REMOTE_ID = "task_remote_id";
   }
   
   public static final class PlannedTasks implements BaseColumns {
     public static final String TABLE_NAME = "planned_tasks";
     
+    public static final String OWNER_USER_ID = "owner_user_id";
     public static final String REMOTE_ID = "remote_id";      
     public static final String NAME = "name";
     public static final String WORKSPACE_ID = "workspace_id";  
