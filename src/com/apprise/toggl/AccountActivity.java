@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -50,7 +51,7 @@ public class AccountActivity extends Activity {
   } 
   
   @Override
-  protected void onResume() {
+  protected void onResume() {    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);    
     super.onResume();
@@ -87,6 +88,8 @@ public class AccountActivity extends Activity {
   }    
   
   protected void init() {    
+    requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+    setProgressBarIndeterminate(true);    
     app = (Toggl) getApplication();
     webApi = new TogglWebApi(app.getAPIToken());
     Intent intent = new Intent(this, SyncService.class);
@@ -112,7 +115,7 @@ public class AccountActivity extends Activity {
   protected void attachEvents() {
     loginButton.setOnClickListener(new View.OnClickListener() {
 
-      public void onClick(View v) {
+      public void onClick(View v) {  
         setProgressBarIndeterminateVisibility(true);
         new Thread(authenticateInBackground).start();
       }
@@ -131,17 +134,18 @@ public class AccountActivity extends Activity {
     startActivity(new Intent(AccountActivity.this, TasksActivity.class));
   }
   
-  public void saveCurrentUser(User user) {
+  private User saveCurrentUser(User user) {
     DatabaseAdapter dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
     User fetchedUser = dbAdapter.findUserByRemoteId(user.id);
     if(fetchedUser == null) {
-      dbAdapter.createUser(user); 
+      user = dbAdapter.createUser(user); 
     } else {
       user._id = fetchedUser._id;
       dbAdapter.updateUser(user);
     }
     dbAdapter.close();
+    return user;
   }
   
   protected Runnable authenticateInBackground = new Runnable() {
@@ -152,9 +156,9 @@ public class AccountActivity extends Activity {
       User user = webApi.authenticateWithCredentials(email, password);
 
       if (user != null) {
+        user = saveCurrentUser(user);        
         app.logIn(user);
-        webApi.apiToken = user.api_token;
-        saveCurrentUser(user);
+        webApi.setApiToken(user.api_token);
         Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());
         new Thread(syncAllInBackground).start();        
       } else {
@@ -168,9 +172,10 @@ public class AccountActivity extends Activity {
     @Override
     public void onReceive(Context context, Intent intent) {
       Log.d(TAG, "sync completed on: " + intent.getStringExtra(SyncService.COLLECTION));
-      if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED))
+      if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED)) {
         setProgressBarIndeterminateVisibility(false);        
         startTasksActivity();      
+      }
     }
   };  
   
