@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.Util;
+import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
@@ -215,6 +216,54 @@ public class DatabaseAdapter {
     values.put(Projects.SYNC_DIRTY, project.sync_dirty);
 
     if (project.workspace != null) values.put(Projects.WORKSPACE_REMOTE_ID, project.workspace.id);
+    
+    return values;
+  }
+
+  public Client createClient(Client client) {
+    ContentValues values = setClientValues(client);
+    
+    long _id = db.insert(Clients.TABLE_NAME, Clients.NAME, values);
+    return findClient(_id);    
+  }
+  
+  public Client findClient(long _id) {
+    Cursor cursor = getMovedCursor(Clients.TABLE_NAME, Clients._ID, _id);
+    Client client = ORM.mapClient(cursor, this);
+    safeClose(cursor);
+    return client;
+  }
+  
+  public Client findClientByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(Clients.TABLE_NAME, Clients.REMOTE_ID, remoteId);
+    Client client = ORM.mapClient(cursor, this);
+    safeClose(cursor);
+    return client;
+  }  
+  
+  public boolean updateClient(Client client) {
+    ContentValues values = setClientValues(client);
+    
+    int affectedRows = db.update(Clients.TABLE_NAME, values, Clients._ID + " = " + client._id, null);
+    return affectedRows == 1;    
+  } 
+  
+  public Cursor findAllClients() {
+    return db.query(Clients.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);        
+  }
+  
+  public int deleteClient(long _id) {
+    return delete(Clients.TABLE_NAME, Clients._ID, _id);    
+  }  
+  
+  private ContentValues setClientValues(Client client) {
+    ContentValues values = new ContentValues();
+    values.put(Clients.OWNER_USER_ID, app.getCurrentUser()._id);    
+    values.put(Clients.NAME, client.name);
+    values.put(Clients.HOURLY_RATE, client.hourly_rate);
+    values.put(Clients.CURRENCY, client.currency);
+    
+    if (client.workspace != null) values.put(Clients.WORKSPACE_REMOTE_ID, client.workspace.id);
     
     return values;
   }
@@ -482,6 +531,18 @@ public class DatabaseAdapter {
       return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), billable, clientProjectName, hourlyRate, name, remote_id, syncDirty);
     }
     
+    public static Client mapClient(Cursor cursor, DatabaseAdapter dbAdapter) {
+      if (cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(Clients._ID));
+      String name = cursor.getString(cursor.getColumnIndex(Clients.NAME));
+      String hourlyRate = cursor.getString(cursor.getColumnIndex(Clients.HOURLY_RATE));
+      String currency = cursor.getString(cursor.getColumnIndex(Clients.CURRENCY));
+      long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Clients.WORKSPACE_REMOTE_ID));
+      
+      return new Client(_id, name, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), hourlyRate, currency);
+    }
+    
     public static Task mapTask(Cursor cursor, DatabaseAdapter dbAdapter) {
       if (cursor == null) return null;
       
@@ -574,6 +635,15 @@ public class DatabaseAdapter {
       + Projects.NAME + " TEXT"
       + ");";
     
+    private static final String CREATE_CLIENTS_TABLE = "CREATE TABLE " + Clients.TABLE_NAME + " ("
+    + Clients._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+    + Clients.OWNER_USER_ID + " INTEGER NOT NULL,"      
+    + Clients.REMOTE_ID + " INTEGER NOT NULL,"
+    + Clients.NAME + " TEXT,"      
+    + Clients.HOURLY_RATE + " TEXT,"
+    + Clients.CURRENCY + " TEXT"
+    + ");";
+    
     private static final String CREATE_TASKS_TABLE = "CREATE TABLE " + Tasks.TABLE_NAME + " ("
       + Tasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
       + Tasks.OWNER_USER_ID + " INTEGER NOT NULL,"      
@@ -612,6 +682,7 @@ public class DatabaseAdapter {
       db.execSQL(CREATE_USERS_TABLE);
       db.execSQL(CREATE_WORKSPACES_TABLE);      
       db.execSQL(CREATE_PROJECTS_TABLE);
+      db.execSQL(CREATE_CLIENTS_TABLE);
       db.execSQL(CREATE_TASKS_TABLE);
       db.execSQL(CREATE_DELETED_TASKS_TABLE);
       db.execSQL(CREATE_PLANNED_TASKS_TABLE);
@@ -664,6 +735,17 @@ public class DatabaseAdapter {
     public static final String CLIENT_PROJECT_NAME = "client_project_name";
     public static final String HOURLY_RATE = "hourly_rate";
     public static final String NAME = "name";   
+  }
+  
+  public static final class Clients implements BaseColumns {
+    public static final String TABLE_NAME = "clients";
+
+    public static final String OWNER_USER_ID = "owner_user_id";
+    public static final String REMOTE_ID = "remote_id";
+    public static final String NAME = "name";
+    public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
+    public static final String HOURLY_RATE = "hourly_rate";
+    public static final String CURRENCY = "currency";
   }
   
   public static final class Tasks implements BaseColumns {
