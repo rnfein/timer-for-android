@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 
-public class AccountActivityTests extends ActivityInstrumentationTestCase2<AccountActivity>{
+public class AccountActivityTest extends ActivityInstrumentationTestCase2<AccountActivity>{
 
-  public AccountActivityTests() {
+  public AccountActivityTest() {
     super("com.apprise.toggl", AccountActivity.class);
   }
   

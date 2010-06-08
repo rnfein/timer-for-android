@@ -40,7 +40,7 @@ public class TogglTests extends TestSuite {
     suite.addTestSuite(ModelTest.class);
     suite.addTestSuite(DatabaseAdapterTest.class);
     suite.addTestSuite(SyncServiceTest.class);
-    suite.addTestSuite(AccountActivityTests.class);
+    suite.addTestSuite(AccountActivityTest.class);
     return suite;
   }
 }
