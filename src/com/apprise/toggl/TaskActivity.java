@@ -150,17 +150,16 @@ public class TaskActivity extends ApplicationActivity {
     timeTrackingButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         if (trackingService.isTracking(task)) {
-          // is tracking the task
-          // TODO: save task
           trackingService.stopTracking();
+          // TODO: set task stop date
+          saveTask();
           timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
         }
         else if (trackingService.isTracking()) {
           // is tracking another task
-          // TODO: stop the other or notify user?
+          // stop the other or notify user?
         }
         else {
-          // all clear
           trackingService.startTracking(task);
           timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
         }
