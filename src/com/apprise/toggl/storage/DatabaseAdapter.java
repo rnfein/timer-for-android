@@ -201,22 +201,6 @@ public class DatabaseAdapter {
     return db.query(Projects.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);        
   }
   
-  public Cursor findAllProjectsForSpinner() {
-    Cursor cursor = db.rawQuery( "SELECT * FROM (" +
-    		"SELECT " + Projects._ID + ", " +
-        Projects.CLIENT_PROJECT_NAME +
-        " FROM " + Projects.TABLE_NAME + 
-        " WHERE " + Projects.OWNER_USER_ID + " = ?" + 
-        " UNION " +
-        "SELECT -1 as _id, '+ Add New Project' as " + Projects.CLIENT_PROJECT_NAME +
-        " UNION " +
-        "SELECT 0 as _id, '' as " + Projects.CLIENT_PROJECT_NAME +
-        ") ORDER BY (_id >= 0) desc",
-        new String[] { String.valueOf(app.getCurrentUser()._id) });
-
-    return cursor;        
-  }
-  
   public int deleteProject(long _id) {
     return delete(Projects.TABLE_NAME, Projects._ID, _id);    
   }
