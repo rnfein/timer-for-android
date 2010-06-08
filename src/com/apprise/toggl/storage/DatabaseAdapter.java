@@ -214,7 +214,7 @@ public class DatabaseAdapter {
     values.put(Projects.REMOTE_ID, project.id);
     values.put(Projects.SYNC_DIRTY, project.sync_dirty);
 
-    if (project.workspace != null) values.put(Projects.WORKSPACE_ID, project.workspace._id);
+    if (project.workspace != null) values.put(Projects.WORKSPACE_REMOTE_ID, project.workspace.id);
     
     return values;
   }
@@ -254,7 +254,7 @@ public class DatabaseAdapter {
         + Tasks.TABLE_NAME + "." + Tasks.DURATION + ", "
         + Projects.TABLE_NAME + "." + Projects.CLIENT_PROJECT_NAME
         + " FROM " + Tasks.TABLE_NAME 
-        + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + 
+        + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_REMOTE_ID + " = " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + 
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
         " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
 
@@ -300,8 +300,8 @@ public class DatabaseAdapter {
     values.put(Tasks.SYNC_DIRTY, task.sync_dirty);
 //    values.put(Tasks.TAG_NAMES, "tag_names"); //TODO
 //
-    if (task.workspace != null) values.put(Tasks.WORKSPACE_ID, task.workspace._id);
-    if (task.project != null) values.put(Tasks.PROJECT_ID, task.project._id); 
+    if (task.workspace != null) values.put(Tasks.WORKSPACE_REMOTE_ID, task.workspace.id);
+    if (task.project != null) values.put(Tasks.PROJECT_REMOTE_ID, task.project.id); 
     
     return values;
   }
@@ -345,8 +345,8 @@ public class DatabaseAdapter {
   /*
    * finds planned tasks by project remote id
    */
-  public Cursor findPlannedTasksByProjectId(long projectId) {
-    return getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks.PROJECT_ID, projectId);
+  public Cursor findPlannedTasksByProjectId(long projectRemoteId) {
+    return getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks.PROJECT_REMOTE_ID, projectRemoteId);
   }
   
   public Cursor findAllPlannedTasks() {
@@ -371,8 +371,8 @@ public class DatabaseAdapter {
     values.put(PlannedTasks.ESTIMATED_WORKHOURS, plannedTask.estimated_workhours);
     values.put(PlannedTasks.NAME, plannedTask.name);
     
-    if(plannedTask.project != null) values.put(PlannedTasks.PROJECT_ID, plannedTask.project._id);
-    if(plannedTask.workspace != null) values.put(PlannedTasks.WORKSPACE_ID, plannedTask.workspace._id);
+    if(plannedTask.project != null) values.put(PlannedTasks.PROJECT_REMOTE_ID, plannedTask.project.id);
+    if(plannedTask.workspace != null) values.put(PlannedTasks.WORKSPACE_REMOTE_ID, plannedTask.workspace.id);
     if(plannedTask.user != null) values.put(PlannedTasks.USER_ID, plannedTask.user._id);
 
     return values;
@@ -476,10 +476,10 @@ public class DatabaseAdapter {
       long hourlyRate = cursor.getLong(cursor.getColumnIndex(Projects.HOURLY_RATE));
       String name = cursor.getString(cursor.getColumnIndex(Projects.NAME));
       long remote_id = cursor.getLong(cursor.getColumnIndex(Projects.REMOTE_ID));
-      long workspaceId = cursor.getLong(cursor.getColumnIndex(Projects.WORKSPACE_ID));
+      long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Projects.WORKSPACE_REMOTE_ID));
       boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Projects.SYNC_DIRTY)) == 1);
       
-      return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspace(workspaceId), billable, clientProjectName, hourlyRate, name, remote_id, syncDirty);
+      return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), billable, clientProjectName, hourlyRate, name, remote_id, syncDirty);
     }
     
     public static Task mapTask(Cursor cursor, DatabaseAdapter dbAdapter) {
@@ -489,8 +489,8 @@ public class DatabaseAdapter {
       boolean billable = (cursor.getInt(cursor.getColumnIndex(Tasks.BILLABLE)) == 1);
       String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
       long duration = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
-      long projectId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_ID));
-      long workspaceId = cursor.getLong(cursor.getColumnIndex(Tasks.WORKSPACE_ID));
+      long projectRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_REMOTE_ID));
+      long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.WORKSPACE_REMOTE_ID));
       String start = cursor.getString(cursor.getColumnIndex(Tasks.START));
       String stop = cursor.getString(cursor.getColumnIndex(Tasks.STOP));
       long remote_id = cursor.getLong(cursor.getColumnIndex(Tasks.REMOTE_ID));
@@ -499,7 +499,7 @@ public class DatabaseAdapter {
       //TODO: String tagNames = cursor.getString(cursor.getColumnIndex(Tasks.TAG_NAMES));
       String[] tagNames = null;
       
-      return new Task(_id, dbAdapter.findProject(projectId), dbAdapter.findWorkspace(workspaceId),
+      return new Task(_id, dbAdapter.findProjectByRemoteId(projectRemoteId), dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId),
           duration, start, billable, description, stop, tagNames, remote_id, syncDirty);
     }
     
@@ -518,13 +518,13 @@ public class DatabaseAdapter {
       long _id = cursor.getLong(cursor.getColumnIndex(PlannedTasks._ID));
       long remote_id = cursor.getLong(cursor.getColumnIndex(PlannedTasks.REMOTE_ID));
       String name = cursor.getString(cursor.getColumnIndex(PlannedTasks.NAME));
-      long workspaceId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.WORKSPACE_ID));
-      long projectId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.PROJECT_ID));
+      long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.WORKSPACE_REMOTE_ID));
+      long projectRemoteId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.PROJECT_REMOTE_ID));
       long userId = cursor.getLong(cursor.getColumnIndex(PlannedTasks.USER_ID));
       long estimatedWorkhours = cursor.getLong(cursor.getColumnIndex(PlannedTasks.ESTIMATED_WORKHOURS));
 
-      return new PlannedTask(_id, name, dbAdapter.findWorkspace(workspaceId), remote_id, 
-          dbAdapter.findProject(projectId), dbAdapter.findUser(userId), estimatedWorkhours);
+      return new PlannedTask(_id, name, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), remote_id, 
+          dbAdapter.findProjectByRemoteId(projectRemoteId), dbAdapter.findUser(userId), estimatedWorkhours);
     }
     
   }
@@ -567,7 +567,7 @@ public class DatabaseAdapter {
       + Projects.FIXED_FEE + " INTEGER,"
       + Projects.ESTIMATED_WORKHOURS + " INTEGER,"
       + Projects.IS_FIXED_FEE + " INTEGER,"
-      + Projects.WORKSPACE_ID + " INTEGER,"
+      + Projects.WORKSPACE_REMOTE_ID + " INTEGER,"
       + Projects.BILLABLE + " INTEGER,"
       + Projects.CLIENT_PROJECT_NAME + " TEXT,"
       + Projects.HOURLY_RATE + " INTEGER,"
@@ -579,8 +579,8 @@ public class DatabaseAdapter {
       + Tasks.OWNER_USER_ID + " INTEGER NOT NULL,"      
       + Tasks.REMOTE_ID + " INTEGER NOT NULL,"  
       + Tasks.SYNC_DIRTY + " INTEGER NOT NULL,"  
-      + Tasks.PROJECT_ID + " INTEGER,"
-      + Tasks.WORKSPACE_ID + " INTEGER,"
+      + Tasks.PROJECT_REMOTE_ID + " INTEGER,"
+      + Tasks.WORKSPACE_REMOTE_ID + " INTEGER,"
       + Tasks.DURATION + " INTEGER,"
       + Tasks.START + " TEXT,"
       + Tasks.BILLABLE + " INTEGER,"
@@ -600,8 +600,8 @@ public class DatabaseAdapter {
       + PlannedTasks.OWNER_USER_ID + " INTEGER NOT NULL,"      
       + PlannedTasks.REMOTE_ID + " INTEGER NOT NULL,"      
       + PlannedTasks.NAME + " TEXT,"
-      + PlannedTasks.WORKSPACE_ID + " INTEGER,"
-      + PlannedTasks.PROJECT_ID + " INTEGER,"
+      + PlannedTasks.WORKSPACE_REMOTE_ID + " INTEGER,"
+      + PlannedTasks.PROJECT_REMOTE_ID + " INTEGER,"
       + PlannedTasks.USER_ID + " INTEGER,"
       + PlannedTasks.ESTIMATED_WORKHOURS + " INTEGER"
     + ");";
@@ -659,7 +659,7 @@ public class DatabaseAdapter {
     public static final String FIXED_FEE = "fixed_fee";
     public static final String ESTIMATED_WORKHOURS = "estimated_workhours";
     public static final String IS_FIXED_FEE = "is_fixed_fee";
-    public static final String WORKSPACE_ID = "workspace_remote_id";
+    public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
     public static final String BILLABLE = "billable";
     public static final String CLIENT_PROJECT_NAME = "client_project_name";
     public static final String HOURLY_RATE = "hourly_rate";
@@ -672,8 +672,8 @@ public class DatabaseAdapter {
     public static final String OWNER_USER_ID = "owner_user_id";
     public static final String REMOTE_ID = "remote_id";
     public static final String SYNC_DIRTY = "sync_dirty";     
-    public static final String PROJECT_ID = "project_id";
-    public static final String WORKSPACE_ID = "workspace_id";
+    public static final String PROJECT_REMOTE_ID = "project_remote_id";
+    public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
     public static final String DURATION = "duration";
     public static final String START = "start";
     public static final String BILLABLE = "billable";
@@ -695,8 +695,8 @@ public class DatabaseAdapter {
     public static final String OWNER_USER_ID = "owner_user_id";
     public static final String REMOTE_ID = "remote_id";      
     public static final String NAME = "name";
-    public static final String WORKSPACE_ID = "workspace_id";  
-    public static final String PROJECT_ID = "project_id";
+    public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";  
+    public static final String PROJECT_REMOTE_ID = "project_remote_id";
     public static final String USER_ID = "user_id";
     public static final String ESTIMATED_WORKHOURS = "estimated_workhours";
   }
