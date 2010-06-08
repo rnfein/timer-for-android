@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.models.Task;
 
 import android.app.Service;
