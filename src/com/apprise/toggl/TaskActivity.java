@@ -146,12 +146,23 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   private void setDate(int year, int month, int date) {
+    Date start = Util.parseStringToDate(task.start);
+    Date stop = Util.parseStringToDate(task.stop);
+    
     Calendar cal = (Calendar) Calendar.getInstance().clone();
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
     cal.set(Calendar.DATE, date);
+    cal.set(Calendar.HOUR_OF_DAY, start.getHours());
+    cal.set(Calendar.MINUTE, start.getMinutes());
+    cal.set(Calendar.SECOND, start.getSeconds());
     task.start = Util.formatDateToString(cal.getTime());
-    //TODO: time should be left the same. Do we have to change the date of stop also?
+
+    cal.set(Calendar.HOUR_OF_DAY, stop.getHours());
+    cal.set(Calendar.MINUTE, stop.getMinutes());
+    cal.set(Calendar.SECOND, stop.getSeconds());
+    task.stop = Util.formatDateToString(cal.getTime());
+    
     saveTask();
     initDateView();
   }
