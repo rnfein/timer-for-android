@@ -57,14 +57,14 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   @Override
-  protected void onResume() {
+  protected void onStart() {
     IntentFilter filter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
     registerReceiver(updateReceiver, filter);
     super.onResume();
   }
   
   @Override
-  protected void onPause() {
+  protected void onStop() {
     unregisterReceiver(updateReceiver);
     super.onPause();
   }
@@ -226,11 +226,11 @@ public class TaskActivity extends ApplicationActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
+      task.duration = trackingService.getCurrentDuration();
       updateDuration();
     }
 
   };
-  
 
   private ServiceConnection trackingConnection = new ServiceConnection() {
     
@@ -239,6 +239,7 @@ public class TaskActivity extends ApplicationActivity {
       trackingService = binding.getService();
 
       if (trackingService.isTracking(task)) {
+        task.duration = trackingService.getCurrentDuration();
         updateDuration();
         timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
       }

@@ -22,4 +22,8 @@
     
     <string name="choose">(choose)</string>
     <string name="no_description">(no description)</string>
+    
+    <string name="notification_ticker">Time tracking started</string>
+    <string name="notification_expanded_title">Toggl</string>
+    <string name="notification_expanded_content">Time elapsed...</string>
 </resources>

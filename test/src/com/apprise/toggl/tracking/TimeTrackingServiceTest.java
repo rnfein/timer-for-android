@@ -16,7 +16,8 @@ public class TimeTrackingServiceTest extends ServiceTestCase<TimeTrackingService
   
   @Override
   protected void setUp() throws Exception {
-    TimeTrackingService.TimeTrackingBinder binder = (TimeTrackingService.TimeTrackingBinder) bindService(new Intent(getContext(), TimeTrackingService.class));
+    TimeTrackingService.TimeTrackingBinder binder = (TimeTrackingService.TimeTrackingBinder)
+      bindService(new Intent(getContext(), TimeTrackingService.class));
     service = binder.getService();
     super.setUp();
   }
@@ -28,7 +29,7 @@ public class TimeTrackingServiceTest extends ServiceTestCase<TimeTrackingService
   
   public void testStartTracking() throws Exception {
     Task task = new Task();
-    task.id = 3l;
+    task._id = 3l;
     service.startTracking(task);
     
     Thread.sleep(2100);
@@ -37,7 +38,7 @@ public class TimeTrackingServiceTest extends ServiceTestCase<TimeTrackingService
 
   public void testStopTracking() throws Exception {
     Task task = new Task();
-    task.id = 3l;
+    task._id = 3l;
     task.duration = 440l;
     service.startTracking(task);
     
@@ -49,9 +50,9 @@ public class TimeTrackingServiceTest extends ServiceTestCase<TimeTrackingService
   
   public void testIsTracking() {
     Task task = new Task();
-    task.id = 3l;
+    task._id = 3l;
     Task otherTask = new Task();
-    otherTask.id = 4l;
+    otherTask._id = 4l;
     service.startTracking(task);
     
     assertTrue(service.isTracking());

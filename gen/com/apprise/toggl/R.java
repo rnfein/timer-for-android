@@ -105,6 +105,9 @@ public final class R {
         public static final int log_in=0x7f06000f;
         public static final int log_out=0x7f06000b;
         public static final int no_description=0x7f060012;
+        public static final int notification_expanded_content=0x7f060015;
+        public static final int notification_expanded_title=0x7f060014;
+        public static final int notification_ticker=0x7f060013;
         public static final int password=0x7f06000e;
         public static final int planned=0x7f060007;
         public static final int project=0x7f060009;
