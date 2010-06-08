@@ -20,6 +20,6 @@
     <string name="log_in">Log in</string>
     <string name="create_account">Create a new account</string>
     
-    <string name="choose">(choose)</string>
+    <string name="choose">Choose</string>
     <string name="no_description">(no description)</string>
 </resources>

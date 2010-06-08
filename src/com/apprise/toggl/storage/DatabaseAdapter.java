@@ -202,9 +202,12 @@ public class DatabaseAdapter {
     		"SELECT " + Projects._ID + ", " +
         Projects.CLIENT_PROJECT_NAME +
         " FROM " + Projects.TABLE_NAME + 
-        " WHERE " + Projects.OWNER_USER_ID + " = ?" + " UNION " +
+        " WHERE " + Projects.OWNER_USER_ID + " = ?" + 
+        " UNION " +
         "SELECT -1 as _id, '+ Add New Project' as " + Projects.CLIENT_PROJECT_NAME +
-        ") ORDER BY (_id > 0) desc",
+        " UNION " +
+        "SELECT 0 as _id, '' as " + Projects.CLIENT_PROJECT_NAME +
+        ") ORDER BY (_id >= 0) desc",
         new String[] { String.valueOf(app.getCurrentUser()._id) });
 
     return cursor;        
