@@ -130,6 +130,7 @@ public class TaskActivity extends ApplicationActivity {
           // is tracking the task
           // TODO: save task
           trackingService.stopTracking();
+          timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
         }
         else if (trackingService.isTracking()) {
           // is tracking another task
@@ -137,8 +138,8 @@ public class TaskActivity extends ApplicationActivity {
         }
         else {
           // all clear
-          // TODO: change image for button
           trackingService.startTracking(task);
+          timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
         }
       }
     });
@@ -239,7 +240,7 @@ public class TaskActivity extends ApplicationActivity {
 
       if (trackingService.isTracking(task)) {
         updateDuration();
-        // TODO: update timer button
+        timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
       }
     }
 
