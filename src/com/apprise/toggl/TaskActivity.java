@@ -120,14 +120,11 @@ public class TaskActivity extends ApplicationActivity {
     if (task.project != null) {
       long project_remote_id = task.project.id;
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
-      if (cursor != null) {
-        if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
-          plannedTasksArea.setVisibility(LinearLayout.GONE);
-        }
+      if ((cursor == null) || (cursor.getCount() == 0) || !cursor.moveToFirst()) {
+        plannedTasksArea.setVisibility(LinearLayout.GONE);
       }
     } else {
       plannedTasksArea.setVisibility(LinearLayout.GONE);
-
     }
   }
 
