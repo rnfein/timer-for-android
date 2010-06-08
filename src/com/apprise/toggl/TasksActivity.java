@@ -76,7 +76,6 @@ public class TasksActivity extends ApplicationListActivity {
   }
   
   public void populateList() {
-    Cursor tasksCursor;  
     TasksCursorAdapter cursorAdapter;
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
@@ -88,8 +87,8 @@ public class TasksActivity extends ApplicationListActivity {
     dbAdapter.open();
 
     for (int i = 0; i <= taskRetentionDays; i++) {
-      tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
-      startManagingCursor(tasksCursor);
+      Cursor tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
+//      startManagingCursor(tasksCursor);
       cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item,
           tasksCursor, fieldsToShow, viewsToFill);
           date = Util.smallDateString(queryCal.getTime());
