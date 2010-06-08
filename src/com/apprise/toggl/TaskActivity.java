@@ -74,20 +74,20 @@ public class TaskActivity extends ApplicationActivity {
   protected void onStart() {
     IntentFilter filter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
     registerReceiver(updateReceiver, filter);
-    super.onResume();
+    super.onStart();
   }
   
   @Override
   protected void onStop() {
     unregisterReceiver(updateReceiver);
-    super.onPause();
+    super.onStop();
   }
 
   @Override
   protected void onResume() {
     dbAdapter.open();
-    initProjectView();
-    initPlannedTasks();
+    updateProjectView();
+    updatePlannedTasks();
     super.onResume();
   }
   
@@ -117,10 +117,10 @@ public class TaskActivity extends ApplicationActivity {
     descriptionView.setText(task.description);
     billableCheckBox.setChecked(task.billable);
     updateDuration();
-    initDateView();
+    updateDateView();
   }
 
-  private void initProjectView() {
+  private void updateProjectView() {
     if (task.project != null) {
       projectView.setText(task.project.client_project_name);
     } else {
@@ -128,11 +128,11 @@ public class TaskActivity extends ApplicationActivity {
     }
   }        
 
-  private void initDateView() {
+  private void updateDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
   }
 
-  private void initPlannedTasks() {
+  private void updatePlannedTasks() {
     if (task.project != null) {
       long project_remote_id = task.project.id;
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
@@ -140,7 +140,7 @@ public class TaskActivity extends ApplicationActivity {
         plannedTasksArea.setVisibility(LinearLayout.GONE);
       }
       if (cursor != null) {
-        cursor.close();
+        startManagingCursor(cursor);
       }
     } else {
       plannedTasksArea.setVisibility(LinearLayout.GONE);
@@ -167,8 +167,7 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
     
-    findViewById(R.id.task_project_area).setOnClickListener(
-    new View.OnClickListener() {
+    findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         showChooseProjectDialog();          
       }
@@ -189,27 +188,25 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
 
-    findViewById(R.id.task_tags_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            Log.d(TAG, "clicked tags");
-            // TODO: tags
-          }
-        });
+    findViewById(R.id.task_tags_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked tags");
+        // TODO: tags
+      }
+    });
 
-    findViewById(R.id.task_planned_tasks_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            Log.d(TAG, "clicked planned tasks");
-            // TODO: planned tasks
-          }
-        });
+    findViewById(R.id.task_planned_tasks_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked planned tasks");
+        // TODO: planned tasks
+      }
+    });
   }
   
   private void showChooseProjectDialog() {
     Cursor projectsCursor = dbAdapter.findAllProjects();
     startManagingCursor(projectsCursor);
-
+    
     String[] from = new String[] { Projects.CLIENT_PROJECT_NAME };
     int[] to = new int[] { R.id.project_item_project_name };
     final SimpleCursorAdapter projectsAdapter = new SimpleCursorAdapter(
@@ -222,8 +219,8 @@ public class TaskActivity extends ApplicationActivity {
         long clickedId = projectsAdapter.getItemId(pos);
         task.project = dbAdapter.findProject(clickedId);
         saveTask();
-        initProjectView();
-        initPlannedTasks();
+        updateProjectView();
+        updatePlannedTasks();
       }
     });
     builder.setPositiveButton(R.string.create_new, new DialogInterface.OnClickListener() {
@@ -236,10 +233,10 @@ public class TaskActivity extends ApplicationActivity {
       public void onClick(DialogInterface dialog, int which) {
         task.project = null;
         saveTask();
-        initProjectView();
-        initPlannedTasks();
+        updateProjectView();
+        updatePlannedTasks();
       }
-    });    
+    });
     builder.show();
   }
 
@@ -270,7 +267,7 @@ public class TaskActivity extends ApplicationActivity {
     task.stop = Util.formatDateToString(cal.getTime());
 
     saveTask();
-    initDateView();
+    updateDateView();
   }
 
   private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
