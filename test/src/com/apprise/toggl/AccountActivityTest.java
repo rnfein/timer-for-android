@@ -1,6 +1,6 @@
 package com.apprise.toggl;
 
-import android.app.Activity;
+import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 
@@ -11,27 +11,31 @@ public class AccountActivityTest extends ActivityInstrumentationTestCase2<Accoun
   }
   
   public void testStoreEditTextsOnKill() {
-    Activity activity = getActivity();
+    final EditText email = (EditText) getActivity().findViewById(R.id.email);
+    final EditText password = (EditText) getActivity().findViewById(R.id.password);
     
-    final Activity uiRef = activity;
-    activity.runOnUiThread(new Runnable() {
-      
+    getActivity().runOnUiThread(new Runnable() {
       public void run() {
-        EditText email = (EditText) uiRef.findViewById(R.id.email);
-        EditText password = (EditText) uiRef.findViewById(R.id.password);
-
         email.setText("ted@toggl.com");
         password.setText("tog..");                
       }
     });
-    
-    // kill activity
-    activity.finish();
-    
-    // revive activity
-    activity = getActivity();
-    EditText email = (EditText) activity.findViewById(R.id.email);
-    EditText password = (EditText) activity.findViewById(R.id.password);
+
+    getInstrumentation().waitForIdleSync();
+
+    getActivity().runOnUiThread(new Runnable() {
+      public void run() {
+        Bundle savedState = new Bundle();
+        getInstrumentation().callActivityOnSaveInstanceState(getActivity(), savedState);
+        
+        email.setText("");
+        password.setText("");
+
+        getInstrumentation().callActivityOnRestoreInstanceState(getActivity(), savedState);
+      }
+    });
+
+    getInstrumentation().waitForIdleSync();
 
     assertEquals("ted@toggl.com", email.getText().toString());
     assertEquals("tog..", password.getText().toString());

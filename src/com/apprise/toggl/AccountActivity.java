@@ -25,6 +25,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class AccountActivity extends Activity {
+  
+  private static final String STATE_EMAIL = "com.apprise.toggl.STATE_EMAIL";
+  private static final String STATE_PASSWORD = "com.apprise.toggl.STATE_PASSWORD";
 
   private TogglWebApi webApi;
   private SyncService syncService;
@@ -48,14 +51,13 @@ public class AccountActivity extends Activity {
     initViews();
     initFields();
     attachEvents();
-  } 
+  }
   
   @Override
   protected void onResume() {    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);    
     super.onResume();
-    initFields();
   }  
   
   @Override
@@ -68,7 +70,21 @@ public class AccountActivity extends Activity {
   protected void onDestroy() {
     unbindService(syncConnection);
     super.onDestroy();
-  }  
+  }
+
+  @Override
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    emailEditText.setText(savedInstanceState.getString(STATE_EMAIL));
+    passwordEditText.setText(savedInstanceState.getString(STATE_PASSWORD));
+    super.onRestoreInstanceState(savedInstanceState);
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle saveInstanceState) {
+    saveInstanceState.putString(STATE_EMAIL, emailEditText.getText().toString());
+    saveInstanceState.putString(STATE_PASSWORD, passwordEditText.getText().toString());
+    super.onSaveInstanceState(saveInstanceState);
+  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
