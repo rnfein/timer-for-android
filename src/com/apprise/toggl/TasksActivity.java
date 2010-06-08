@@ -17,7 +17,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +29,6 @@ import android.widget.TextView;
 
 public class TasksActivity extends ApplicationListActivity {
 
-  private static final String TAG = "TasksActivity"; 
-  
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
   private Toggl app;
@@ -82,7 +79,7 @@ public class TasksActivity extends ApplicationListActivity {
     
     for (int i = 0; i <= taskRetentionDays; i++) {
       Cursor tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
-      
+     
       if (tasksCursor.getCount() > 0) {
         TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
         String date = Util.smallDateString(queryCal.getTime());

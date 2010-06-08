@@ -55,11 +55,11 @@ public final class R {
         public static final int create_project_cancel=0x7f080008;
         public static final int create_project_create=0x7f080007;
         public static final int email=0x7f080000;
+        public static final int item_name=0x7f080009;
         public static final int login=0x7f080002;
         public static final int new_project_client_area=0x7f080005;
         public static final int password=0x7f080001;
         public static final int project_client=0x7f080006;
-        public static final int project_item_project_name=0x7f080009;
         public static final int project_name=0x7f080004;
         public static final int signup_menu_return=0x7f08001c;
         public static final int task_billable_cb=0x7f080012;
@@ -86,7 +86,7 @@ public final class R {
         public static final int account=0x7f030000;
         public static final int create_project=0x7f030001;
         public static final int main=0x7f030002;
-        public static final int project_item=0x7f030003;
+        public static final int simple_list_item=0x7f030003;
         public static final int task=0x7f030004;
         public static final int task_item=0x7f030005;
         public static final int tasks=0x7f030006;
@@ -104,6 +104,7 @@ public final class R {
         public static final int authentication_failed=0x7f06000c;
         public static final int billable=0x7f060006;
         public static final int cancel=0x7f06000e;
+        public static final int choose_client=0x7f06001b;
         public static final int choose_project=0x7f060015;
         public static final int choose_tip=0x7f060014;
         public static final int client=0x7f06001a;
@@ -118,9 +119,9 @@ public final class R {
         public static final int name=0x7f06000d;
         public static final int new_project=0x7f060019;
         public static final int no_description=0x7f060018;
-        public static final int notification_expanded_content=0x7f06001d;
-        public static final int notification_expanded_title=0x7f06001c;
-        public static final int notification_ticker=0x7f06001b;
+        public static final int notification_expanded_content=0x7f06001e;
+        public static final int notification_expanded_title=0x7f06001d;
+        public static final int notification_ticker=0x7f06001c;
         public static final int password=0x7f060011;
         public static final int planned=0x7f060007;
         public static final int project=0x7f060009;
