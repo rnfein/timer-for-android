@@ -518,24 +518,4 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
     Log.d(TAG, "SyncServiceTest#testSync done.");
   }
   
-  private class MockModel extends Model {
-
-    public boolean identicalTo(Model other) {
-      return false;
-    }
-
-    public void updateAttributes(Model other) {
-
-    }
-
-  }
-
-  private class MockToggl extends Toggl {
-    
-    public String getAPIToken() {
-      return null;
-    }
-    
-  }
-  
 }
