@@ -57,7 +57,15 @@ public class TaskActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.task);
 
-    init();
+    dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
+    dbAdapter.open();
+    long _id = getIntent().getLongExtra(TASK_ID, -1);
+    task = dbAdapter.findTask(_id);
+    dbAdapter.close();
+
+    Intent intent = new Intent(this, TimeTrackingService.class);
+    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
+
     initViews();
     attachEvents();
   }
@@ -75,13 +83,24 @@ public class TaskActivity extends ApplicationActivity {
     super.onPause();
   }
 
-  protected void init() {
-    dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
+  @Override
+  protected void onResume() {
     dbAdapter.open();
-    long _id = getIntent().getLongExtra(TASK_ID, -1);
-    task = dbAdapter.findTask(_id);
-    Intent intent = new Intent(this, TimeTrackingService.class);
-    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
+    initProjectSpinner();
+    initPlannedTasks();
+    super.onResume();
+  }
+  
+  @Override
+  protected void onPause() {
+    dbAdapter.close();
+    super.onPause();
+  }
+  
+  @Override
+  protected void onDestroy() {
+    unbindService(trackingConnection);
+    super.onDestroy();
   }
 
   protected void initViews() {
@@ -99,9 +118,6 @@ public class TaskActivity extends ApplicationActivity {
     billableCheckBox.setChecked(task.billable);
     updateDuration();
     initDateView();
-    initProjectSpinner();
-
-    initPlannedTasks();
   }
 
   private void initProjectSpinner() {
@@ -139,6 +155,7 @@ public class TaskActivity extends ApplicationActivity {
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
           plannedTasksArea.setVisibility(LinearLayout.GONE);
         }
+        cursor.close();
       }
     } else {
       plannedTasksArea.setVisibility(LinearLayout.GONE);
@@ -273,6 +290,7 @@ public class TaskActivity extends ApplicationActivity {
         task.project = dbAdapter.findProject(clickedId);
         saveTask();
       }
+      clickedProject.close();
     }
 
     public void onNothingSelected(AdapterView parent) {
