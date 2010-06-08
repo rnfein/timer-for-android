@@ -87,15 +87,16 @@
       android:layout_height="fill_parent"
       android:layout_width="50dp"
       android:layout_weight="5">
-	    <TextView
+	    <Spinner
 	      android:id="@+id/task_project"
+	      android:prompt="@string/choose"
 	      android:layout_width="30dp"
 	      android:layout_height="fill_parent"
 	      android:layout_weight="4"
-	      android:paddingTop="@dimen/label_padding_top"
 	      android:gravity="right"
 	      android:textSize="@dimen/label_text_size"           
 	      android:textColor="@color/black"
+	      android:background="@color/transparent"
 	      android:maxLines="1"/>      
 	    <ImageView
 	      android:src="@drawable/arrow"

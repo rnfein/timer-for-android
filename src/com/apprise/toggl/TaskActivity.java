@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Calendar;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
-import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
+import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
 
 import android.app.DatePickerDialog;
@@ -14,11 +14,16 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public class TaskActivity extends ApplicationActivity {
 
@@ -30,7 +35,7 @@ public class TaskActivity extends ApplicationActivity {
   DatabaseAdapter dbAdapter;
   Task task;
   EditText descriptionView;
-  TextView projectView;
+  Spinner projectSpinner;
   TextView dateView;
   TextView plannedTasksView;
   TextView tagsView;
@@ -57,7 +62,7 @@ public class TaskActivity extends ApplicationActivity {
   protected void initViews() {
     descriptionView = (EditText) findViewById(R.id.task_description);
     dateView = (TextView) findViewById(R.id.task_date);
-    projectView = (TextView) findViewById(R.id.task_project);    
+    projectSpinner = (Spinner) findViewById(R.id.task_project);    
     plannedTasksArea = (LinearLayout) findViewById(R.id.task_planned_tasks_area);
     plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
     tagsView = (TextView) findViewById(R.id.task_tags);
@@ -66,18 +71,31 @@ public class TaskActivity extends ApplicationActivity {
     descriptionView.setText(task.description);
     billableCheckBox.setChecked(task.billable);
     initDateView();
-    initProjectView();
+    initProjectSpinner();
     
     initPlannedTasks();
   }
 
-  private void initProjectView() {
-    if(task.project != null) {
-      projectView.setText(task.project.client_project_name); 
-    } else {
-      projectView.setText(R.string.choose);
-      projectView.setTextColor(R.color.light_gray);
-    }
+  private void initProjectSpinner() {
+    Cursor projectsCursor = dbAdapter.findAllProjectsForSpinner();
+    startManagingCursor(projectsCursor);
+    
+    String[] from = new String[]{Projects.CLIENT_PROJECT_NAME};
+    int[] to = new int[]{R.id.project_item_project_name};
+    
+    SimpleCursorAdapter projectsAdapter =
+      new SimpleCursorAdapter(this, R.layout.project_item, projectsCursor, from, to);
+    projectsAdapter.setDropDownViewResource(R.layout.project_dropdown_item);
+    projectSpinner.setAdapter(projectsAdapter);    
+    projectSpinner.setOnItemSelectedListener(new OnProjectItemSelectedListener());
+
+    if (task.project != null) {
+      for (int i = -1; i < projectsCursor.getCount(); i++) {
+        if (task.project._id == projectsAdapter.getItemId(i)) {
+          projectSpinner.setSelection(i);
+        }
+      }
+    }   
   }
 
   private void initDateView() {
@@ -103,8 +121,7 @@ public class TaskActivity extends ApplicationActivity {
     findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked project name");        
-        Intent intent = new Intent(TaskActivity.this, ProjectsActivity.class);
-        startActivity(intent); 
+        projectSpinner.performClick();
       }
     });
     
@@ -187,4 +204,16 @@ public class TaskActivity extends ApplicationActivity {
     }
     return null;
   }
+  
+  public class OnProjectItemSelectedListener implements OnItemSelectedListener {
+
+    public void onItemSelected(AdapterView<?> parent,
+        View view, int pos, long id) {
+      Log.d(TAG, parent.getItemAtPosition(pos).toString());
+    }
+
+    public void onNothingSelected(AdapterView parent) {
+      // Do nothing.
+    }
+}  
 }

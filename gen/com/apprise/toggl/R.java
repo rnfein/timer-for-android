@@ -80,13 +80,14 @@ public final class R {
     public static final class layout {
         public static final int account=0x7f030000;
         public static final int main=0x7f030001;
-        public static final int project_item=0x7f030002;
-        public static final int projects=0x7f030003;
-        public static final int task=0x7f030004;
-        public static final int task_item=0x7f030005;
-        public static final int tasks=0x7f030006;
-        public static final int tasks_group_header=0x7f030007;
-        public static final int welcome=0x7f030008;
+        public static final int project_dropdown_item=0x7f030002;
+        public static final int project_item=0x7f030003;
+        public static final int projects=0x7f030004;
+        public static final int task=0x7f030005;
+        public static final int task_item=0x7f030006;
+        public static final int tasks=0x7f030007;
+        public static final int tasks_group_header=0x7f030008;
+        public static final int welcome=0x7f030009;
     }
     public static final class menu {
         public static final int account_menu=0x7f070000;
