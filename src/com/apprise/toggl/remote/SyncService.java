@@ -27,6 +27,7 @@ import java.util.List;
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.ORM;
+import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.DeletedModel;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.Project;
@@ -47,6 +48,7 @@ public class SyncService extends Service {
   public static final String ALL_COMPLETED = "all_completed";
   public static final String PROJECTS_COMPLETED = "projects_completed";
   public static final String TASKS_COMPLETED = "tasks_completed";
+  public static final String CLIENTS_COMPLETED = "tasks_completed";
   
   public static final String TAG = "SyncService";
   
@@ -86,8 +88,9 @@ public class SyncService extends Service {
   }
   
   public void syncAll() {
-    syncProjects();    
-    syncTasks();
+    syncProjects();
+//    syncClients(); TODO Gson throws errors     
+    syncTasks();    
     
     Intent intent = new Intent(SYNC_COMPLETED);
     intent.putExtra(COLLECTION, ALL_COMPLETED);
@@ -195,6 +198,55 @@ public class SyncService extends Service {
       public void broadcastSyncCompleted() {
         Intent intent = new Intent(SYNC_COMPLETED);
         intent.putExtra(COLLECTION, PROJECTS_COMPLETED);
+        sendBroadcast(intent);
+      }      
+      
+    });
+  }
+  
+  public void syncClients() {
+    Log.d(TAG, "#syncClients starting to sync.");
+    dbAdapter.open();
+    
+    sync(dbAdapter.findAllClients(), api.fetchClients(), new SyncProxy() {
+      
+      public void updateRemoteEntry(Model model) {
+
+      }
+      
+      public void updateLocalEntry(Model model) {
+        dbAdapter.updateClient((Client) model);
+      }
+      
+      public Model getLocalEntry(long remoteId) {
+        return dbAdapter.findClientByRemoteId(remoteId);
+      }
+      
+      public DeletedModel getLocalDeletedEntry(long remoteId) {
+        return null;
+      }
+      
+      public void deleteRemoteEntry(long id) { }
+      
+      public void deleteLocalEntry(long _id) {
+        dbAdapter.deleteClient(_id);
+      }
+      
+      public void deleteLocalDeletedEntry(long _id) { }
+      
+      public void createRemoteEntry(Model model) { }
+      
+      public Model createLocalEntry(Model model) {
+        return dbAdapter.createClient((Client) model);
+      }
+      
+      public Model mapEntryFromCursor(Cursor cursor) {
+        return ORM.mapClient(cursor, dbAdapter);
+      }
+      
+      public void broadcastSyncCompleted() {
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, CLIENTS_COMPLETED);
         sendBroadcast(intent);
       }      
       

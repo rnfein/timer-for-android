@@ -127,7 +127,7 @@ public class TasksActivity extends ApplicationListActivity {
     switch (item.getItemId()) {
       case R.id.tasks_menu_refresh:
         setProgressBarIndeterminateVisibility(true);
-        new Thread(refreshTasksInBackgrond).start();
+        new Thread(syncAllInBackground).start();
         return true;
       case R.id.tasks_menu_account:
         startActivity(new Intent(this, AccountActivity.class));
@@ -147,10 +147,17 @@ public class TasksActivity extends ApplicationListActivity {
 
   };
   
-  protected Runnable refreshTasksInBackgrond = new Runnable() {
+  protected Runnable refreshTasksInBackground = new Runnable() {
     
     public void run() {
       syncService.syncTasks();
+    }
+  };
+  
+  protected Runnable syncAllInBackground = new Runnable() {
+    
+    public void run() {
+      syncService.syncAll();
     }
   };
   

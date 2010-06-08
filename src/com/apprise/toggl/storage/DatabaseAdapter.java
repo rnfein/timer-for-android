@@ -539,12 +539,13 @@ public class DatabaseAdapter {
       if (cursor == null) return null;
       
       long _id = cursor.getLong(cursor.getColumnIndex(Clients._ID));
+      long remote_id = cursor.getLong(cursor.getColumnIndex(Clients.REMOTE_ID));
       String name = cursor.getString(cursor.getColumnIndex(Clients.NAME));
-      String hourlyRate = cursor.getString(cursor.getColumnIndex(Clients.HOURLY_RATE));
-      String currency = cursor.getString(cursor.getColumnIndex(Clients.CURRENCY));
+      long hourlyRate = cursor.getLong(cursor.getColumnIndex(Clients.HOURLY_RATE));
+      long currency = cursor.getLong(cursor.getColumnIndex(Clients.CURRENCY));
       long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Clients.WORKSPACE_REMOTE_ID));
       
-      return new Client(_id, name, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), hourlyRate, currency);
+      return new Client(_id, remote_id, name, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), hourlyRate, currency);
     }
     
     public static Task mapTask(Cursor cursor, DatabaseAdapter dbAdapter) {
@@ -644,8 +645,8 @@ public class DatabaseAdapter {
     + Clients.OWNER_USER_ID + " INTEGER NOT NULL,"      
     + Clients.REMOTE_ID + " INTEGER NOT NULL,"
     + Clients.NAME + " TEXT,"      
-    + Clients.HOURLY_RATE + " TEXT,"
-    + Clients.CURRENCY + " TEXT"
+    + Clients.HOURLY_RATE + " INTEGER,"
+    + Clients.CURRENCY + " INTEGER"
     + ");";
     
     private static final String CREATE_TASKS_TABLE = "CREATE TABLE " + Tasks.TABLE_NAME + " ("
