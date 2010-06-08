@@ -29,5 +29,6 @@
     <activity android:name="TasksActivity"/>
     <activity android:name="SignUpActivity"/>
     <service android:enabled="true" android:name=".remote.SyncService" />
+    <service android:enabled="true" android:name=".tracking.TimeTrackingService" />
   </application>
 </manifest>

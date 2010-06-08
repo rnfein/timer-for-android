@@ -50,7 +50,7 @@
 	      android:gravity="center"
 	      android:textColor="@color/black"
 	      android:textSize="@dimen/task_timer_text_size"
-	      android:text="00:30:54"/>  
+	      android:text="00:00:00"/>  
 	    <ImageView
 	      android:src="@drawable/arrow"
 	      android:layout_width="10dp"

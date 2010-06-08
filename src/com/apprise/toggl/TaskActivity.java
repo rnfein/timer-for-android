@@ -1,20 +1,28 @@
 package com.apprise.toggl;
 
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
+import com.apprise.toggl.tracking.TimeTrackingService;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -22,26 +30,28 @@ import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class TaskActivity extends ApplicationActivity {
 
   public static final String TASK_ID = "TASK_ID";
   private static final String TAG = "TaskActivity";
-
-  private static final int DATE_DIALOG_ID = 0;
-
-  DatabaseAdapter dbAdapter;
-  Task task;
-  EditText descriptionView;
+  
+  private static final int DATE_DIALOG_ID = 0;  
+  
+  private DatabaseAdapter dbAdapter;
+  private TimeTrackingService trackingService;
+  private Task task;
+  private Button timeTrackingButton;
+  private TextView durationView;
+  private EditText descriptionView;
   Spinner projectSpinner;
-  TextView dateView;
-  TextView plannedTasksView;
-  TextView tagsView;
-  LinearLayout plannedTasksArea;
-  CheckBox billableCheckBox;
-
+  private TextView dateView;
+  private TextView plannedTasksView;
+  private TextView tagsView;
+  private LinearLayout plannedTasksArea;
+  private CheckBox billableCheckBox;
+  
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -51,15 +61,32 @@ public class TaskActivity extends ApplicationActivity {
     initViews();
     attachEvents();
   }
+  
+  @Override
+  protected void onStart() {
+    IntentFilter filter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
+    registerReceiver(updateReceiver, filter);
+    super.onResume();
+  }
+  
+  @Override
+  protected void onStop() {
+    unregisterReceiver(updateReceiver);
+    super.onPause();
+  }
 
   protected void init() {
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
     task = dbAdapter.findTask(_id);
+    Intent intent = new Intent(this, TimeTrackingService.class);
+    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
   }
 
   protected void initViews() {
+    timeTrackingButton = (Button) findViewById(R.id.timer_trigger);
+    durationView = (TextView) findViewById(R.id.task_timer_duration);
     descriptionView = (EditText) findViewById(R.id.task_description);
     dateView = (TextView) findViewById(R.id.task_date);
     projectSpinner = (Spinner) findViewById(R.id.task_project);
@@ -70,6 +97,7 @@ public class TaskActivity extends ApplicationActivity {
 
     descriptionView.setText(task.description);
     billableCheckBox.setChecked(task.billable);
+    updateDuration();
     initDateView();
     initProjectSpinner();
 
@@ -119,22 +147,41 @@ public class TaskActivity extends ApplicationActivity {
   }
 
   protected void attachEvents() {
+    timeTrackingButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        if (trackingService.isTracking(task)) {
+          // is tracking the task
+          // TODO: save task
+          trackingService.stopTracking();
+          timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
+        }
+        else if (trackingService.isTracking()) {
+          // is tracking another task
+          // TODO: stop the other or notify user?
+        }
+        else {
+          // all clear
+          trackingService.startTracking(task);
+          timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
+        }
+      }
+    });
+    
     findViewById(R.id.task_project_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            Log.d(TAG, "clicked project name");
-            projectSpinner.performClick();
-          }
-        });
-
-    findViewById(R.id.task_date_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            Log.d(TAG, "clicked date");
-            showDialog(DATE_DIALOG_ID);
-          }
-        });
-
+    new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked project name");
+        projectSpinner.performClick();
+      }
+    });
+    
+    findViewById(R.id.task_date_area).setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        Log.d(TAG, "clicked date");        
+        showDialog(DATE_DIALOG_ID);
+      }
+    });
+    
     billableCheckBox.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked billable cb");
@@ -163,8 +210,9 @@ public class TaskActivity extends ApplicationActivity {
   protected void saveTask() {
     Log.d(TAG, "saving task: " + task);
     task.sync_dirty = true;
-    if (!dbAdapter.updateTask(task))
+    if (!dbAdapter.updateTask(task)) {
       dbAdapter.createTask(task);
+    }
   }
 
   private void setDate(int year, int month, int date) {
@@ -232,4 +280,38 @@ public class TaskActivity extends ApplicationActivity {
       // Do nothing.
     }
   }
+  
+  private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      task.duration = trackingService.getCurrentDuration();
+      updateDuration();
+    }
+
+  };
+
+  private ServiceConnection trackingConnection = new ServiceConnection() {
+    
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      TimeTrackingService.TimeTrackingBinder binding = (TimeTrackingService.TimeTrackingBinder) service;
+      trackingService = binding.getService();
+
+      if (trackingService.isTracking(task)) {
+        task.duration = trackingService.getCurrentDuration();
+        updateDuration();
+        timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
+      }
+    }
+
+    public void onServiceDisconnected(ComponentName name) {
+
+    }
+
+  };
+  
+  private void updateDuration() {
+    durationView.setText(Util.secondsToHMS(task.duration));
+  }
+  
 }

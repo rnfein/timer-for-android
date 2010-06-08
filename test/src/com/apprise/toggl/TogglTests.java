@@ -3,6 +3,7 @@ package com.apprise.toggl;
 import com.apprise.toggl.remote.SyncServiceTest;
 import com.apprise.toggl.storage.DatabaseAdapterTest;
 import com.apprise.toggl.storage.ModelTest;
+import com.apprise.toggl.tracking.TimeTrackingServiceTest;
 import com.apprise.toggl.util.UtilTest;
 
 import junit.framework.Test;
@@ -41,6 +42,7 @@ public class TogglTests extends TestSuite {
     suite.addTestSuite(DatabaseAdapterTest.class);
     suite.addTestSuite(SyncServiceTest.class);
     suite.addTestSuite(AccountActivityTest.class);
+    suite.addTestSuite(TimeTrackingServiceTest.class);
     return suite;
   }
 }
