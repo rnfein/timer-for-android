@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 
@@ -13,6 +14,7 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -26,6 +28,7 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class TaskActivity extends ApplicationActivity {
@@ -152,10 +155,7 @@ public class TaskActivity extends ApplicationActivity {
     findViewById(R.id.task_project_area).setOnClickListener(
     new View.OnClickListener() {
       public void onClick(View v) {
-        Log.d(TAG, "clicked project name");
-        AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-          builder.setTitle(R.string.choose);
-          builder.show();          
+        showChooseProjectDialog();          
       }
     });
     
@@ -189,6 +189,28 @@ public class TaskActivity extends ApplicationActivity {
             // TODO: planned tasks
           }
         });
+  }
+  
+  private void showChooseProjectDialog() {
+    Cursor projectsCursor = dbAdapter.findAllProjects();
+    startManagingCursor(projectsCursor);
+
+    String[] from = new String[] { Projects.CLIENT_PROJECT_NAME };
+    int[] to = new int[] { R.id.project_item_project_name };
+    final SimpleCursorAdapter projectsAdapter = new SimpleCursorAdapter(
+        TaskActivity.this, R.layout.project_item, projectsCursor, from, to);
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+    builder.setTitle(R.string.choose);
+    builder.setAdapter(projectsAdapter, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int pos) {
+        long clickedId = projectsAdapter.getItemId(pos);
+        task.project = dbAdapter.findProject(clickedId);
+        saveTask();
+        initProjectView();
+      }
+    });
+    builder.show();
   }
 
   protected void saveTask() {
