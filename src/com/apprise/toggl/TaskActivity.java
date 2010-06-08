@@ -4,10 +4,10 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
-import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -21,16 +21,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
 public class TaskActivity extends ApplicationActivity {
 
@@ -45,7 +41,7 @@ public class TaskActivity extends ApplicationActivity {
   private Button timeTrackingButton;
   private TextView durationView;
   private EditText descriptionView;
-  Spinner projectSpinner;
+  private TextView projectView;
   private TextView dateView;
   private TextView plannedTasksView;
   private TextView tagsView;
@@ -89,7 +85,7 @@ public class TaskActivity extends ApplicationActivity {
     durationView = (TextView) findViewById(R.id.task_timer_duration);
     descriptionView = (EditText) findViewById(R.id.task_description);
     dateView = (TextView) findViewById(R.id.task_date);
-    projectSpinner = (Spinner) findViewById(R.id.task_project);
+    projectView = (TextView) findViewById(R.id.task_project);
     plannedTasksArea = (LinearLayout) findViewById(R.id.task_planned_tasks_area);
     plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
     tagsView = (TextView) findViewById(R.id.task_tags);
@@ -99,33 +95,19 @@ public class TaskActivity extends ApplicationActivity {
     billableCheckBox.setChecked(task.billable);
     updateDuration();
     initDateView();
-    initProjectSpinner();
+    initProjectView();
 
     initPlannedTasks();
   }
 
-  private void initProjectSpinner() {
-    Cursor projectsCursor = dbAdapter.findAllProjectsForSpinner();
-    startManagingCursor(projectsCursor);
-
-    String[] from = new String[] { Projects.CLIENT_PROJECT_NAME };
-    int[] to = new int[] { R.id.project_item_project_name };
-
-    SimpleCursorAdapter projectsAdapter = new SimpleCursorAdapter(this,
-        R.layout.project_item, projectsCursor, from, to);
-    projectsAdapter.setDropDownViewResource(R.layout.project_dropdown_item);
-    projectSpinner.setAdapter(projectsAdapter);
-    projectSpinner
-        .setOnItemSelectedListener(new OnProjectItemSelectedListener());
-
+  private void initProjectView() {
     if (task.project != null) {
-      for (int i = -1; i < projectsCursor.getCount(); i++) {
-        if (task.project._id == projectsAdapter.getItemId(i)) {
-          projectSpinner.setSelection(i);
-        }
-      }
+      projectView.setText(task.project.client_project_name);
+    } else {
+      projectView.setText(R.string.choose);
+      projectView.setTextColor(R.color.light_gray);
     }
-  }
+  }        
 
   private void initDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
@@ -171,7 +153,9 @@ public class TaskActivity extends ApplicationActivity {
     new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked project name");
-        projectSpinner.performClick();
+        AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+          builder.setTitle(R.string.choose);
+          builder.show();          
       }
     });
     
@@ -257,30 +241,6 @@ public class TaskActivity extends ApplicationActivity {
     return null;
   }
 
-  public class OnProjectItemSelectedListener implements OnItemSelectedListener {
-
-    public void onItemSelected(AdapterView<?> parent, View view, int pos,
-        long id) {
-      Cursor clickedProject = (Cursor) parent.getItemAtPosition(pos);
-      Log.d(TAG, "clickedProject: "
-          + clickedProject.getString(clickedProject
-              .getColumnIndex(Projects.CLIENT_PROJECT_NAME)));
-      long clickedId = clickedProject.getInt(clickedProject
-          .getColumnIndex(Projects._ID));
-      if (clickedId == -1) {
-        Log.d(TAG, "clicked Add new project");
-        // TODO: start CreateProject activity
-      } else {
-        task.project = dbAdapter.findProject(clickedId);
-        saveTask();
-      }
-    }
-
-    public void onNothingSelected(AdapterView parent) {
-      // Do nothing.
-    }
-  }
-  
   private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
     
     @Override
