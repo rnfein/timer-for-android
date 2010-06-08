@@ -17,7 +17,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +29,6 @@ import android.widget.TextView;
 
 public class TasksActivity extends ApplicationListActivity {
 
-  private static final String TAG = "TasksActivity"; 
-  
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
   private Toggl app;
@@ -44,19 +41,26 @@ public class TasksActivity extends ApplicationListActivity {
     setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
     
-    init();
+    app = (Toggl) getApplication();    
+    dbAdapter = new DatabaseAdapter(this, app);
+    currentUser = app.getCurrentUser();
+    Intent intent = new Intent(this, SyncService.class);
+    bindService(intent, syncConnection, BIND_AUTO_CREATE);
   }
   
   @Override
   protected void onResume() {
-    super.onResume();    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
-    rebuildList();
+    dbAdapter.open();
+    adapter.clearSections();
+    populateList();
+    super.onResume();
   }
   
   @Override
   protected void onPause() {
+    dbAdapter.close();
     unregisterReceiver(updateReceiver);
     super.onPause();
   }
@@ -67,55 +71,36 @@ public class TasksActivity extends ApplicationListActivity {
     super.onDestroy();
   }
 
-  protected void init() {
-    app = (Toggl) getApplication();    
-    dbAdapter = new DatabaseAdapter(this, app);
-    currentUser = app.getCurrentUser();
-    Intent intent = new Intent(this, SyncService.class);
-    bindService(intent, syncConnection, BIND_AUTO_CREATE);
-  }
-  
   public void populateList() {
-    TasksCursorAdapter cursorAdapter;
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
     String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION, Projects.CLIENT_PROJECT_NAME };
     int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description, R.id.task_item_client_project_name };
-    String date;
-    String header_text;
     
-    dbAdapter.open();
-
     for (int i = 0; i <= taskRetentionDays; i++) {
       Cursor tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
-//      startManagingCursor(tasksCursor);
-      cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item,
-          tasksCursor, fieldsToShow, viewsToFill);
-          date = Util.smallDateString(queryCal.getTime());
-      
-      header_text = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
-      if (cursorAdapter.getCount() != 0)
+     
+      if (tasksCursor.getCount() > 0) {
+        TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
+        String date = Util.smallDateString(queryCal.getTime());
+        String header_text = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
         adapter.addSection(header_text, cursorAdapter);
+        startManagingCursor(tasksCursor);
+      }
+
       queryCal.add(Calendar.DATE, -1);
     }
     
     setListAdapter(adapter);
-    dbAdapter.close();
   }
   
-  private void rebuildList() {
-    adapter.clearSections();
-    populateList();    
-  }
-
   private long getDurationTotal(Cursor tasksCursor) {
     long duration_total = 0;
-    long duration;
+    long duration = 0;
     while (tasksCursor.moveToNext()) {
       duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));
       if (duration > 0) duration_total += duration; 
     }
-    duration = 0;
     return duration_total;
   }
   
@@ -125,6 +110,7 @@ public class TasksActivity extends ApplicationListActivity {
 
     Cursor cursor = (Cursor) adapter.getItem(position);
     long clickedTaskId = cursor.getLong(cursor.getColumnIndex(Tasks._ID));
+    cursor.close();
     
     intent.putExtra(TaskActivity.TASK_ID, clickedTaskId);
     startActivity(intent);    
@@ -172,7 +158,8 @@ public class TasksActivity extends ApplicationListActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-      rebuildList();
+      adapter.clearSections();
+      populateList();
       setProgressBarIndeterminateVisibility(false);      
     }
   };
@@ -182,15 +169,13 @@ public class TasksActivity extends ApplicationListActivity {
       LinearLayout result = (LinearLayout) convertView;
 
       if (convertView == null) {
-        result = (LinearLayout) getLayoutInflater().inflate(
-            R.layout.tasks_group_header, null);
-
+        result = (LinearLayout) getLayoutInflater().inflate(R.layout.tasks_group_header, null);
       }
 
       TextView header = (TextView) result.findViewById(R.id.task_list_header_text);      
       header.setText(caption);
 
-      return (result);
+      return result;
     }
   };
   

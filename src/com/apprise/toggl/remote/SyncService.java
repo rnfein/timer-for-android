@@ -147,8 +147,6 @@ public class SyncService extends Service {
       }          
 
     });
-    
-    dbAdapter.close();
   }
   
   public void syncProjects() {
@@ -201,8 +199,6 @@ public class SyncService extends Service {
       }      
       
     });
-    
-    dbAdapter.close();
   }
   
   public void sync(Cursor localCursor, List<? extends Model> remoteEntries, SyncProxy proxy) {
@@ -263,6 +259,7 @@ public class SyncService extends Service {
     }
 
     localCursor.close();
+    dbAdapter.close();
     proxy.broadcastSyncCompleted();
   }
   

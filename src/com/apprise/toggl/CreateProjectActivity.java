@@ -33,18 +33,26 @@ public class CreateProjectActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.create_project);
     
-    init();
-    
-    project = dbAdapter.createDirtyProject();       
+    app = (Toggl) getApplication();
+    dbAdapter = new DatabaseAdapter(this, app);
+    dbAdapter.open();
+    project = dbAdapter.createDirtyProject();
     
     initViews();
     attachEvents();
   }
+
+    
+  @Override
+  protected void onResume() {
+    dbAdapter.open();
+    super.onResume();
+  }
   
-  private void init() {
-    app = (Toggl) getApplication();
-    dbAdapter = new DatabaseAdapter(this, app);
-    dbAdapter.open(); 
+  @Override
+  protected void onPause() {
+    dbAdapter.close();
+    super.onPause();
   }
   
   private void initViews() {

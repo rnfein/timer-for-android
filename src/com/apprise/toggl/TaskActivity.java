@@ -57,7 +57,15 @@ public class TaskActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.task);
 
-    init();
+    dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
+    dbAdapter.open();
+    long _id = getIntent().getLongExtra(TASK_ID, -1);
+    task = dbAdapter.findTask(_id);
+    dbAdapter.close();
+
+    Intent intent = new Intent(this, TimeTrackingService.class);
+    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
+
     initViews();
     attachEvents();
   }
@@ -75,13 +83,24 @@ public class TaskActivity extends ApplicationActivity {
     super.onPause();
   }
 
-  protected void init() {
-    dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
+  @Override
+  protected void onResume() {
     dbAdapter.open();
-    long _id = getIntent().getLongExtra(TASK_ID, -1);
-    task = dbAdapter.findTask(_id);
-    Intent intent = new Intent(this, TimeTrackingService.class);
-    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
+    initProjectView();
+    initPlannedTasks();
+    super.onResume();
+  }
+  
+  @Override
+  protected void onPause() {
+    dbAdapter.close();
+    super.onPause();
+  }
+  
+  @Override
+  protected void onDestroy() {
+    unbindService(trackingConnection);
+    super.onDestroy();
   }
 
   protected void initViews() {
@@ -99,9 +118,6 @@ public class TaskActivity extends ApplicationActivity {
     billableCheckBox.setChecked(task.billable);
     updateDuration();
     initDateView();
-    initProjectView();
-
-    initPlannedTasks();
   }
 
   private void initProjectView() {
@@ -122,6 +138,9 @@ public class TaskActivity extends ApplicationActivity {
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
       if ((cursor == null) || (cursor.getCount() == 0) || !cursor.moveToFirst()) {
         plannedTasksArea.setVisibility(LinearLayout.GONE);
+      }
+      if (cursor != null) {
+        cursor.close();
       }
     } else {
       plannedTasksArea.setVisibility(LinearLayout.GONE);
@@ -273,7 +292,7 @@ public class TaskActivity extends ApplicationActivity {
     }
     return null;
   }
-
+  
   private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
     
     @Override
