@@ -93,7 +93,9 @@ public class TaskActivity extends ApplicationActivity {
   
   @Override
   protected void onPause() {
-    dbAdapter.close();
+    // FIXME: When closed, managed cursors are b0rked on resume,
+    // if left open, then we got a nasty db spill in the log.
+    // dbAdapter.close();
     super.onPause();
   }
   
