@@ -354,7 +354,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     
     Task task3 = new Task();
     task2.start = "2010-15-12T04:19:45+02:00";
-    Task createdTask3 = dbAdapter.createTask(task3);
+    dbAdapter.createTask(task3);
     
     Date date = new Date();
     date.setYear(110);
