@@ -1,6 +1,7 @@
 package com.apprise.toggl.tracking;
 
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -55,8 +56,8 @@ public class TimeTrackingService extends Service {
         Intent intent = new Intent(BROADCAST_SECOND_ELAPSED);
         sendBroadcast(intent);
       }
-    }, Util.currentDate(), 1000);
-    
+    }, new Date(System.currentTimeMillis() + 1000), 1000);
+
     isTracking = true;
   }
   
