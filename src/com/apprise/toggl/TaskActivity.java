@@ -1,19 +1,25 @@
 package com.apprise.toggl;
 
-import java.util.Date;
 import java.util.Calendar;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
-import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.Task;
+import com.apprise.toggl.tracking.TimeTrackingService;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -27,15 +33,18 @@ public class TaskActivity extends ApplicationActivity {
   
   private static final int DATE_DIALOG_ID = 0;  
   
-  DatabaseAdapter dbAdapter;
-  Task task;
-  EditText descriptionView;
-  TextView projectView;
-  TextView dateView;
-  TextView plannedTasksView;
-  TextView tagsView;
-  LinearLayout plannedTasksArea;
-  CheckBox billableCheckBox;
+  private DatabaseAdapter dbAdapter;
+  private TimeTrackingService trackingService;
+  private Task task;
+  private Button timeTrackingButton;
+  private TextView durationView;
+  private EditText descriptionView;
+  private TextView projectView;
+  private TextView dateView;
+  private TextView plannedTasksView;
+  private TextView tagsView;
+  private LinearLayout plannedTasksArea;
+  private CheckBox billableCheckBox;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -45,16 +54,33 @@ public class TaskActivity extends ApplicationActivity {
     init();
     initViews();
     attachEvents();
-  } 
+  }
   
+  @Override
+  protected void onResume() {
+    IntentFilter filter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
+    registerReceiver(updateReceiver, filter);
+    super.onResume();
+  }
+  
+  @Override
+  protected void onPause() {
+    unregisterReceiver(updateReceiver);
+    super.onPause();
+  }
+
   protected void init() {
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
     task = dbAdapter.findTask(_id);
+    Intent intent = new Intent(this, TimeTrackingService.class);
+    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
   }
 
   protected void initViews() {
+    timeTrackingButton = (Button) findViewById(R.id.timer_trigger);
+    durationView = (TextView) findViewById(R.id.task_timer_duration);
     descriptionView = (EditText) findViewById(R.id.task_description);
     dateView = (TextView) findViewById(R.id.task_date);
     projectView = (TextView) findViewById(R.id.task_project);    
@@ -65,6 +91,7 @@ public class TaskActivity extends ApplicationActivity {
     
     descriptionView.setText(task.description);
     billableCheckBox.setChecked(task.billable);
+    updateDuration();
     initDateView();
     initProjectView();
     
@@ -97,6 +124,25 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   protected void attachEvents() {
+    timeTrackingButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        if (trackingService.isTracking(task)) {
+          // is tracking the task
+          // TODO: save task
+          trackingService.stopTracking();
+        }
+        else if (trackingService.isTracking()) {
+          // is tracking another task
+          // TODO: stop the other or notify user?
+        }
+        else {
+          // all clear
+          // TODO: change image for button
+          trackingService.startTracking(task);
+        }
+      }
+    });
+    
     findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked project name");        
@@ -138,8 +184,9 @@ public class TaskActivity extends ApplicationActivity {
   protected void saveTask() {
     Log.d(TAG, "saving task: " + task);
     task.sync_dirty = true;
-    if (!dbAdapter.updateTask(task))
+    if (!dbAdapter.updateTask(task)) {
       dbAdapter.createTask(task);
+    }
   }
   
   private void setDate(int year, int month, int date) {
@@ -173,4 +220,37 @@ public class TaskActivity extends ApplicationActivity {
     }
     return null;
   }
+  
+  private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      updateDuration();
+    }
+
+  };
+  
+
+  private ServiceConnection trackingConnection = new ServiceConnection() {
+    
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      TimeTrackingService.TimeTrackingBinder binding = (TimeTrackingService.TimeTrackingBinder) service;
+      trackingService = binding.getService();
+
+      if (trackingService.isTracking(task)) {
+        updateDuration();
+        // TODO: update timer button
+      }
+    }
+
+    public void onServiceDisconnected(ComponentName name) {
+
+    }
+
+  };
+  
+  private void updateDuration() {
+    durationView.setText(Util.secondsToHMS(task.duration));
+  }
+  
 }
