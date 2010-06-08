@@ -37,6 +37,7 @@ public class TaskActivity extends ApplicationActivity {
   private static final String TAG = "TaskActivity";
   
   private static final int DATE_DIALOG_ID = 0;  
+  static final int CREATE_NEW_PROJECT_REQUEST = 1;  
   
   private DatabaseAdapter dbAdapter;
   private TimeTrackingService trackingService;
@@ -209,7 +210,8 @@ public class TaskActivity extends ApplicationActivity {
     });
     builder.setPositiveButton(R.string.create_new, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int which) {
-        //TODO
+        Intent intent = new Intent(TaskActivity.this, CreateProjectActivity.class);
+        startActivityForResult(intent, CREATE_NEW_PROJECT_REQUEST);
       }
     });
     builder.setNegativeButton(R.string.leave_empty, new DialogInterface.OnClickListener() {
@@ -304,6 +306,14 @@ public class TaskActivity extends ApplicationActivity {
   
   private void updateDuration() {
     durationView.setText(Util.secondsToHMS(task.duration));
+  }
+
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == CREATE_NEW_PROJECT_REQUEST) {
+      if (resultCode == RESULT_OK) {
+        //TODO: set and save created project
+      }
+    }
   }
   
 }

@@ -14,6 +14,9 @@
     <string name="projects">Projects</string>
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
+    <string name="name">Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
 
     <string name="email">E-mail</string>
     <string name="password">Password</string>
@@ -25,6 +28,9 @@
     <string name="leave_empty">Leave Empty</string>
     <string name="create_new">Create New</string>
     <string name="no_description">(no description)</string>
+    
+    <string name="new_project">New Project</string>
+    <string name="client">Client</string>
     
     <string name="notification_ticker">Time tracking started</string>
     <string name="notification_expanded_title">Toggl</string>
