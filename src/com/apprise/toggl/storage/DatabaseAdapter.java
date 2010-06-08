@@ -42,6 +42,10 @@ public class DatabaseAdapter {
     db.close();
   }
   
+  public boolean isOpen() {
+    return db != null && db.isOpen();
+  }
+  
   public void open() throws SQLiteException {
     this.dbHelper = new DatabaseOpenHelper(this.context, getDatabaseName(), null, DATABASE_VERSION);
     try {
