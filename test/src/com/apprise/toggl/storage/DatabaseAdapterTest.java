@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.TogglTests;
+import com.apprise.toggl.mock.MockToggl;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.DeletedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;

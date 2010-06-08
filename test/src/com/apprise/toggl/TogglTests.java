@@ -2,6 +2,8 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.SyncServiceTest;
 import com.apprise.toggl.storage.DatabaseAdapterTest;
+import com.apprise.toggl.storage.ModelTest;
+import com.apprise.toggl.util.UtilTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
