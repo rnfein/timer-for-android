@@ -4,7 +4,7 @@
   android:layout_width="fill_parent"
   android:layout_height="42dp">
   <TextView 
-   android:id="@+id/project_item_project_name"
+   android:id="@+id/item_name"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:textColor="@color/black"

@@ -192,9 +192,9 @@ public class TaskActivity extends ApplicationActivity {
     startManagingCursor(projectsCursor);
 
     String[] from = new String[] { Projects.CLIENT_PROJECT_NAME };
-    int[] to = new int[] { R.id.project_item_project_name };
+    int[] to = new int[] { R.id.item_name };
     final SimpleCursorAdapter projectsAdapter = new SimpleCursorAdapter(
-        TaskActivity.this, R.layout.project_item, projectsCursor, from, to);
+        TaskActivity.this, R.layout.simple_list_item, projectsCursor, from, to);
 
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.choose_project);
@@ -308,6 +308,9 @@ public class TaskActivity extends ApplicationActivity {
   }
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    Log.d(TAG, "onActivityResult requestCode: " + requestCode);
+    Log.d(TAG, "onActivityResult resultCode:" + requestCode);
+    Log.d(TAG, "onActivityResult intent:" + data);
     if (requestCode == CREATE_NEW_PROJECT_REQUEST) {
       if (resultCode == RESULT_OK) {
         //TODO: set and save created project
