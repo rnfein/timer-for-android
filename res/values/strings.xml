@@ -20,7 +20,10 @@
     <string name="log_in">Log in</string>
     <string name="create_account">Create a new account</string>
     
-    <string name="choose">Choose</string>
+    <string name="choose_tip">(choose)</string>
+    <string name="choose_project">Choose Project</string>
+    <string name="leave_empty">Leave Empty</string>
+    <string name="create_new">Create New</string>
     <string name="no_description">(no description)</string>
     
     <string name="notification_ticker">Time tracking started</string>

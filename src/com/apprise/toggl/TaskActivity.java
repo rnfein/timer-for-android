@@ -107,8 +107,7 @@ public class TaskActivity extends ApplicationActivity {
     if (task.project != null) {
       projectView.setText(task.project.client_project_name);
     } else {
-      projectView.setText(R.string.choose);
-      projectView.setTextColor(R.color.light_gray);
+      projectView.setText(R.string.choose_tip);
     }
   }        
 
@@ -198,15 +197,29 @@ public class TaskActivity extends ApplicationActivity {
         TaskActivity.this, R.layout.project_item, projectsCursor, from, to);
 
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-    builder.setTitle(R.string.choose);
+    builder.setTitle(R.string.choose_project);
     builder.setAdapter(projectsAdapter, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int pos) {
         long clickedId = projectsAdapter.getItemId(pos);
         task.project = dbAdapter.findProject(clickedId);
         saveTask();
         initProjectView();
+        initPlannedTasks();
       }
     });
+    builder.setPositiveButton(R.string.create_new, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        //TODO
+      }
+    });
+    builder.setNegativeButton(R.string.leave_empty, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        task.project = null;
+        saveTask();
+        initProjectView();
+        initPlannedTasks();
+      }
+    });    
     builder.show();
   }
 
