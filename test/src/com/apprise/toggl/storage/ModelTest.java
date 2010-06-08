@@ -1,9 +1,10 @@
-package com.apprise.toggl;
+package com.apprise.toggl.storage;
 
-import com.apprise.toggl.storage.models.*;
+import com.apprise.toggl.storage.models.Model;
+import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.storage.models.Task;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 
 public class ModelTest extends AndroidTestCase {

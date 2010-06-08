@@ -1,11 +1,9 @@
-package com.apprise.toggl;
+package com.apprise.toggl.util;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import android.test.AndroidTestCase;
 import android.util.Log;
-import android.webkit.DateSorter;
 
 import com.apprise.toggl.Util;
 
