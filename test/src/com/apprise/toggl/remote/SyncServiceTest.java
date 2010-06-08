@@ -31,14 +31,22 @@ public class SyncServiceTest extends ServiceTestCase<SyncService> {
   
   @Override
   protected void setUp() throws Exception {
-    setApplication(new MockToggl());
+    Toggl app = new MockToggl();
+    setApplication(app);
     
     SyncService.SyncBinder binder = (SyncService.SyncBinder) bindService(new Intent(getContext(), SyncService.class));
     service = binder.getService();
 
-    dbAdapter = new DatabaseAdapter(getContext());
+    dbAdapter = new DatabaseAdapter(getContext(), app);
     dbAdapter.setDatabaseName(TogglTests.TEST_DATABASE_NAME);
     dbAdapter.open();
+    
+    User user = new User();
+    user.id = 123;
+    user.email = "syncuser@toggl.com";
+    User createdUser = dbAdapter.createUser(user);
+    app.logIn(createdUser);
+    
     super.setUp();
   }
 

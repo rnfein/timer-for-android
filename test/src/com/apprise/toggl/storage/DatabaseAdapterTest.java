@@ -19,7 +19,6 @@ import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
 
-import android.app.Application;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -32,7 +31,8 @@ public class DatabaseAdapterTest extends AndroidTestCase {
 
   @Override
   protected void setUp() throws Exception {
-    app = Toggl.getInstance();
+    app = new MockToggl();
+    
     dbAdapter = new DatabaseAdapter(getContext(), app);
     dbAdapter.setDatabaseName(TogglTests.TEST_DATABASE_NAME);
     dbAdapter.open();
@@ -560,7 +560,8 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     dbAdapter.deletePlannedTask(createdPlannedTask._id);
     
     assertNull(dbAdapter.findPlannedTask(createdPlannedTask._id));
-  }  
+  }
+
 }
 
 
