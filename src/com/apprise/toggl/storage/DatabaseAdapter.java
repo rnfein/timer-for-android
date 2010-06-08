@@ -43,10 +43,6 @@ public class DatabaseAdapter {
     db.close();
   }
   
-  public boolean isOpen() {
-    return db != null && db.isOpen();
-  }
-  
   public void open() throws SQLiteException {
     this.dbHelper = new DatabaseOpenHelper(this.context, getDatabaseName(), null, DATABASE_VERSION);
     try {
@@ -55,6 +51,7 @@ public class DatabaseAdapter {
       Log.e(TAG, "Couldn't open a writable DB, returning a readable.", e);
       db = dbHelper.getReadableDatabase();
     }
+
   }
 
   public User createUser(User user) {
