@@ -62,8 +62,15 @@ public class SyncService extends Service {
     app = (Toggl) getApplication();
     api = new TogglWebApi(app.getAPIToken());
     dbAdapter = new DatabaseAdapter(this, app);
+    dbAdapter.open();
   }
   
+  @Override
+  public void onDestroy() {
+    dbAdapter.close();
+    super.onDestroy();
+  }
+
   @Override
   public IBinder onBind(Intent intent) {
     return new SyncBinder(this);
@@ -99,7 +106,6 @@ public class SyncService extends Service {
   
   public void syncTasks() {
     Log.d(TAG, "#syncTasks starting to sync.");
-    dbAdapter.open();
 
     sync(dbAdapter.findAllTasks(), api.fetchTasks(), new SyncProxy() {
       
@@ -154,7 +160,6 @@ public class SyncService extends Service {
   
   public void syncProjects() {
     Log.d(TAG, "#syncProjects starting to sync.");
-    dbAdapter.open();
     
     sync(dbAdapter.findAllProjects(), api.fetchProjects(), new SyncProxy() {
       
@@ -206,7 +211,6 @@ public class SyncService extends Service {
   
   public void syncClients() {
     Log.d(TAG, "#syncClients starting to sync.");
-    dbAdapter.open();
     
     sync(dbAdapter.findAllClients(), api.fetchClients(), new SyncProxy() {
       
@@ -311,7 +315,6 @@ public class SyncService extends Service {
     }
 
     localCursor.close();
-    dbAdapter.close();
     proxy.broadcastSyncCompleted();
   }
   

@@ -41,20 +41,13 @@ public class CreateProjectActivity extends ApplicationActivity {
     initViews();
     attachEvents();
   }
-
-    
-  @Override
-  protected void onResume() {
-    dbAdapter.open();
-    super.onResume();
-  }
   
   @Override
-  protected void onPause() {
+  protected void onDestroy() {
     dbAdapter.close();
-    super.onPause();
+    super.onDestroy();
   }
-  
+
   private void initViews() {
     projectNameView = (EditText) findViewById(R.id.project_name);
     projectClientView = (TextView) findViewById(R.id.project_client);

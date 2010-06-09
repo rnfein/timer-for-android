@@ -43,6 +43,7 @@ public class TasksActivity extends ApplicationListActivity {
     
     app = (Toggl) getApplication();    
     dbAdapter = new DatabaseAdapter(this, app);
+    dbAdapter.open();
     currentUser = app.getCurrentUser();
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);
@@ -52,7 +53,6 @@ public class TasksActivity extends ApplicationListActivity {
   protected void onResume() {
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
-    dbAdapter.open();
     adapter.clearSections();
     populateList();
     super.onResume();
@@ -60,13 +60,13 @@ public class TasksActivity extends ApplicationListActivity {
   
   @Override
   protected void onPause() {
-    dbAdapter.close();
     unregisterReceiver(updateReceiver);
     super.onPause();
   }
   
   @Override
   protected void onDestroy() {
+    dbAdapter.close();
     unbindService(syncConnection);
     super.onDestroy();
   }
