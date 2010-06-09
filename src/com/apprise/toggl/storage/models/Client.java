@@ -2,10 +2,10 @@ package com.apprise.toggl.storage.models;
 
 public class Client extends Model {
   
-  public String name;
-  public Workspace workspace;
-  public long hourly_rate;
   public long currency;
+  public Workspace workspace;
+  public long hourly_rate;  
+  public String name;
   
   public Client(long _id, long remoteId, String name, Workspace workspace, long hourlyRate,
       long currency) {
@@ -13,7 +13,7 @@ public class Client extends Model {
     this.id = remoteId;
     this.name = name;
     this.workspace = workspace;
-    hourly_rate = hourlyRate;
+    this.hourly_rate = hourlyRate;
     this.currency = currency;
   }
   
@@ -21,7 +21,7 @@ public class Client extends Model {
     Long workspace_id = null;
     
     if (workspace != null)
-      workspace_id = new Long(workspace._id);
+      workspace_id = new Long(workspace.id);
     
     return "workspace_id: " + workspace_id
       + ", remote_id: " + id
