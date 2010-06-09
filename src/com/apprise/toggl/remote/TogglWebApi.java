@@ -119,7 +119,7 @@ public class TogglWebApi {
   
   public Project createProject(Project project, Toggl app) {
     Type type = new TypeToken<Project>() {}.getType();
-    String jsonString = project.apiJsonString(app);
+    String jsonString = project.apiJsonString(app.getCurrentUser());
     String url = PROJECTS_URL;
     
     if (getSession()) {

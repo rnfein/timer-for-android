@@ -95,13 +95,13 @@ public class Project extends Model {
     name = otherProject.name;
   }
   
-  public String apiJsonString(Toggl app) {
+  public String apiJsonString(User currentUser) {
     Gson gson = new Gson();
     JsonObject workspaceObj = new JsonObject();
     JsonObject rootObj = new JsonObject();
     JsonObject projectObj = gson.toJsonTree(this).getAsJsonObject();
 
-    workspaceObj.addProperty("id", app.getCurrentUser().default_workspace_id);
+    workspaceObj.addProperty("id", currentUser.default_workspace_id);
     projectObj.add("workspace", workspaceObj);
     rootObj.add("project", projectObj);
     
