@@ -231,7 +231,7 @@ public class DatabaseAdapter {
     values.put(Projects.SYNC_DIRTY, project.sync_dirty);
 
     if (project.workspace != null) values.put(Projects.WORKSPACE_REMOTE_ID, project.workspace.id);
-//    if (project.client != null) values.put(Projects.CLIENT_REMOTE_ID, project.client.id);
+    if (project.client != null) values.put(Projects.CLIENT_REMOTE_ID, project.client.id);
     
     return values;
   }
