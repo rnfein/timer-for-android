@@ -194,8 +194,24 @@ public class SyncService extends Service {
       
       public void deleteLocalDeletedEntry(long _id) { }
       
+      /*
+       * Create new remote Project based on dirty record and save it locally.
+       * Switch old dirty project record relations in tasks to newly created project.
+       * Delete dirty project record.   
+       */
       public void createRemoteEntry(Model model) {
-        // TODO
+        Project dirtyProject = (Project) model;
+        Project remoteProject = api.createProject(dirtyProject, app);
+        Project newProject = dbAdapter.createProject(remoteProject);
+        
+        Cursor tasks = dbAdapter.findAllTasksByProjectLocalId(dirtyProject._id);
+        while (tasks.moveToNext()) {
+          Task task = ORM.mapTask(tasks, dbAdapter);
+          task.project = newProject;
+          dbAdapter.updateTask(task);
+        }
+        dbAdapter.deleteProject(dirtyProject._id);
+        tasks.close();
       }
       
       public Model createLocalEntry(Model model) {

@@ -236,7 +236,7 @@ public class DatabaseAdapter {
     return values;
   }
 
-  public Client createClient(Client client) {
+  public Client createClient(Client client) { // TODO: test
     ContentValues values = setClientValues(client);
     
     long _id = db.insert(Clients.TABLE_NAME, Clients.NAME, values);
@@ -320,7 +320,7 @@ public class DatabaseAdapter {
     }
   }
   
-  public Cursor findTasksForListByDate(Date date) {
+  public Cursor findTasksForListByDate(Date date) { // TODO: test
     String dateString = Util.formatDateToString(date); 
     Cursor cursor = db.rawQuery("SELECT " 
         + Tasks.TABLE_NAME + "." + Tasks._ID + ", "
@@ -335,6 +335,10 @@ public class DatabaseAdapter {
         " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
 
     return cursor;
+  }  
+  
+  public Cursor findAllTasksByProjectLocalId(long projectLocalId) { // TODO: test
+    return db.query(Tasks.TABLE_NAME, null, " owner_user_id = ? AND "+ Tasks.PROJECT_LOCAL_ID +" = ?", new String[]{ String.valueOf(app.getCurrentUser()._id), String.valueOf(projectLocalId)}, null, null, null);        
   }  
   
   public Cursor findAllTasks() {
