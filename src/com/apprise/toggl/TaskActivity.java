@@ -84,13 +84,18 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onResume() {
+    descriptionView.setText(task.description);
+    billableCheckBox.setChecked(task.billable);
     updateProjectView();
     updatePlannedTasks();
+    updateDuration();
+    updateDateView();
     super.onResume();
   }
   
   @Override
   protected void onPause() {
+    // TODO: save field states (like description edittext)
     super.onPause();
   }
   
@@ -111,11 +116,6 @@ public class TaskActivity extends ApplicationActivity {
     plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
     tagsView = (TextView) findViewById(R.id.task_tags);
     billableCheckBox = (CheckBox) findViewById(R.id.task_billable_cb);
-
-    descriptionView.setText(task.description);
-    billableCheckBox.setChecked(task.billable);
-    updateDuration();
-    updateDateView();
   }
 
   private void updateProjectView() {
