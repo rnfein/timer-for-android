@@ -17,11 +17,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import com.apprise.toggl.Toggl;
 import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.PlannedTask;
@@ -115,6 +117,37 @@ public class TogglWebApi {
     return (LinkedList<Project>) fetchCollection(collectionType, PROJECTS_URL);
   }
   
+  public Project createProject(Project project, Toggl app) {
+    Type type = new TypeToken<Project>() {}.getType();
+    String jsonString = project.apiJsonString(app);
+    String url = PROJECTS_URL;
+    
+    if (getSession()) {
+      Gson gson = new Gson();
+      Log.d(TAG, "posting JSON: " + jsonString);
+      HttpResponse response = executeJSONPostRequest(url, jsonString);
+      if (ok(response)) {
+        Log.d(TAG, "TogglWebApi#createProject got a successful response");
+        InputStreamReader reader = null;
+        try {
+          reader = getResponseReader(response);
+          return gson.fromJson(reader, type);
+        } finally {
+          try {
+            reader.close();
+          } catch (Exception e) {
+          }
+        }
+      } else {
+        Log.e(TAG, "TogglWebApi#createProject got a failed request: "
+            + response.getStatusLine().getStatusCode());
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+  
   @SuppressWarnings("unchecked")
   public LinkedList<PlannedTask> fetchPlannedTasks() {
     Type collectionType = new TypeToken<LinkedList<PlannedTask>>() {}.getType();
@@ -194,6 +227,20 @@ public class TogglWebApi {
     HttpEntity entity = initEntity(params);
     HttpPost request = new HttpPost(url);
     request.addHeader(entity.getContentType());
+    request.setEntity(entity);
+    return execute(request);
+  }
+  
+  protected HttpResponse executeJSONPostRequest(String url,
+      String data) {
+    HttpPost request = new HttpPost(url);
+    StringEntity entity = null;
+    try {
+      entity = new StringEntity(data);
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    request.addHeader("Content-type", "application/json");
     request.setEntity(entity);
     return execute(request);
   }
