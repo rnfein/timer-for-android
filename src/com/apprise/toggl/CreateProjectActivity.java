@@ -25,8 +25,8 @@ public class CreateProjectActivity extends ApplicationActivity {
   private TextView projectClientView;
   private Button createButton;
   private Button cancelButton;
-  
-  static final String CREATED_PROJECT_REMOTE_ID = "created_project_remote_id";
+
+  static final String CREATED_PROJECT_LOCAL_ID = "created_project_local_id";
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +67,9 @@ public class CreateProjectActivity extends ApplicationActivity {
         project.name = new String( String.valueOf(projectNameView.getText()));
         dbAdapter.updateProject(project);
         Intent intent = getIntent();
-        // TODO: Here we need an async api request to create a remote project to get the remote_id
-        intent.putExtra(CREATED_PROJECT_REMOTE_ID, project.id);
+        intent.putExtra(CREATED_PROJECT_LOCAL_ID, project.id);
         setResult(RESULT_OK, intent);
-        finish();
+        finish();          
       }
     });
     
@@ -115,5 +114,4 @@ public class CreateProjectActivity extends ApplicationActivity {
     });    
     builder.show();
   }  
-  
 }
