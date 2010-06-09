@@ -327,12 +327,14 @@ public class TaskActivity extends ApplicationActivity {
   }
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    Log.d(TAG, "onActivityResult requestCode: " + requestCode);
-    Log.d(TAG, "onActivityResult resultCode:" + requestCode);
-    Log.d(TAG, "onActivityResult intent:" + data);
     if (requestCode == CREATE_NEW_PROJECT_REQUEST) {
       if (resultCode == RESULT_OK) {
-        //TODO: set and save created project
+        long createdId = data.getLongExtra(CreateProjectActivity.CREATED_PROJECT_LOCAL_ID, 0);
+        if (createdId > 0) {
+          task.project = dbAdapter.findProject(createdId);
+          saveTask();
+          updateProjectView();
+        }
       }
     }
   }
