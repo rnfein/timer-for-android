@@ -79,13 +79,16 @@ public class TasksActivity extends ApplicationListActivity {
     
     for (int i = 0; i <= taskRetentionDays; i++) {
       Cursor tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
-     
+
       if (tasksCursor.getCount() > 0) {
+        startManagingCursor(tasksCursor);
         TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
         String date = Util.smallDateString(queryCal.getTime());
-        String header_text = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
-        adapter.addSection(header_text, cursorAdapter);
-        startManagingCursor(tasksCursor);
+        String headerText = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
+        adapter.addSection(headerText, cursorAdapter);
+      }
+      else {
+        tasksCursor.close();
       }
 
       queryCal.add(Calendar.DATE, -1);
