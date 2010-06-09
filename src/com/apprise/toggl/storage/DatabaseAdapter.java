@@ -328,7 +328,8 @@ public class DatabaseAdapter {
         + Tasks.TABLE_NAME + "." + Tasks.DURATION + ", "
         + Projects.TABLE_NAME + "." + Projects.CLIENT_PROJECT_NAME
         + " FROM " + Tasks.TABLE_NAME 
-        + " LEFT OUTER JOIN projects ON (" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_REMOTE_ID + " = " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + ")" +
+        + " LEFT OUTER JOIN projects ON " +
+        "((" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_REMOTE_ID + " = " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + ") AND " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + " > 0)" +
         " OR (" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_LOCAL_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + ")" +
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
         " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
@@ -605,9 +606,9 @@ public class DatabaseAdapter {
       
       Project project = null;
       if (projectRemoteId > 0) {
-        project = dbAdapter.findProjectByRemoteId(projectRemoteId); 
+        project = dbAdapter.findProjectByRemoteId(projectRemoteId);
       } else if (projectLocalId > 0) {
-        dbAdapter.findProject(projectLocalId);
+        project = dbAdapter.findProject(projectLocalId);
       }
       
       return new Task(_id, project, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId),
