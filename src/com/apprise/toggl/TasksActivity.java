@@ -165,9 +165,11 @@ public class TasksActivity extends ApplicationListActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-      adapter.clearSections();
-      populateList();
-      setProgressBarIndeterminateVisibility(false);      
+      if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED)) {
+        adapter.clearSections();
+        populateList();
+        setProgressBarIndeterminateVisibility(false);      
+      }
     }
   };
 
