@@ -20,8 +20,8 @@ public class WelcomeActivity extends Activity {
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
     setContentView(R.layout.welcome);
+    super.onCreate(savedInstanceState);
     app = (Toggl) getApplication();
     apiToken = app.getAPIToken();
     dbAdapter = new DatabaseAdapter(this, app);
