@@ -20,12 +20,12 @@ public class Client extends Model {
   }
   
   public String toString() {
-    Long workspace_id = null;
+    Long workspace_remote_id = null;
     
     if (workspace != null)
-      workspace_id = new Long(workspace.id);
+      workspace_remote_id = new Long(workspace.id);
     
-    return "workspace_id: " + workspace_id
+    return "workspace_id: " + workspace_remote_id
       + ", remote_id: " + id
       + ", name: " + name
       + ", hourly_rate: " + hourly_rate
