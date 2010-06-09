@@ -90,6 +90,7 @@ public class TasksActivity extends ApplicationListActivity {
 
       if (tasksCursor.getCount() > 0) {
         startManagingCursor(tasksCursor);
+        taskCursors.add(tasksCursor);
         TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
         String date = Util.smallDateString(queryCal.getTime());
         String headerText = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
