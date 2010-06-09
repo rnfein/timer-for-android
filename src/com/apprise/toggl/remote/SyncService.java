@@ -30,8 +30,10 @@ import com.apprise.toggl.storage.DatabaseAdapter.ORM;
 import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.DeletedModel;
 import com.apprise.toggl.storage.models.Model;
+import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
+import com.apprise.toggl.storage.models.Workspace;
 
 import android.app.Service;
 import android.content.Intent;
@@ -48,7 +50,9 @@ public class SyncService extends Service {
   public static final String ALL_COMPLETED = "all_completed";
   public static final String PROJECTS_COMPLETED = "projects_completed";
   public static final String TASKS_COMPLETED = "tasks_completed";
-  public static final String CLIENTS_COMPLETED = "tasks_completed";
+  public static final String CLIENTS_COMPLETED = "clients_completed";
+  public static final String WORKSPACES_COMPLETED = "workspaces_completed";
+  public static final String PLANNED_TASKS_COMPLETED = "planned_tasks_completed";
   
   public static final String TAG = "SyncService";
   
@@ -88,9 +92,11 @@ public class SyncService extends Service {
   }
   
   public void syncAll() {
-    syncProjects();
-//    syncClients(); TODO Gson throws errors     
-    syncTasks();    
+    syncWorkspaces();
+//  syncClients(); TODO Gson throws errors    
+    syncProjects();     
+    syncTasks();
+    syncPlannedTasks();
     
     Intent intent = new Intent(SYNC_COMPLETED);
     intent.putExtra(COLLECTION, ALL_COMPLETED);
@@ -104,7 +110,7 @@ public class SyncService extends Service {
     sync(dbAdapter.findAllTasks(), api.fetchTasks(), new SyncProxy() {
       
       public void updateRemoteEntry(Model model) {
-
+        //TODO
       }
       
       public void updateLocalEntry(Model model) {
@@ -120,7 +126,7 @@ public class SyncService extends Service {
       }
       
       public void deleteRemoteEntry(long id) {
-        
+        //TODO
       }
       
       public void deleteLocalEntry(long _id) {
@@ -132,10 +138,11 @@ public class SyncService extends Service {
       }
       
       public void createRemoteEntry(Model model) {
-        
+        //TODO
       }
       
       public Model createLocalEntry(Model model) {
+        Log.d(TAG, "creating local task: " + ((Task) model).description);        
         return dbAdapter.createTask((Task) model);
       }
       
@@ -187,7 +194,7 @@ public class SyncService extends Service {
       }
       
       public Model createLocalEntry(Model model) {
-        Log.d(TAG, "creating local entry: " + ((Project) model).client_project_name);
+        Log.d(TAG, "creating local project: " + ((Project) model).client_project_name);
         return dbAdapter.createProject((Project) model);
       }
       
@@ -237,6 +244,7 @@ public class SyncService extends Service {
       public void createRemoteEntry(Model model) { }
       
       public Model createLocalEntry(Model model) {
+        Log.d(TAG, "creating local client: " + ((Client) model).name);        
         return dbAdapter.createClient((Client) model);
       }
       
@@ -247,6 +255,103 @@ public class SyncService extends Service {
       public void broadcastSyncCompleted() {
         Intent intent = new Intent(SYNC_COMPLETED);
         intent.putExtra(COLLECTION, CLIENTS_COMPLETED);
+        sendBroadcast(intent);
+      }      
+      
+    });
+  }
+  
+  public void syncWorkspaces() {
+    Log.d(TAG, "#syncWorkspaces starting to sync.");
+    dbAdapter.open();
+    
+    sync(dbAdapter.findAllWorkspaces(), api.fetchWorkspaces(), new SyncProxy() {
+      
+      public void updateRemoteEntry(Model model) { }
+      
+      public void updateLocalEntry(Model model) {
+        dbAdapter.updateWorkspace((Workspace) model);
+      }
+      
+      public Model getLocalEntry(long remoteId) {
+        return dbAdapter.findWorkspaceByRemoteId(remoteId);
+      }
+      
+      public DeletedModel getLocalDeletedEntry(long remoteId) {
+        return null;
+      }
+      
+      public void deleteRemoteEntry(long id) { }
+      
+      public void deleteLocalEntry(long _id) {
+        dbAdapter.deleteWorkspace(_id);
+      }
+      
+      public void deleteLocalDeletedEntry(long _id) { }
+      
+      public void createRemoteEntry(Model model) { }
+      
+      public Model createLocalEntry(Model model) {
+        Log.d(TAG, "creating local workspace: " + ((Workspace) model).name);
+        Workspace created = dbAdapter.createWorkspace((Workspace) model);
+        Log.d(TAG, "created workspace:" + created);
+        return created;
+      }
+      
+      public Model mapEntryFromCursor(Cursor cursor) {
+        return ORM.mapWorkspace(cursor);
+      }
+      
+      public void broadcastSyncCompleted() {
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, WORKSPACES_COMPLETED);
+        sendBroadcast(intent);
+      }      
+      
+    });
+  }
+  
+  public void syncPlannedTasks() {
+    Log.d(TAG, "#syncPlannedTasks starting to sync.");
+    dbAdapter.open();
+    
+    sync(dbAdapter.findAllPlannedTasks(), api.fetchPlannedTasks(), new SyncProxy() {
+      
+      public void updateRemoteEntry(Model model) { }
+      
+      public void updateLocalEntry(Model model) {
+        dbAdapter.updatePlannedTask((PlannedTask) model);
+      }
+      
+      public Model getLocalEntry(long remoteId) {
+        return dbAdapter.findPlannedTaskByRemoteId(remoteId);
+      }
+      
+      public DeletedModel getLocalDeletedEntry(long remoteId) {
+        return null;
+      }
+      
+      public void deleteRemoteEntry(long id) { }
+      
+      public void deleteLocalEntry(long _id) {
+        dbAdapter.deletePlannedTask(_id);
+      }
+      
+      public void deleteLocalDeletedEntry(long _id) { }
+      
+      public void createRemoteEntry(Model model) { }
+      
+      public Model createLocalEntry(Model model) {
+        return dbAdapter.createPlannedTask((PlannedTask) model);
+      }
+      
+      public Model mapEntryFromCursor(Cursor cursor) {
+        return ORM.mapPlannedTask(cursor, dbAdapter);
+      }
+      
+      public void broadcastSyncCompleted() {
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, PLANNED_TASKS_COMPLETED);
         sendBroadcast(intent);
       }      
       
