@@ -51,13 +51,14 @@ public class TogglWebApi {
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
 
-  private DefaultHttpClient httpClient;
+  private static DefaultHttpClient httpClient;
+
   private String apiToken;
   private boolean restartSession = true; 
   
   public TogglWebApi(String apiToken) {
     this.apiToken = apiToken;
-    createHttpClient();
+    maybeCreateHttpClient();
   }
   
   public void setApiToken(String apiToken) {
@@ -200,15 +201,6 @@ public class TogglWebApi {
     }
   }
   
-  protected void createHttpClient() {
-    httpClient = new DefaultHttpClient();
-    final HttpParams params = httpClient.getParams();
-
-    HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
-    HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
-    ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);
-  }
-  
   protected InputStreamReader getResponseReader(HttpResponse response) {
     try {
       return new InputStreamReader(response.getEntity().getContent());      
@@ -228,4 +220,16 @@ public class TogglWebApi {
     return response != null
         && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
   }
+  
+  protected static void maybeCreateHttpClient() {
+    if (httpClient == null) {
+      httpClient = new DefaultHttpClient();
+      final HttpParams params = httpClient.getParams();
+  
+      HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
+      HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
+      ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);      
+    }
+  }
+  
 }
