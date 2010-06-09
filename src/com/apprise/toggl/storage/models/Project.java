@@ -1,10 +1,8 @@
 package com.apprise.toggl.storage.models;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import com.apprise.toggl.Toggl;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 
 public class Project extends Model {
@@ -97,55 +95,15 @@ public class Project extends Model {
     name = otherProject.name;
   }
   
-  public String apiJsonString() {
-    JSONArray rootObj = new JSONArray();
-    JSONArray projectObj = new JSONArray();
-    JSONArray workspaceObj = new JSONArray();
-    JSONArray clientObj = new JSONArray();
-    
-    Toggl app = new Toggl().getInstance();
-    
-    workspaceObj.put("id:");
-    if (this.workspace != null) {      
-      workspaceObj.put(this.workspace.id);      
-    } else {
-      workspaceObj.put(48003);
-    }
-    
-    if (this.client != null) {
-      clientObj.put("id:");
-      clientObj.put(client.id);
-    } 
-    
-    try {
-      projectObj.put("fixed_fee:");
-      projectObj.put(this.fixed_fee);
-      projectObj.put("estimated_workhours:");
-      projectObj.put(this.estimated_workhours);
-      projectObj.put("fixed_fee:");
-      projectObj.put(this.fixed_fee);
-      projectObj.put("is_fixed_fee:");
-      projectObj.put(this.is_fixed_fee);
-      projectObj.put("workspace:");
-      projectObj.put(workspaceObj.toString());
-      projectObj.put("billable:");
-      projectObj.put(this.billable);
-      projectObj.put("client_project_name:");
-      projectObj.put(this.client_project_name);
-      projectObj.put("hourly_rate:");
-      projectObj.put(this.hourly_rate);
-      projectObj.put("client:");
-      if (this.client != null) {
-        projectObj.put(clientObj.toString());
-      }
-      projectObj.put("name:");
-      projectObj.put(this.name);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    
-    rootObj.put("project:");
-    rootObj.put(projectObj.toString());
+  public String apiJsonString(Toggl app) {
+    Gson gson = new Gson();
+    JsonObject workspaceObj = new JsonObject();
+    JsonObject rootObj = new JsonObject();
+    JsonObject projectObj = gson.toJsonTree(this).getAsJsonObject();
+
+    workspaceObj.addProperty("id", app.getCurrentUser().default_workspace_id);
+    projectObj.add("workspace", workspaceObj);
+    rootObj.add("project", projectObj);
     
     return rootObj.toString();
   }
