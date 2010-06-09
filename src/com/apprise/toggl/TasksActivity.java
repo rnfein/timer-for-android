@@ -1,6 +1,7 @@
 package com.apprise.toggl;
 
 import java.util.Calendar;
+import java.util.LinkedList;
 
 import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
@@ -33,6 +34,7 @@ public class TasksActivity extends ApplicationListActivity {
   private SyncService syncService;
   private Toggl app;
   private User currentUser;
+  private LinkedList<Cursor> taskCursors = new LinkedList<Cursor>();
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -70,8 +72,14 @@ public class TasksActivity extends ApplicationListActivity {
     unbindService(syncConnection);
     super.onDestroy();
   }
-
+  
   public void populateList() {
+    for (Cursor c : taskCursors) {
+      stopManagingCursor(c);
+      c.close();
+    }
+    taskCursors.clear();
+    
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
     String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION, Projects.CLIENT_PROJECT_NAME };
