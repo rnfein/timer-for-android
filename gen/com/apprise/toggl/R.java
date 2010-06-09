@@ -43,12 +43,13 @@ public final class R {
         public static final int startup=0x7f020004;
         public static final int textfield=0x7f020005;
         public static final int timer_trigger_button=0x7f020006;
-        public static final int trigger=0x7f020007;
-        public static final int trigger_active=0x7f020008;
-        public static final int trigger_inactive=0x7f020009;
-        public static final int txt_bottom=0x7f02000a;
-        public static final int txt_middle=0x7f02000b;
-        public static final int txt_top=0x7f02000c;
+        public static final int toggl_startlogo=0x7f020007;
+        public static final int trigger=0x7f020008;
+        public static final int trigger_active=0x7f020009;
+        public static final int trigger_inactive=0x7f02000a;
+        public static final int txt_bottom=0x7f02000b;
+        public static final int txt_middle=0x7f02000c;
+        public static final int txt_top=0x7f02000d;
     }
     public static final class id {
         public static final int account_menu_log_out=0x7f08001b;
