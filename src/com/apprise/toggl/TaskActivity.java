@@ -61,7 +61,6 @@ public class TaskActivity extends ApplicationActivity {
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
     task = dbAdapter.findTask(_id);
-    dbAdapter.close();
 
     Intent intent = new Intent(this, TimeTrackingService.class);
     bindService(intent, trackingConnection, BIND_AUTO_CREATE);
@@ -85,7 +84,6 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onResume() {
-    dbAdapter.open();
     updateProjectView();
     updatePlannedTasks();
     super.onResume();
@@ -93,14 +91,12 @@ public class TaskActivity extends ApplicationActivity {
   
   @Override
   protected void onPause() {
-    // FIXME: When closed, managed cursors are b0rked on resume,
-    // if left open, then we got a nasty db spill in the log.
-    // dbAdapter.close();
     super.onPause();
   }
   
   @Override
   protected void onDestroy() {
+    dbAdapter.close();
     unbindService(trackingConnection);
     super.onDestroy();
   }
@@ -142,7 +138,7 @@ public class TaskActivity extends ApplicationActivity {
         plannedTasksArea.setVisibility(LinearLayout.GONE);
       }
       if (cursor != null) {
-        startManagingCursor(cursor);
+        cursor.close();
       }
     } else {
       plannedTasksArea.setVisibility(LinearLayout.GONE);

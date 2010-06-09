@@ -51,13 +51,14 @@ public class TogglWebApi {
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
 
-  private DefaultHttpClient httpClient;
+  private static DefaultHttpClient httpClient;
+
   private String apiToken;
   private boolean restartSession = true; 
   
   public TogglWebApi(String apiToken) {
     this.apiToken = apiToken;
-    createHttpClient();
+    maybeCreateHttpClient();
   }
   
   public void setApiToken(String apiToken) {
@@ -80,13 +81,21 @@ public class TogglWebApi {
   
   private User userAuthentication(ArrayList<NameValuePair> params) {
     HttpResponse response = executePostRequest(SESSIONS_URL, params);
-
+    
     if (ok(response)) {
       Gson gson = new Gson();
-      User user = gson.fromJson(getResponseReader(response), User.class);            
-      Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response for user: " + user.toString());
-      this.apiToken = user.api_token;
-      return user;
+      InputStreamReader reader = null;
+      try {
+        reader = getResponseReader(response);
+        User user = gson.fromJson(reader, User.class);            
+        Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response for user: " + user.toString());
+        this.apiToken = user.api_token;
+        return user;          
+      } finally {
+        try {
+          reader.close();
+        } catch (Exception e) {}
+      }
     } else {
       int statusCode = response.getStatusLine().getStatusCode();
       Log.e(TAG, "TogglWebApi#AuthenticateWithToken got a failed request: " + statusCode);
@@ -127,11 +136,18 @@ public class TogglWebApi {
   private LinkedList<? extends Model> fetchCollection(Type collectionType, String url) {
     if (getSession()) {
       HttpResponse response = executeGetRequest(url);
-      
       if (ok(response)) {
         Gson gson = new Gson();
         Log.d(TAG, "TogglWebApi#fetchCollection got a successful response");
-        return gson.fromJson(getResponseReader(response), collectionType);
+        InputStreamReader reader = null;
+        try {
+          reader = getResponseReader(response);
+          return gson.fromJson(reader, collectionType);          
+        } finally {
+          try {
+            reader.close();
+          } catch (Exception e) {}
+        }
       } else {
         Log.e(TAG, "TogglWebApi#fetchCollection got a failed request: "
             + response.getStatusLine().getStatusCode());
@@ -195,23 +211,14 @@ public class TogglWebApi {
     try {
       return httpClient.execute(request);
     } catch (final IOException e) {
-      Log.d(TAG, "IOException when performing remote request", e);
+      Log.e(TAG, "IOException when performing remote request", e);
       return null;
     }
   }
   
-  protected void createHttpClient() {
-    httpClient = new DefaultHttpClient();
-    final HttpParams params = httpClient.getParams();
-
-    HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
-    HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
-    ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);
-  }
-  
   protected InputStreamReader getResponseReader(HttpResponse response) {
     try {
-      return new InputStreamReader(response.getEntity().getContent());      
+      return new InputStreamReader(response.getEntity().getContent());
     } catch(IOException e) {
       Log.e(TAG, "TogglWebApi#getResponseReader couldn't read response content.", e);
       return null;
@@ -228,4 +235,16 @@ public class TogglWebApi {
     return response != null
         && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
   }
+  
+  protected static void maybeCreateHttpClient() {
+    if (httpClient == null) {
+      httpClient = new DefaultHttpClient();
+      final HttpParams params = httpClient.getParams();
+  
+      HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
+      HttpConnectionParams.setSoTimeout(params, CONNECTION_TIMEOUT);
+      ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);      
+    }
+  }
+  
 }
