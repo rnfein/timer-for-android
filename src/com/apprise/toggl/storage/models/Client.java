@@ -2,13 +2,13 @@ package com.apprise.toggl.storage.models;
 
 public class Client extends Model {
   
-  public long currency;
+  public String currency;
   public Workspace workspace;
-  public long hourly_rate;  
+  public float hourly_rate;  
   public String name;
   
-  public Client(long _id, long remoteId, String name, Workspace workspace, long hourlyRate,
-      long currency) {
+  public Client(long _id, long remoteId, String name, Workspace workspace, float hourlyRate,
+      String currency) {
     this._id = _id;
     this.id = remoteId;
     this.name = name;

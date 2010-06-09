@@ -217,6 +217,7 @@ public class DatabaseAdapter {
     values.put(Projects.SYNC_DIRTY, project.sync_dirty);
 
     if (project.workspace != null) values.put(Projects.WORKSPACE_REMOTE_ID, project.workspace.id);
+//    if (project.client != null) values.put(Projects.CLIENT_REMOTE_ID, project.client.id);
     
     return values;
   }
@@ -518,18 +519,19 @@ public class DatabaseAdapter {
       if (cursor == null) return null;
       
       long _id = cursor.getLong(cursor.getColumnIndex(Projects._ID));
-      long fixedFee = cursor.getLong(cursor.getColumnIndex(Projects.FIXED_FEE));
+      float fixedFee = cursor.getFloat(cursor.getColumnIndex(Projects.FIXED_FEE));
       boolean billable = (cursor.getInt(cursor.getColumnIndex(Projects.BILLABLE)) == 1);
       String clientProjectName = cursor.getString(cursor.getColumnIndex(Projects.CLIENT_PROJECT_NAME));
       long estimatedWorkhours = cursor.getLong(cursor.getColumnIndex(Projects.ESTIMATED_WORKHOURS));
       boolean isFixedFee = (cursor.getLong(cursor.getColumnIndex(Projects.IS_FIXED_FEE)) == 1);
-      long hourlyRate = cursor.getLong(cursor.getColumnIndex(Projects.HOURLY_RATE));
+      float hourlyRate = cursor.getFloat(cursor.getColumnIndex(Projects.HOURLY_RATE));
       String name = cursor.getString(cursor.getColumnIndex(Projects.NAME));
       long remote_id = cursor.getLong(cursor.getColumnIndex(Projects.REMOTE_ID));
       long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Projects.WORKSPACE_REMOTE_ID));
+      long clientRemoteId = cursor.getLong(cursor.getColumnIndex(Projects.CLIENT_REMOTE_ID));
       boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Projects.SYNC_DIRTY)) == 1);
       
-      return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), billable, clientProjectName, hourlyRate, name, remote_id, syncDirty);
+      return new Project(_id, fixedFee, estimatedWorkhours, isFixedFee, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), billable, clientProjectName, hourlyRate, dbAdapter.findClientByRemoteId(clientRemoteId), name, remote_id, syncDirty);
     }
     
     public static Client mapClient(Cursor cursor, DatabaseAdapter dbAdapter) {
@@ -538,8 +540,8 @@ public class DatabaseAdapter {
       long _id = cursor.getLong(cursor.getColumnIndex(Clients._ID));
       long remote_id = cursor.getLong(cursor.getColumnIndex(Clients.REMOTE_ID));
       String name = cursor.getString(cursor.getColumnIndex(Clients.NAME));
-      long hourlyRate = cursor.getLong(cursor.getColumnIndex(Clients.HOURLY_RATE));
-      long currency = cursor.getLong(cursor.getColumnIndex(Clients.CURRENCY));
+      float hourlyRate = cursor.getFloat(cursor.getColumnIndex(Clients.HOURLY_RATE));
+      String currency = cursor.getString(cursor.getColumnIndex(Clients.CURRENCY));
       long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Clients.WORKSPACE_REMOTE_ID));
       
       return new Client(_id, remote_id, name, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), hourlyRate, currency);
@@ -627,13 +629,14 @@ public class DatabaseAdapter {
       + Projects.OWNER_USER_ID + " INTEGER NOT NULL,"      
       + Projects.REMOTE_ID + " INTEGER NOT NULL,"
       + Projects.SYNC_DIRTY + " INTEGER NOT NULL,"      
-      + Projects.FIXED_FEE + " INTEGER,"
+      + Projects.FIXED_FEE + " REAL,"
       + Projects.ESTIMATED_WORKHOURS + " INTEGER,"
       + Projects.IS_FIXED_FEE + " INTEGER,"
       + Projects.WORKSPACE_REMOTE_ID + " INTEGER,"
       + Projects.BILLABLE + " INTEGER,"
       + Projects.CLIENT_PROJECT_NAME + " TEXT,"
-      + Projects.HOURLY_RATE + " INTEGER,"
+      + Projects.CLIENT_REMOTE_ID + " INTEGER,"
+      + Projects.HOURLY_RATE + " REAL,"
       + Projects.NAME + " TEXT"
       + ");";
     
@@ -642,8 +645,8 @@ public class DatabaseAdapter {
     + Clients.OWNER_USER_ID + " INTEGER NOT NULL,"      
     + Clients.REMOTE_ID + " INTEGER NOT NULL,"
     + Clients.NAME + " TEXT,"      
-    + Clients.HOURLY_RATE + " INTEGER,"
-    + Clients.CURRENCY + " INTEGER"
+    + Clients.HOURLY_RATE + " REAL,"
+    + Clients.CURRENCY + " TEXT"
     + ");";
     
     private static final String CREATE_TASKS_TABLE = "CREATE TABLE " + Tasks.TABLE_NAME + " ("
@@ -735,6 +738,7 @@ public class DatabaseAdapter {
     public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
     public static final String BILLABLE = "billable";
     public static final String CLIENT_PROJECT_NAME = "client_project_name";
+    public static final String CLIENT_REMOTE_ID = "client_remote_id";
     public static final String HOURLY_RATE = "hourly_rate";
     public static final String NAME = "name";   
   }

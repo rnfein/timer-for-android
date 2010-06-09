@@ -2,20 +2,21 @@ package com.apprise.toggl.storage.models;
 
 public class Project extends Model {
   
-  public long fixed_fee;
+  public float fixed_fee;
   public long estimated_workhours;
   public boolean is_fixed_fee;
   public Workspace workspace;
   public boolean billable;
   public String client_project_name;
-  public long hourly_rate;
+  public float hourly_rate;
+//  public Client client;
   public String name;
   
   public Project() {}
   
-  public Project(long _id, long fixedFee, long estimatedWorkhours,
+  public Project(long _id, float fixedFee, long estimatedWorkhours,
       boolean isFixedFee, Workspace workspace, boolean billable,
-      String clientProjectName, long hourlyRate, String name, long remote_id,
+      String clientProjectName, float hourlyRate, Client client, String name, long remote_id,
       boolean syncDirty) {
     this._id = _id;
     this.fixed_fee = fixedFee;
@@ -25,14 +26,15 @@ public class Project extends Model {
     this.billable = billable;
     this.client_project_name = clientProjectName;
     this.hourly_rate = hourlyRate;
+//    this.client = client;
     this.name = name;
     this.id = remote_id;
     this.sync_dirty = syncDirty;
   }
   
-  public static Project dirty(long fixedFee, long estimatedWorkhours,
+  public static Project dirty(float fixedFee, long estimatedWorkhours,
       boolean isFixedFee, Workspace workspace, boolean billable,
-      String clientProjectName, long hourlyRate, String name, long remote_id) {
+      String clientProjectName, float hourlyRate, Client client, String name, long remote_id) {
     Project project = new Project();
     project.fixed_fee = fixedFee;
     project.estimated_workhours = estimatedWorkhours;
@@ -41,6 +43,7 @@ public class Project extends Model {
     project.billable = billable;
     project.client_project_name = clientProjectName;
     project.hourly_rate = hourlyRate;
+//    project.client = client;
     project.name = name;
     project.id = remote_id;
     project.sync_dirty = true;
@@ -48,17 +51,21 @@ public class Project extends Model {
   }
   
   public String toString() {
-    Long workspace_id = null;
+    Long workspace_remote_id = null;
+    Long client_remote_id = null;
     
     if (workspace != null)
-      workspace_id = new Long(workspace._id);
+      workspace_remote_id = new Long(workspace.id);
+//    if (client != null)
+//      client_remote_id = new Long(client.id);
     
-    return "workspace_id: " + workspace_id
+    return "workspace_id: " + workspace_remote_id
       + ", fixed_fee: " + fixed_fee
       + ", estimated_workhours: " + estimated_workhours
       + ", is_fixed_fee: " + is_fixed_fee
       + ", billable: " + billable
       + ", client_project_name: " + client_project_name
+      + ", client_remote_id: " + client_remote_id
       + ", hourly_rate: " + hourly_rate
       + ", name: " + name
       + ", remote_id: " + id; 
@@ -78,6 +85,7 @@ public class Project extends Model {
     workspace = otherProject.workspace;
     billable = otherProject.billable;
     client_project_name = otherProject.client_project_name;
+//    client = otherProject.client;
     hourly_rate = otherProject.hourly_rate;
     name = otherProject.name;
   }
