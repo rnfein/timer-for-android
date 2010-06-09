@@ -63,6 +63,9 @@ public class TaskActivity extends ApplicationActivity {
     task = dbAdapter.findTask(_id);
 
     Intent intent = new Intent(this, TimeTrackingService.class);
+    if (!TimeTrackingService.isAlive()) {
+      startService(intent);      
+    }
     bindService(intent, trackingConnection, BIND_AUTO_CREATE);
 
     initViews();
@@ -84,13 +87,18 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onResume() {
+    descriptionView.setText(task.description);
+    billableCheckBox.setChecked(task.billable);
     updateProjectView();
     updatePlannedTasks();
+    updateDuration();
+    updateDateView();
     super.onResume();
   }
   
   @Override
   protected void onPause() {
+    // TODO: save field states (like description edittext)
     super.onPause();
   }
   
@@ -111,11 +119,6 @@ public class TaskActivity extends ApplicationActivity {
     plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
     tagsView = (TextView) findViewById(R.id.task_tags);
     billableCheckBox = (CheckBox) findViewById(R.id.task_billable_cb);
-
-    descriptionView.setText(task.description);
-    billableCheckBox.setChecked(task.billable);
-    updateDuration();
-    updateDateView();
   }
 
   private void updateProjectView() {
@@ -292,8 +295,10 @@ public class TaskActivity extends ApplicationActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-      task.duration = trackingService.getCurrentDuration();
-      updateDuration();
+      if (trackingService.isTracking(task)) {
+        task.duration = trackingService.getCurrentDuration();
+        updateDuration();        
+      }
     }
 
   };
