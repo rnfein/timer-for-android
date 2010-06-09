@@ -9,7 +9,7 @@ public class Project extends Model {
   public boolean billable;
   public String client_project_name;
   public float hourly_rate;
-//  public Client client;
+  public Client client;
   public String name;
   
   public Project() {}
@@ -26,7 +26,7 @@ public class Project extends Model {
     this.billable = billable;
     this.client_project_name = clientProjectName;
     this.hourly_rate = hourlyRate;
-//    this.client = client;
+    this.client = client;
     this.name = name;
     this.id = remote_id;
     this.sync_dirty = syncDirty;
@@ -43,7 +43,7 @@ public class Project extends Model {
     project.billable = billable;
     project.client_project_name = clientProjectName;
     project.hourly_rate = hourlyRate;
-//    project.client = client;
+    project.client = client;
     project.name = name;
     project.id = remote_id;
     project.sync_dirty = true;
@@ -56,8 +56,8 @@ public class Project extends Model {
     
     if (workspace != null)
       workspace_remote_id = new Long(workspace.id);
-//    if (client != null)
-//      client_remote_id = new Long(client.id);
+    if (client != null)
+      client_remote_id = new Long(client.id);
     
     return "workspace_id: " + workspace_remote_id
       + ", fixed_fee: " + fixed_fee
@@ -85,7 +85,7 @@ public class Project extends Model {
     workspace = otherProject.workspace;
     billable = otherProject.billable;
     client_project_name = otherProject.client_project_name;
-//    client = otherProject.client;
+    client = otherProject.client;
     hourly_rate = otherProject.hourly_rate;
     name = otherProject.name;
   }
