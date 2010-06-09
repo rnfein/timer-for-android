@@ -7,6 +7,8 @@ public class Client extends Model {
   public float hourly_rate;  
   public String name;
   
+  public Client() {}
+  
   public Client(long _id, long remoteId, String name, Workspace workspace, float hourlyRate,
       String currency) {
     this._id = _id;
