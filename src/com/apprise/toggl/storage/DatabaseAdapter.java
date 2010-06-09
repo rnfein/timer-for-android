@@ -379,8 +379,10 @@ public class DatabaseAdapter {
     if (task.project != null) { 
       if (task.project.id > 0) {
         values.put(Tasks.PROJECT_REMOTE_ID, task.project.id);
+        values.put(Tasks.PROJECT_LOCAL_ID, 0);
       } else if (task.project._id > 0) {
         values.put(Tasks.PROJECT_LOCAL_ID, task.project._id);
+        values.put(Tasks.PROJECT_REMOTE_ID, 0);
       }
     }
     
