@@ -328,7 +328,8 @@ public class DatabaseAdapter {
         + Tasks.TABLE_NAME + "." + Tasks.DURATION + ", "
         + Projects.TABLE_NAME + "." + Projects.CLIENT_PROJECT_NAME
         + " FROM " + Tasks.TABLE_NAME 
-        + " LEFT OUTER JOIN projects ON " + Tasks.TABLE_NAME + "." + Tasks.PROJECT_REMOTE_ID + " = " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + 
+        + " LEFT OUTER JOIN projects ON (" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_REMOTE_ID + " = " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + ")" +
+        " OR (" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_LOCAL_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + ")" +
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
         " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
 
@@ -375,7 +376,13 @@ public class DatabaseAdapter {
 //    values.put(Tasks.TAG_NAMES, "tag_names"); //TODO
 //
     if (task.workspace != null) values.put(Tasks.WORKSPACE_REMOTE_ID, task.workspace.id);
-    if (task.project != null) values.put(Tasks.PROJECT_REMOTE_ID, task.project.id); 
+    if (task.project != null) { 
+      if (task.project.id > 0) {
+        values.put(Tasks.PROJECT_REMOTE_ID, task.project.id);
+      } else if (task.project._id > 0) {
+        values.put(Tasks.PROJECT_LOCAL_ID, task.project._id);
+      }
+    }
     
     return values;
   }
@@ -584,6 +591,7 @@ public class DatabaseAdapter {
       String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
       long duration = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
       long projectRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_REMOTE_ID));
+      long projectLocalId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_LOCAL_ID));
       long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.WORKSPACE_REMOTE_ID));
       String start = cursor.getString(cursor.getColumnIndex(Tasks.START));
       String stop = cursor.getString(cursor.getColumnIndex(Tasks.STOP));
@@ -593,7 +601,14 @@ public class DatabaseAdapter {
       //TODO: String tagNames = cursor.getString(cursor.getColumnIndex(Tasks.TAG_NAMES));
       String[] tagNames = null;
       
-      return new Task(_id, dbAdapter.findProjectByRemoteId(projectRemoteId), dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId),
+      Project project = null;
+      if (projectRemoteId > 0) {
+        project = dbAdapter.findProjectByRemoteId(projectRemoteId); 
+      } else if (projectLocalId > 0) {
+        dbAdapter.findProject(projectLocalId);
+      }
+      
+      return new Task(_id, project, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId),
           duration, start, billable, description, stop, tagNames, remote_id, syncDirty);
     }
     
@@ -685,6 +700,7 @@ public class DatabaseAdapter {
       + Tasks.REMOTE_ID + " INTEGER NOT NULL,"  
       + Tasks.SYNC_DIRTY + " INTEGER NOT NULL,"  
       + Tasks.PROJECT_REMOTE_ID + " INTEGER,"
+      + Tasks.PROJECT_LOCAL_ID + " INTEGER,"
       + Tasks.WORKSPACE_REMOTE_ID + " INTEGER,"
       + Tasks.DURATION + " INTEGER,"
       + Tasks.START + " TEXT,"
@@ -791,6 +807,7 @@ public class DatabaseAdapter {
     public static final String REMOTE_ID = "remote_id";
     public static final String SYNC_DIRTY = "sync_dirty";     
     public static final String PROJECT_REMOTE_ID = "project_remote_id";
+    public static final String PROJECT_LOCAL_ID = "project_local_id";
     public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
     public static final String DURATION = "duration";
     public static final String START = "start";
