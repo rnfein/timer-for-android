@@ -295,8 +295,10 @@ public class TaskActivity extends ApplicationActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-      task.duration = trackingService.getCurrentDuration();
-      updateDuration();
+      if (trackingService.isTracking(task)) {
+        task.duration = trackingService.getCurrentDuration();
+        updateDuration();        
+      }
     }
 
   };
