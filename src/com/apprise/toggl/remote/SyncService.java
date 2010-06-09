@@ -100,7 +100,7 @@ public class SyncService extends Service {
   
   public void syncAll() {
     syncWorkspaces();
-//  syncClients(); TODO Gson throws errors    
+//    syncClients(); //TODO Gson throws errors    
     syncProjects();     
     syncTasks();
     syncPlannedTasks();
@@ -267,7 +267,6 @@ public class SyncService extends Service {
   
   public void syncWorkspaces() {
     Log.d(TAG, "#syncWorkspaces starting to sync.");
-    dbAdapter.open();
     
     sync(dbAdapter.findAllWorkspaces(), api.fetchWorkspaces(), new SyncProxy() {
       
@@ -317,7 +316,6 @@ public class SyncService extends Service {
   
   public void syncPlannedTasks() {
     Log.d(TAG, "#syncPlannedTasks starting to sync.");
-    dbAdapter.open();
     
     sync(dbAdapter.findAllPlannedTasks(), api.fetchPlannedTasks(), new SyncProxy() {
       
