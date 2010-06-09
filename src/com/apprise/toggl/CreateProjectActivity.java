@@ -25,6 +25,7 @@ public class CreateProjectActivity extends ApplicationActivity {
   private TextView projectClientView;
   private Button createButton;
   private Button cancelButton;
+  private String clientName;  
 
   static final String CREATED_PROJECT_LOCAL_ID = "created_project_local_id";
   
@@ -53,21 +54,16 @@ public class CreateProjectActivity extends ApplicationActivity {
     projectClientView = (TextView) findViewById(R.id.project_client);
     createButton = (Button) findViewById(R.id.create_project_create);
     cancelButton = (Button) findViewById(R.id.create_project_cancel);
-   
-    initClientView();
-  }
-  
-  private void initClientView() {
-    projectClientView.setText(project.client_project_name);
   }
   
   private void attachEvents() {
     createButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         project.name = new String( String.valueOf(projectNameView.getText()));
+        project.client_project_name = clientName + " - " + projectNameView.getText();        
         dbAdapter.updateProject(project);
         Intent intent = getIntent();
-        intent.putExtra(CREATED_PROJECT_LOCAL_ID, project.id);
+        intent.putExtra(CREATED_PROJECT_LOCAL_ID, project._id);
         setResult(RESULT_OK, intent);
         finish();          
       }
@@ -102,10 +98,10 @@ public class CreateProjectActivity extends ApplicationActivity {
     builder.setAdapter(clientsAdapter, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int pos) {
         long clickedId = clientsAdapter.getItemId(pos);
-        String clientName = dbAdapter.findClient(clickedId).name;
-        project.client_project_name = clientName + " - " + project.name;
+        clientName = dbAdapter.findClient(clickedId).name;
+        project.client_project_name = clientName + " - " + projectNameView.getText();
         dbAdapter.updateProject(project);
-        initClientView();
+        projectClientView.setText(clientName);
       }
     });
     builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
