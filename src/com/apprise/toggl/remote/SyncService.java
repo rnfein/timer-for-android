@@ -46,13 +46,13 @@ import android.util.Log;
 public class SyncService extends Service {
 
   public static final String SYNC_COMPLETED = "com.apprise.toggl.remote.SYNC_COMPLETED";
-  public static final String COLLECTION = "collection";
-  public static final String ALL_COMPLETED = "all_completed";
-  public static final String PROJECTS_COMPLETED = "projects_completed";
-  public static final String TASKS_COMPLETED = "tasks_completed";
-  public static final String CLIENTS_COMPLETED = "clients_completed";
-  public static final String WORKSPACES_COMPLETED = "workspaces_completed";
-  public static final String PLANNED_TASKS_COMPLETED = "planned_tasks_completed";
+  public static final String COLLECTION = "com.apprise.toggl.remote.COLLECTION";
+  public static final String ALL_COMPLETED = "com.apprise.toggl.remote.ALL_COMPLETED";
+  public static final String PROJECTS_COMPLETED = "com.apprise.toggl.remote.PROJECTS_COMPLETED";
+  public static final String TASKS_COMPLETED = "com.apprise.toggl.remote.TASKS_COMPLETED";
+  public static final String CLIENTS_COMPLETED = "com.apprise.toggl.remote.CLIENTS_COMPLETED";
+  public static final String WORKSPACES_COMPLETED = "com.apprise.toggl.remote.WORKSPACES_COMPLETED";
+  public static final String PLANNED_TASKS_COMPLETED = "com.apprise.toggl.remote.PLANNED_TASKS_COMPLETED";
   
   public static final String TAG = "SyncService";
   
