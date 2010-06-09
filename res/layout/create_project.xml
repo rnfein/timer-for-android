@@ -49,12 +49,13 @@
 					android:layout_width="fill_parent"
 					android:layout_height="fill_parent"
 					android:layout_weight="3"
-					android:gravity="center"
+          android:paddingTop="@dimen/label_padding_top" 					
+					android:gravity="right"
 					android:maxWidth="97dp"
 					android:singleLine="true"
 					android:textSize="@dimen/login_edittext_size"
 					android:background="@color/transparent"
-					android:paddingRight="@dimen/login_edittext_padding_right"/>        
+					android:paddingRight="45dp"/>        
       </LinearLayout>      
       <LinearLayout
         android:background="@drawable/txt_bottom"
@@ -81,6 +82,7 @@
 		        android:layout_height="fill_parent"
 		        android:layout_weight="4"
 		        android:gravity="right"
+            android:singleLine="true"		        
 		        android:paddingTop="@dimen/label_padding_top"        
 		        android:textSize="@dimen/label_text_size"           
 		        android:textColor="@color/black"/>   

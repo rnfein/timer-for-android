@@ -19,6 +19,7 @@
 		    android:layout_height="24dp"
 		    android:textColor="@color/black"
 		    android:textStyle="bold"       
+		    android:singleLine="true"
 		    android:gravity="center_vertical"
 		    android:paddingLeft="@dimen/listitem_padding_left"
 		    android:textSize="@dimen/listitem_text_size"     

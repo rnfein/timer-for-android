@@ -46,11 +46,11 @@
 	          android:text="@string/email"/>
 	      <EditText
 	          android:id="@+id/email"
-	          android:layout_width="fill_parent"
+	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="3"
             android:gravity="center"
-            android:maxWidth="97dp"
+            android:maxWidth="105dp"
             android:singleLine="true"
             android:textSize="@dimen/login_edittext_size"
 	          android:background="@color/transparent"
@@ -121,6 +121,7 @@
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="40dp"
+      android:layout_marginRight="15dp"
       android:gravity="center">
       <ImageView
         android:layout_width="wrap_content"

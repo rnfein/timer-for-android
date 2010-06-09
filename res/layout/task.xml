@@ -93,6 +93,7 @@
         android:layout_height="fill_parent"
         android:layout_weight="4"
         android:gravity="right"
+        android:singleLine="true"
         android:paddingTop="@dimen/label_padding_top"        
 	      android:textSize="@dimen/label_text_size"           
 	      android:textColor="@color/black"
