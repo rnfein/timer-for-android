@@ -13,11 +13,10 @@ public class WelcomeActivity extends Activity {
 
   private static final String TAG = "WelcomeActivity";
   
-  Toggl app;
-  TogglWebApi webApi;
-  String apiToken;
-  DatabaseAdapter dbAdapter;
-  User currentUser = null;
+  private Toggl app;
+  private TogglWebApi webApi;
+  private String apiToken;
+  private DatabaseAdapter dbAdapter;
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -25,47 +24,49 @@ public class WelcomeActivity extends Activity {
     setContentView(R.layout.welcome);
     app = (Toggl) getApplication();
     apiToken = app.getAPIToken();
+    dbAdapter = new DatabaseAdapter(this, app);
+    dbAdapter.open();
     
     if (apiToken != null) {
-      getCurrentUserFromDb();
+      User currentUser = getCurrentUserFromDb();
       if (currentUser != null) {
         app.logIn(currentUser);
         startTasksActivity();
       } else {
-        webApi = new TogglWebApi(apiToken);        
         new Thread(authenticateInBackground).start(); 
       }
     } else {
       startAccountActivity();
     }
   }
-  
+ 
   @Override
-  protected void onPause() {
-    super.onPause();
-    finish();
+  protected void onDestroy() {
+    dbAdapter.close();
+    super.onDestroy();
   }
 
-  private void getCurrentUserFromDb() {
-    dbAdapter = new DatabaseAdapter(this, app);
-    dbAdapter.open();
-    currentUser = dbAdapter.findUserByApiToken(apiToken);
-    dbAdapter.close();
-    Log.d(TAG, "fetched user: " + currentUser);
+  private User getCurrentUserFromDb() {
+    User currentUser = dbAdapter.findUserByApiToken(apiToken);
+    Log.d(TAG, "Found user: " + currentUser);
+    return currentUser;
   }
   
   private void startAccountActivity() {
     startActivity(new Intent(WelcomeActivity.this, AccountActivity.class));
+    finish();
   }
   
   private void startTasksActivity() {
     startActivity(new Intent(WelcomeActivity.this, TasksActivity.class));
+    finish();
   }
 
-  protected Runnable authenticateInBackground = new Runnable() {
+  private Runnable authenticateInBackground = new Runnable() {
     
     public void run() {
-      currentUser = webApi.authenticateWithToken(apiToken);
+      webApi = new TogglWebApi(apiToken);
+      User currentUser = webApi.authenticateWithToken(apiToken);
 
       if (currentUser != null) {
         app.logIn(currentUser);
