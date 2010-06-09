@@ -282,6 +282,7 @@ public class DatabaseAdapter {
     values.put(Clients.NAME, client.name);
     values.put(Clients.HOURLY_RATE, client.hourly_rate);
     values.put(Clients.CURRENCY, client.currency);
+    values.put(Clients.REMOTE_ID, client.id);
     
     if (client.workspace != null) values.put(Clients.WORKSPACE_REMOTE_ID, client.workspace.id);
     
@@ -669,13 +670,14 @@ public class DatabaseAdapter {
       + ");";
     
     private static final String CREATE_CLIENTS_TABLE = "CREATE TABLE " + Clients.TABLE_NAME + " ("
-    + Clients._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-    + Clients.OWNER_USER_ID + " INTEGER NOT NULL,"      
-    + Clients.REMOTE_ID + " INTEGER NOT NULL,"
-    + Clients.NAME + " TEXT,"      
-    + Clients.HOURLY_RATE + " REAL,"
-    + Clients.CURRENCY + " TEXT"
-    + ");";
+      + Clients._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+      + Clients.OWNER_USER_ID + " INTEGER NOT NULL,"      
+      + Clients.REMOTE_ID + " INTEGER NOT NULL,"
+      + Clients.WORKSPACE_REMOTE_ID + " INTEGER,"
+      + Clients.NAME + " TEXT,"      
+      + Clients.HOURLY_RATE + " REAL,"
+      + Clients.CURRENCY + " TEXT"
+      + ");";
     
     private static final String CREATE_TASKS_TABLE = "CREATE TABLE " + Tasks.TABLE_NAME + " ("
       + Tasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"

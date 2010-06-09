@@ -100,7 +100,7 @@ public class SyncService extends Service {
   
   public void syncAll() {
     syncWorkspaces();
-//    syncClients(); //TODO Gson throws errors    
+    syncClients();    
     syncProjects();     
     syncTasks();
     syncPlannedTasks();
