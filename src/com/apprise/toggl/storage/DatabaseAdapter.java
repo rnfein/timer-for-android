@@ -63,9 +63,11 @@ public class DatabaseAdapter {
   
   public User findUser(long _id) {
     Cursor cursor = getMovedCursorWithoutOwner(Users.TABLE_NAME, Users._ID, _id);
-    User user = ORM.mapUser(cursor);
-    safeClose(cursor);
-    return user;
+    try {
+      return ORM.mapUser(cursor);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public boolean updateUser(User user) {
@@ -77,16 +79,20 @@ public class DatabaseAdapter {
   
   public User findUserByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursorWithoutOwner(Users.TABLE_NAME, Users.REMOTE_ID, remoteId);
-    User user = ORM.mapUser(cursor);
-    safeClose(cursor);
-    return user;
+    try {
+      return ORM.mapUser(cursor);
+    } finally {
+      safeClose(cursor);  
+    }
   }  
   
   public User findUserByApiToken(String apiToken) {
     Cursor cursor = getMovedCursorByStringWithoutOwner(Users.TABLE_NAME, Users.API_TOKEN, apiToken);
-    User user = ORM.mapUser(cursor);
-    safeClose(cursor);
-    return user;
+    try {
+      return ORM.mapUser(cursor);
+    } finally {
+      safeClose(cursor);  
+    }
   }  
   
   public Cursor findAllUsers() {
@@ -125,9 +131,11 @@ public class DatabaseAdapter {
 
   public Workspace findWorkspace(long _id) {
     Cursor cursor = getMovedCursor(Workspaces.TABLE_NAME, Workspaces._ID, _id);
-    Workspace workspace = ORM.mapWorkspace(cursor);
-    safeClose(cursor);
-    return workspace;
+    try {
+      return ORM.mapWorkspace(cursor);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public boolean updateWorkspace(Workspace workspace) {
@@ -139,9 +147,11 @@ public class DatabaseAdapter {
   
   public Workspace findWorkspaceByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursor(Workspaces.TABLE_NAME, Workspaces.REMOTE_ID, remoteId);
-    Workspace workspace = ORM.mapWorkspace(cursor);
-    safeClose(cursor);
-    return workspace;
+    try {
+      return ORM.mapWorkspace(cursor);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public Cursor findAllWorkspaces() {
@@ -176,16 +186,20 @@ public class DatabaseAdapter {
   
   public Project findProject(long _id) {
     Cursor cursor = getMovedCursor(Projects.TABLE_NAME, Projects._ID, _id);
-    Project project = ORM.mapProject(cursor, this);
-    safeClose(cursor);
-    return project;
+    try {
+      return ORM.mapProject(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public Project findProjectByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursor(Projects.TABLE_NAME, Projects.REMOTE_ID, remoteId);
-    Project project = ORM.mapProject(cursor, this);
-    safeClose(cursor);
-    return project;
+    try {
+      return ORM.mapProject(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }  
   
   public boolean updateProject(Project project) {
@@ -230,16 +244,20 @@ public class DatabaseAdapter {
   
   public Client findClient(long _id) {
     Cursor cursor = getMovedCursor(Clients.TABLE_NAME, Clients._ID, _id);
-    Client client = ORM.mapClient(cursor, this);
-    safeClose(cursor);
-    return client;
+    try {
+      return ORM.mapClient(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public Client findClientByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursor(Clients.TABLE_NAME, Clients.REMOTE_ID, remoteId);
-    Client client = ORM.mapClient(cursor, this);
-    safeClose(cursor);
-    return client;
+    try {
+      return ORM.mapClient(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }  
   
   public boolean updateClient(Client client) {
@@ -284,16 +302,20 @@ public class DatabaseAdapter {
   
   public Task findTask(long _id) {
     Cursor cursor = getMovedCursor(Tasks.TABLE_NAME, Tasks._ID, _id);
-    Task task = ORM.mapTask(cursor, this);
-    safeClose(cursor);
-    return task;
+    try {
+      return ORM.mapTask(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public Task findTaskByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursor(Tasks.TABLE_NAME, Tasks.REMOTE_ID, remoteId);
-    Task task = ORM.mapTask(cursor, this);
-    safeClose(cursor);
-    return task;
+    try {
+      return ORM.mapTask(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public Cursor findTasksForListByDate(Date date) {
@@ -358,9 +380,11 @@ public class DatabaseAdapter {
   
   public DeletedTask findDeletedTask(long taskRemoteId) {
     Cursor cursor = getMovedCursor(DeletedTasks.TABLE_NAME, DeletedTasks.TASK_REMOTE_ID, taskRemoteId);
-    DeletedTask deletedTask = ORM.mapDeletedTask(cursor);
-    safeClose(cursor);
-    return deletedTask;
+    try {
+      return ORM.mapDeletedTask(cursor);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public Cursor findAllDeletedTasks() {
@@ -380,16 +404,20 @@ public class DatabaseAdapter {
   
   public PlannedTask findPlannedTask(long _id) {
     Cursor cursor = getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks._ID, _id);
-    PlannedTask plannedTask = ORM.mapPlannedTask(cursor, this);
-    safeClose(cursor);
-    return plannedTask;    
+    try {
+      return ORM.mapPlannedTask(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
   }
   
   public PlannedTask findPlannedTaskByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursor(PlannedTasks.TABLE_NAME, PlannedTasks.REMOTE_ID, remoteId);
-    PlannedTask plannedTask = ORM.mapPlannedTask(cursor, this);
-    safeClose(cursor);
-    return plannedTask;    
+    try {
+      return ORM.mapPlannedTask(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }    
   }
   
   /*
