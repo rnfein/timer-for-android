@@ -20,17 +20,29 @@ public class TimeTrackingService extends Service {
 
   public static final String BROADCAST_SECOND_ELAPSED = "com.apprise.toggl.tracking.BROADCAST_SECOND_ELAPSED";
   public static final int NOTIFICATION_ID = 1;
+  private static boolean isAlive = false; 
   
   private Timer timer;
   private Task task;
   private long seconds = 0l;
   private boolean isTracking = false;
+
+  public static boolean isAlive() {
+    return isAlive;
+  }
   
   @Override
   public void onCreate() {
+    isAlive = true;
     super.onCreate();
   }
 
+  @Override
+  public void onDestroy() {
+    isAlive = false;
+    super.onDestroy();
+  }
+  
   @Override
   public IBinder onBind(Intent intent) {
     return new TimeTrackingBinder(this);

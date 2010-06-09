@@ -63,6 +63,9 @@ public class TaskActivity extends ApplicationActivity {
     task = dbAdapter.findTask(_id);
 
     Intent intent = new Intent(this, TimeTrackingService.class);
+    if (!TimeTrackingService.isAlive()) {
+      startService(intent);      
+    }
     bindService(intent, trackingConnection, BIND_AUTO_CREATE);
 
     initViews();
