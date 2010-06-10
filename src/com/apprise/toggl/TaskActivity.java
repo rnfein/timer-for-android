@@ -59,7 +59,11 @@ public class TaskActivity extends ApplicationActivity {
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
-    task = dbAdapter.findTask(_id);
+    if (_id > 0) {
+      task = dbAdapter.findTask(_id);
+    } else {
+      task = dbAdapter.createDirtyTask();
+    }
 
     Intent intent = new Intent(this, TimeTrackingService.class);
     if (!TimeTrackingService.isAlive()) {
