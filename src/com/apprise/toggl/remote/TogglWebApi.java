@@ -25,6 +25,8 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import com.apprise.toggl.Toggl;
+import com.apprise.toggl.remote.exception.FailedResponseException;
+import com.apprise.toggl.remote.exception.NotSignedInException;
 import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.PlannedTask;
@@ -207,10 +209,10 @@ public class TogglWebApi {
       } else {
         Log.e(TAG, "TogglWebApi#fetchCollection got a failed request: "
             + response.getStatusLine().getStatusCode());
-        return null;
+        throw new FailedResponseException();
       }
     } else {
-      return null;
+      throw new NotSignedInException();
     }
   }
   
@@ -242,15 +244,15 @@ public class TogglWebApi {
       Log.d(TAG, "post JSON: " + jsonString);
       HttpResponse response = executeJSONPostRequest(url, jsonString);    
       if (ok(response)) {
-        Log.d(TAG, "TogglWebApi#createProject got a successful response");
+        Log.d(TAG, "TogglWebApi#postJSON got a successful response");
         return getResponseReader(response);
       } else {
-        Log.e(TAG, "TogglWebApi#createProject got a failed request: "
+        Log.e(TAG, "TogglWebApi#postJSON got a failed request: "
             + response.getStatusLine().getStatusCode());
-        return null;
+        throw new FailedResponseException();
       }
     } else {
-      return null;
+      throw new NotSignedInException();
     }
   }  
   
