@@ -11,6 +11,10 @@ public class ApiException extends RuntimeException {
     this.cause = cause;
   }
 
+  public ApiException() {
+    super();
+  }
+  
   public String getError() {
     return cause;
   }
