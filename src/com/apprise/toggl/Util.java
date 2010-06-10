@@ -5,8 +5,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class Util {
 
@@ -84,6 +89,18 @@ public class Util {
     String minutesStr = (minutes<10 ? "0" : "")+ minutes;
     String hoursStr = (hours<10 ? "0" : "")+ hours;
     return new String(hoursStr + ":" + minutesStr + ":" + secondsStr);
-  }  
+  }
+  
+  public static String joinStringArray(String[] array, String separator){
+    List<String> list = Arrays.asList(array);
+    JSONArray jsonArray = new JSONArray(list);
+    String string = null;    
+    try {
+      string = jsonArray.join(separator);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return string;
+  }
 
 }
