@@ -98,7 +98,7 @@ public class TogglWebApi {
       } finally {
         try {
           reader.close();
-        } catch (Exception e) {}
+        } catch (IOException e) {}
       }
     } else {
       int statusCode = response.getStatusLine().getStatusCode();
@@ -125,15 +125,14 @@ public class TogglWebApi {
     String url = PROJECTS_URL;
     Gson gson = new Gson();    
     InputStreamReader reader = putJSON(jsonString, url);    
+
     try {
       return gson.fromJson(reader, type);
-    } catch (Exception e) {
     } finally {
       try {
         reader.close();
       } catch (IOException e) {}
-    } 
-    return null;
+    }
   }
   
   @SuppressWarnings("unchecked")
@@ -156,13 +155,11 @@ public class TogglWebApi {
     InputStreamReader reader = postJSON(jsonString, url);
     try {
       return gson.fromJson(reader, type);
-    } catch (Exception e) {
     } finally {
       try {
         reader.close();
       } catch (IOException e) {}
     }    
-    return null;
   }  
   
   public Task updateTask(Task task, Toggl app) {
@@ -205,7 +202,7 @@ public class TogglWebApi {
         } finally {
           try {
             reader.close();
-          } catch (Exception e) {}
+          } catch (IOException e) {}
         }
       } else {
         Log.e(TAG, "TogglWebApi#fetchCollection got a failed request: "
@@ -246,12 +243,7 @@ public class TogglWebApi {
       HttpResponse response = executeJSONPostRequest(url, jsonString);    
       if (ok(response)) {
         Log.d(TAG, "TogglWebApi#createProject got a successful response");
-        try {
-          InputStreamReader reader = null;          
-          reader = getResponseReader(response);
-          return reader;
-        } catch (Exception e) {
-        }
+        return getResponseReader(response);
       } else {
         Log.e(TAG, "TogglWebApi#createProject got a failed request: "
             + response.getStatusLine().getStatusCode());
@@ -260,7 +252,6 @@ public class TogglWebApi {
     } else {
       return null;
     }
-    return null;
   }  
   
   /*
