@@ -168,7 +168,7 @@ public class TogglWebApi {
     String url = TASKS_URL_BASE + task.id + ".json";
     Gson gson = new Gson();
     Log.d(TAG, "update task url: " + url);
-    InputStreamReader reader = postJSON(jsonString, url);
+    InputStreamReader reader = putJSON(jsonString, url);
     try {
       return gson.fromJson(reader, type);
     } finally {
@@ -216,7 +216,7 @@ public class TogglWebApi {
   
   private InputStreamReader putJSON(String jsonString, String url) {      
     if (getSession()) {
-      Log.d(TAG, "posting JSON: " + jsonString);
+      Log.d(TAG, "put JSON: " + jsonString);
       HttpResponse response = executeJSONPutRequest(url, jsonString);    
       if (ok(response)) {
         Log.d(TAG, "TogglWebApi#createProject got a successful response");
@@ -239,7 +239,7 @@ public class TogglWebApi {
   
   private InputStreamReader postJSON(String jsonString, String url) {      
     if (getSession()) {
-      Log.d(TAG, "posting JSON: " + jsonString);
+      Log.d(TAG, "post JSON: " + jsonString);
       HttpResponse response = executeJSONPostRequest(url, jsonString);    
       if (ok(response)) {
         Log.d(TAG, "TogglWebApi#createProject got a successful response");
