@@ -12,6 +12,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -180,8 +181,12 @@ public class TogglWebApi {
     } 
   }  
   
-  public boolean deleteTask(Task task) {
-    // TODO
+  public boolean deleteTask(long id) {
+    String url = TASKS_URL_BASE + id + ".json";
+    HttpResponse response = executeDeleteRequest(url);
+    if (ok(response)) {    
+      Log.e(TAG, "TogglWebApi#deleteTask got a successful response");
+    }
     return false;
   }  
   
@@ -321,6 +326,11 @@ public class TogglWebApi {
     }
     request.addHeader("Content-type", "application/json");
     request.setEntity(entity);
+    return execute(request);
+  }
+  
+  protected HttpResponse executeDeleteRequest(String url) {
+    HttpDelete request = new HttpDelete(url);
     return execute(request);
   }
 

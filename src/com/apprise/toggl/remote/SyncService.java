@@ -134,7 +134,7 @@ public class SyncService extends Service {
       }
       
       public void deleteRemoteEntry(long id) {
-        //TODO
+        api.deleteTask(id);
       }
       
       public void deleteLocalEntry(long _id) {

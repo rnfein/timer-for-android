@@ -1,6 +1,5 @@
 package com.apprise.toggl.storage.models;
 
-import com.apprise.toggl.Toggl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
