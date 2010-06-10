@@ -1,17 +1,9 @@
 package com.apprise.toggl.storage.models;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.util.Log;
 
 import com.apprise.toggl.Util;
-import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
@@ -119,12 +111,29 @@ public class Task extends Model {
       workspaceObj.addProperty("id", this.workspace.id);      
     }
     
-    String tagNamesJson = gson.toJson(this.tag_names);
-    taskObj.addProperty("tag_names", tagNamesJson);
     taskObj.add("workspace", workspaceObj);
+    taskObj.remove("tag_names");
     rootObj.add("task", taskObj);
     
-    return rootObj.toString();
+    String requestJson = rootObj.toString();
+
+    // FIXME: workaround to add tag_names array to JSON since taskObj.addProperty takes only String, Boolean, Number or Char
+    if (this.tag_names.length > 0) {
+      String tagJson = "\"tag_names\":[";
+        for (int i = 0; i < tag_names.length; i++) {
+          tagJson += "\"" + tag_names[i] + "\"";
+          if (i < (tag_names.length -1)){
+            tagJson += ",";
+          }
+        }
+      tagJson += "],";
+      String working = requestJson.substring(0, (requestJson.indexOf(":") + 2)) 
+        + tagJson
+        + requestJson.substring((requestJson.indexOf(":") + 2), requestJson.length());
+      requestJson = working;
+    }
+    
+    return requestJson;
   }  
     
 }
