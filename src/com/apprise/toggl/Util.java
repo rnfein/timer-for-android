@@ -97,6 +97,7 @@ public class Util {
     String string = null;    
     try {
       string = jsonArray.join(separator);
+      string = string.replaceAll("\"", "");
     } catch (JSONException e) {
       e.printStackTrace();
     }

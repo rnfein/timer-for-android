@@ -60,6 +60,19 @@ public class UtilTest extends AndroidTestCase {
     assertEquals("00:35:35", Util.secondsToHMS(2135));
     assertEquals("03:21:54", Util.secondsToHMS(12114));
   }
+  
+  public void testJoinStringArray() {
+    String[] stringArr = new String[] {
+      "baa",
+      "buu",
+      "boo"
+    };
+    
+    String joined = Util.joinStringArray(stringArr, ";");
+    
+    assertEquals("baa;buu;boo", joined);
+  }
+  
 }
 
 
