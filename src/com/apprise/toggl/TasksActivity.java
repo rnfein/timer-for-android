@@ -136,6 +136,10 @@ public class TasksActivity extends ApplicationListActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.tasks_menu_new_task:
+        Intent intent = new Intent(this, TaskActivity.class);
+        startActivity(intent);
+        return true;
       case R.id.tasks_menu_refresh:
         setProgressBarIndeterminateVisibility(true);
         new Thread(syncAllInBackground).start();
