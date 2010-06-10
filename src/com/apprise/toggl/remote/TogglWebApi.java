@@ -45,6 +45,7 @@ public class TogglWebApi {
   private static final String API_URL = BASE_URL + "/api/v1";
   private static final String SESSIONS_URL = API_URL + "/sessions.json";
   private static final String TASKS_URL = API_URL + "/tasks.json";
+  private static final String TASKS_URL_BASE = API_URL + "/tasks/";
   private static final String WORKSPACES_URL = API_URL + "/workspaces.json";
   private static final String PROJECTS_URL = API_URL + "/projects.json";
   private static final String PLANNED_TASKS_URL = API_URL + "/planned_tasks.json";
@@ -121,31 +122,12 @@ public class TogglWebApi {
     Type type = new TypeToken<Project>() {}.getType();
     String jsonString = project.apiJsonString(app.getCurrentUser());
     String url = PROJECTS_URL;
-    
-    if (getSession()) {
-      Gson gson = new Gson();
-      Log.d(TAG, "posting JSON: " + jsonString);
-      HttpResponse response = executeJSONPostRequest(url, jsonString);
-      if (ok(response)) {
-        Log.d(TAG, "TogglWebApi#createProject got a successful response");
-        InputStreamReader reader = null;
-        try {
-          reader = getResponseReader(response);
-          return gson.fromJson(reader, type);
-        } finally {
-          try {
-            reader.close();
-          } catch (Exception e) {
-          }
-        }
-      } else {
-        Log.e(TAG, "TogglWebApi#createProject got a failed request: "
-            + response.getStatusLine().getStatusCode());
-        return null;
-      }
-    } else {
-      return null;
-    }
+    Gson gson = new Gson();    
+    InputStreamReader reader = postJSON(jsonString, url);    
+    try {
+      return gson.fromJson(reader, type);
+    } catch (Exception e) {}
+    return null;
   }
   
   @SuppressWarnings("unchecked")
@@ -159,6 +141,36 @@ public class TogglWebApi {
     Type collectionType = new TypeToken<LinkedList<Task>>() {}.getType();
     return (LinkedList<Task>) fetchCollection(collectionType, TASKS_URL);    
   }
+  
+  public Task createTask(Task task, Toggl app) {
+    Type type = new TypeToken<Task>() {}.getType();
+    String jsonString = task.apiJsonString(app.getCurrentUser());
+    String url = TASKS_URL;
+    Gson gson = new Gson();    
+    InputStreamReader reader = postJSON(jsonString, url);
+    try {
+      return gson.fromJson(reader, type);
+    } catch (Exception e) {}
+    return null;
+  }  
+  
+  public Task updateTask(Task task, Toggl app) {
+    Type type = new TypeToken<Task>() {}.getType();
+    String jsonString = task.apiJsonString(app.getCurrentUser());
+    String url = TASKS_URL_BASE + task.id + ".json";
+    Gson gson = new Gson();
+    Log.d(TAG, "update task url: " + url);
+    InputStreamReader reader = postJSON(jsonString, url);
+    try {
+      return gson.fromJson(reader, type);
+    } catch (Exception e) {}
+    return null;
+  }  
+  
+  public boolean deleteTask(Task task) {
+    // TODO
+    return false;
+  }  
   
   @SuppressWarnings("unchecked")
   public LinkedList<Client> fetchClients() {
@@ -190,6 +202,32 @@ public class TogglWebApi {
       return null;
     }
   }
+  
+  private InputStreamReader postJSON(String jsonString, String url) {
+    if (getSession()) {
+      Log.d(TAG, "posting JSON: " + jsonString);
+      HttpResponse response = executeJSONPostRequest(url, jsonString);
+      if (ok(response)) {
+        Log.d(TAG, "TogglWebApi#createProject got a successful response");
+        InputStreamReader reader = null;
+        try {
+          reader = getResponseReader(response);
+          return reader;
+        } finally {
+          try {
+            reader.close();
+          } catch (Exception e) {
+          }
+        }
+      } else {
+        Log.e(TAG, "TogglWebApi#createProject got a failed request: "
+            + response.getStatusLine().getStatusCode());
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }  
   
   /*
    * Authenticate if session cookies are missing
