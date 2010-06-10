@@ -5,6 +5,8 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Clients;
 import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.widget.DialogCursorAdapter;
+import com.apprise.toggl.widget.DialogCursorAdapter.Block;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,7 +16,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class CreateProjectActivity extends ApplicationActivity {
@@ -89,10 +90,11 @@ public class CreateProjectActivity extends ApplicationActivity {
     Cursor clientsCursor = dbAdapter.findAllClients();
     startManagingCursor(clientsCursor);
 
-    String[] from = new String[] { Clients.NAME };
-    int[] to = new int[] { R.id.item_name };
-    final SimpleCursorAdapter clientsAdapter = new SimpleCursorAdapter(
-        CreateProjectActivity.this, R.layout.simple_list_item, clientsCursor, from, to);
+    final DialogCursorAdapter clientsAdapter = new DialogCursorAdapter(this, clientsCursor, Clients.NAME, new Block() {
+      public boolean isCurrent(long entryId) {
+        return project.client != null && project.client._id == entryId;
+      }
+    });
 
     AlertDialog.Builder builder = new AlertDialog.Builder(CreateProjectActivity.this);
     builder.setTitle(R.string.choose_client);

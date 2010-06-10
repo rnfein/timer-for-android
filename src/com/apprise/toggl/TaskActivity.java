@@ -7,6 +7,8 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
+import com.apprise.toggl.widget.DialogCursorAdapter;
+import com.apprise.toggl.widget.DialogCursorAdapter.Block;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -28,7 +30,6 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class TaskActivity extends ApplicationActivity {
@@ -208,10 +209,14 @@ public class TaskActivity extends ApplicationActivity {
     Cursor projectsCursor = dbAdapter.findAllProjects();
     startManagingCursor(projectsCursor);
     
-    String[] from = new String[] { Projects.CLIENT_PROJECT_NAME };
-    int[] to = new int[] { R.id.item_name };
-    final SimpleCursorAdapter projectsAdapter = new SimpleCursorAdapter(
-        TaskActivity.this, R.layout.simple_list_item, projectsCursor, from, to);
+    final DialogCursorAdapter projectsAdapter = new DialogCursorAdapter(TaskActivity.this, projectsCursor,
+      Projects.CLIENT_PROJECT_NAME,
+      new Block() {
+        public boolean isCurrent(long entryId) {
+          return task.project != null && task.project._id == entryId;
+        }
+      }
+    );
 
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.choose_project);
@@ -251,7 +256,7 @@ public class TaskActivity extends ApplicationActivity {
       dbAdapter.createTask(task);
     }
   }
-
+  
   private void setDate(int year, int month, int date) {
     Date start = Util.parseStringToDate(task.start);
     Date stop = Util.parseStringToDate(task.stop);
