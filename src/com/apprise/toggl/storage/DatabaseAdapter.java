@@ -1,6 +1,11 @@
 package com.apprise.toggl.storage;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.Util;
@@ -378,8 +383,10 @@ public class DatabaseAdapter {
     values.put(Tasks.START, task.start);
     values.put(Tasks.STOP, task.stop);
     values.put(Tasks.SYNC_DIRTY, task.sync_dirty);
-//    values.put(Tasks.TAG_NAMES, "tag_names"); //TODO
-//
+    
+    String tagNames = Util.joinStringArray(task.tag_names, ";");
+    values.put(Tasks.TAG_NAMES, tagNames);
+
     if (task.workspace != null) values.put(Tasks.WORKSPACE_REMOTE_ID, task.workspace.id);
     if (task.project != null) { 
       if (task.project.id > 0) {
@@ -605,8 +612,8 @@ public class DatabaseAdapter {
       long remote_id = cursor.getLong(cursor.getColumnIndex(Tasks.REMOTE_ID));
       boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Tasks.SYNC_DIRTY)) == 1);
 
-      //TODO: String tagNames = cursor.getString(cursor.getColumnIndex(Tasks.TAG_NAMES));
-      String[] tagNames = null;
+      String tagNames = cursor.getString(cursor.getColumnIndex(Tasks.TAG_NAMES));
+      String[] tagNamesArr = tagNames.split(";");
       
       Project project = null;
       if (projectRemoteId > 0) {
@@ -616,7 +623,7 @@ public class DatabaseAdapter {
       }
       
       return new Task(_id, project, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId),
-          duration, start, billable, description, stop, tagNames, remote_id, syncDirty);
+          duration, start, billable, description, stop, tagNamesArr, remote_id, syncDirty);
     }
     
     public static DeletedTask mapDeletedTask(Cursor cursor) {
@@ -713,8 +720,8 @@ public class DatabaseAdapter {
       + Tasks.START + " TEXT,"
       + Tasks.BILLABLE + " INTEGER,"
       + Tasks.DESCRIPTION + " TEXT,"
-      + Tasks.STOP + " TEXT"
-//      + Tasks.TAG_NAMES + " TEXT"
+      + Tasks.STOP + " TEXT,"
+      + Tasks.TAG_NAMES + " TEXT"
       + ");";
     
     private static final String CREATE_DELETED_TASKS_TABLE = "CREATE TABLE " + DeletedTasks.TABLE_NAME + " ("
