@@ -304,6 +304,9 @@ public class DatabaseAdapter {
   public Task createDirtyTask() {
     Task dirtyTask = new Task();
     dirtyTask.sync_dirty = true;
+    dirtyTask.start = Util.formatDateToString(Util.currentDate());
+    dirtyTask.stop = Util.formatDateToString(Util.currentDate());
+    dirtyTask.workspace = findWorkspace(app.getCurrentUser().default_workspace_id);
     return createTask(dirtyTask);
   }
   
@@ -384,7 +387,12 @@ public class DatabaseAdapter {
     values.put(Tasks.STOP, task.stop);
     values.put(Tasks.SYNC_DIRTY, task.sync_dirty);
     
-    String tagNames = Util.joinStringArray(task.tag_names, ";");
+    String tagNames = null;
+    if (task.tag_names != null) {
+      if (task.tag_names.length > 0) {
+        tagNames = Util.joinStringArray(task.tag_names, ";");
+      }
+    }
     values.put(Tasks.TAG_NAMES, tagNames);
 
     if (task.workspace != null) values.put(Tasks.WORKSPACE_REMOTE_ID, task.workspace.id);
@@ -616,7 +624,10 @@ public class DatabaseAdapter {
       boolean syncDirty = (cursor.getInt(cursor.getColumnIndex(Tasks.SYNC_DIRTY)) == 1);
 
       String tagNames = cursor.getString(cursor.getColumnIndex(Tasks.TAG_NAMES));
-      String[] tagNamesArr = tagNames.split(";");
+      String[] tagNamesArr = null; 
+      if (tagNames != null) {
+        tagNamesArr = tagNames.split(";");
+      }
       
       Project project = null;
       if (projectRemoteId > 0) {

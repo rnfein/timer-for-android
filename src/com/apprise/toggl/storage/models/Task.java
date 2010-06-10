@@ -1,7 +1,5 @@
 package com.apprise.toggl.storage.models;
 
-import android.util.Log;
-
 import com.apprise.toggl.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -62,7 +60,10 @@ public class Task extends Model {
     if (workspace != null)
       workspace_id = new Long(workspace._id);
 
-    String tagNames = Util.joinStringArray(this.tag_names, ";");
+    String tagNames = null;
+    if (this.tag_names != null) {
+      tagNames = Util.joinStringArray(this.tag_names, ";");
+    }
     
     return "project_id: " + project_id
       + ", workspace_id: " + workspace_id
