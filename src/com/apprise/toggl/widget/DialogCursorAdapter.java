@@ -31,7 +31,7 @@ public class DialogCursorAdapter extends CursorAdapter {
     long projectId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
     
     if (block.isCurrent(projectId)) {
-      nameView.setBackgroundResource(R.drawable.arrow);
+      nameView.setBackgroundResource(R.drawable.dialog_item_current);
     } else {
       nameView.setBackgroundResource(0);
     }
