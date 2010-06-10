@@ -146,7 +146,10 @@ public class SyncService extends Service {
       }
       
       public void createRemoteEntry(Model model) {
-        api.createTask((Task) model, app);
+        Task task = (Task) model;
+        Task createdTask = api.createTask(task, app);
+        task.updateAttributes(createdTask);
+        dbAdapter.updateTask(task);
       }
       
       public Model createLocalEntry(Model model) {
