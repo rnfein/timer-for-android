@@ -146,7 +146,7 @@ public class SyncService extends Service {
       }
       
       public void createRemoteEntry(Model model) {
-        //TODO
+        api.createTask((Task) model, app);
       }
       
       public Model createLocalEntry(Model model) {
