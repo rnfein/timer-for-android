@@ -14,6 +14,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.cookie.Cookie;
@@ -125,7 +126,7 @@ public class TogglWebApi {
     String jsonString = project.apiJsonString(app.getCurrentUser());
     String url = PROJECTS_URL;
     Gson gson = new Gson();    
-    InputStreamReader reader = postJSON(jsonString, url);
+    InputStreamReader reader = putJSON(jsonString, url);    
 
     try {
       return gson.fromJson(reader, type);
@@ -215,6 +216,29 @@ public class TogglWebApi {
     }
   }
   
+  private InputStreamReader putJSON(String jsonString, String url) {      
+    if (getSession()) {
+      Log.d(TAG, "posting JSON: " + jsonString);
+      HttpResponse response = executeJSONPutRequest(url, jsonString);    
+      if (ok(response)) {
+        Log.d(TAG, "TogglWebApi#createProject got a successful response");
+        try {
+          InputStreamReader reader = null;          
+          reader = getResponseReader(response);
+          return reader;
+        } catch (Exception e) {
+        }
+      } else {
+        Log.e(TAG, "TogglWebApi#createProject got a failed request: "
+            + response.getStatusLine().getStatusCode());
+        return null;
+      }
+    } else {
+      return null;
+    }
+    return null;
+  }  
+  
   private InputStreamReader postJSON(String jsonString, String url) {      
     if (getSession()) {
       Log.d(TAG, "posting JSON: " + jsonString);
@@ -275,6 +299,20 @@ public class TogglWebApi {
   protected HttpResponse executeJSONPostRequest(String url,
       String data) {
     HttpPost request = new HttpPost(url);
+    StringEntity entity = null;
+    try {
+      entity = new StringEntity(data);
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    request.addHeader("Content-type", "application/json");
+    request.setEntity(entity);
+    return execute(request);
+  }
+  
+  protected HttpResponse executeJSONPutRequest(String url,
+      String data) {
+    HttpPut request = new HttpPut(url);
     StringEntity entity = null;
     try {
       entity = new StringEntity(data);
