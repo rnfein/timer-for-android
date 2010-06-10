@@ -114,23 +114,24 @@ public class Task extends Model {
     
     taskObj.add("workspace", workspaceObj);
     taskObj.remove("tag_names");
+    taskObj.addProperty("created_with", "Toggl Android Client.");
     rootObj.add("task", taskObj);
     
     String requestJson = rootObj.toString();
 
     // FIXME: workaround to add tag_names array to JSON since taskObj.addProperty takes only String, Boolean, Number or Char
-    if (this.tag_names.length > 0) {
+    if (this.tag_names != null) {
       String tagJson = "\"tag_names\":[";
-        for (int i = 0; i < tag_names.length; i++) {
-          tagJson += "\"" + tag_names[i] + "\"";
-          if (i < (tag_names.length -1)){
-            tagJson += ",";
-          }
+      for (int i = 0; i < tag_names.length; i++) {
+        tagJson += "\"" + tag_names[i] + "\"";
+        if (i < (tag_names.length - 1)) {
+          tagJson += ",";
         }
+      }
       tagJson += "],";
-      String working = requestJson.substring(0, (requestJson.indexOf(":") + 2)) 
-        + tagJson
-        + requestJson.substring((requestJson.indexOf(":") + 2), requestJson.length());
+      String working = requestJson.substring(0, (requestJson.indexOf(":") + 2))
+          + tagJson
+          + requestJson.substring((requestJson.indexOf(":") + 2), requestJson.length());
       requestJson = working;
     }
     
