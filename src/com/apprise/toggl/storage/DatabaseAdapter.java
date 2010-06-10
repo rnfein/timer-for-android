@@ -367,8 +367,9 @@ public class DatabaseAdapter {
       // if task was successfully deleted, create an entry in the deleted table
       // with the remote id
       ContentValues values = new ContentValues();
+      values.put(DeletedTasks.OWNER_USER_ID, app.getCurrentUser()._id);
       values.put(DeletedTasks.TASK_REMOTE_ID, remoteId);
-      db.insert(DeletedTasks.TABLE_NAME, null, values);
+      db.insert(DeletedTasks.TABLE_NAME, DeletedTasks.TASK_REMOTE_ID, values);
     }
   }
   

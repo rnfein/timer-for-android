@@ -23,9 +23,10 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -118,6 +119,28 @@ public class TaskActivity extends ApplicationActivity {
     super.onDestroy();
   }
 
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.task_menu, menu);
+    return super.onCreateOptionsMenu(menu);
+  }   
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.task_menu_new_task:
+        Intent intent = new Intent(this, TaskActivity.class);
+        startActivity(intent);
+        finish();
+        return true;
+      case R.id.task_menu_delete_task:
+        dbAdapter.deleteTask(task);
+        finish();
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }  
+  
   protected void initViews() {
     timeTrackingButton = (Button) findViewById(R.id.timer_trigger);
     durationView = (TextView) findViewById(R.id.task_timer_duration);
