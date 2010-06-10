@@ -119,9 +119,8 @@ public class Task extends Model {
       workspaceObj.addProperty("id", this.workspace.id);      
     }
     
-//    JSONArray tagNamesArr = new JSONArray(this.tag_names);
-//    tagNamesArr.join(";");
-//    taskObj.addProperty("tag_names", tagNamesObj);
+    String tagNamesJson = gson.toJson(this.tag_names);
+    taskObj.addProperty("tag_names", tagNamesJson);
     taskObj.add("workspace", workspaceObj);
     rootObj.add("task", taskObj);
     
