@@ -5,8 +5,6 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Clients;
 import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.Project;
-import com.apprise.toggl.widget.DialogCursorAdapter;
-import com.apprise.toggl.widget.DialogCursorAdapter.Block;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -87,31 +85,27 @@ public class CreateProjectActivity extends ApplicationActivity {
   }
 
   private void showChooseClientDialog() {
-    Cursor clientsCursor = dbAdapter.findAllClients();
+    final Cursor clientsCursor = dbAdapter.findAllClients();
     startManagingCursor(clientsCursor);
-
-    final DialogCursorAdapter clientsAdapter = new DialogCursorAdapter(this, clientsCursor, Clients.NAME, new Block() {
-      public boolean isCurrent(long entryId) {
-        return project.client != null && project.client._id == entryId;
-      }
-    });
 
     AlertDialog.Builder builder = new AlertDialog.Builder(CreateProjectActivity.this);
     builder.setTitle(R.string.choose_client);
-    builder.setAdapter(clientsAdapter, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int pos) {
-        long clickedId = clientsAdapter.getItemId(pos);
+    
+    builder.setSingleChoiceItems(clientsCursor, getCheckedItem(clientsCursor, project.client), Clients.NAME, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        clientsCursor.moveToPosition(which);
+        long clickedId = clientsCursor.getLong(clientsCursor.getColumnIndex(Clients._ID));;        
         Client client = dbAdapter.findClient(clickedId); 
         clientName = client.name;
         project.client = client;
         project.client_project_name = clientName + " - " + projectNameView.getText();
         dbAdapter.updateProject(project);
         projectClientView.setText(clientName);
+        dialog.dismiss();
       }
     });
     builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-      }
+      public void onClick(DialogInterface dialog, int which) {}
     });    
     builder.show();
   }  

@@ -7,8 +7,6 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
-import com.apprise.toggl.widget.DialogCursorAdapter;
-import com.apprise.toggl.widget.DialogCursorAdapter.Block;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -206,27 +204,22 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   private void showChooseProjectDialog() {
-    Cursor projectsCursor = dbAdapter.findAllProjects();
+    final Cursor projectsCursor = dbAdapter.findAllProjects();
     startManagingCursor(projectsCursor);
     
-    final DialogCursorAdapter projectsAdapter = new DialogCursorAdapter(TaskActivity.this, projectsCursor,
-      Projects.CLIENT_PROJECT_NAME,
-      new Block() {
-        public boolean isCurrent(long entryId) {
-          return task.project != null && task.project._id == entryId;
-        }
-      }
-    );
-
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.choose_project);
-    builder.setAdapter(projectsAdapter, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int pos) {
-        long clickedId = projectsAdapter.getItemId(pos);
+    
+    builder.setSingleChoiceItems(projectsCursor, getCheckedItem(projectsCursor, task.project),
+      Projects.CLIENT_PROJECT_NAME, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        projectsCursor.moveToPosition(which);
+        long clickedId = projectsCursor.getLong(projectsCursor.getColumnIndex(Projects._ID));;
         task.project = dbAdapter.findProject(clickedId);
         saveTask();
         updateProjectView();
         updatePlannedTasks();
+        dialog.dismiss();
       }
     });
     builder.setPositiveButton(R.string.create_new, new DialogInterface.OnClickListener() {
@@ -243,6 +236,7 @@ public class TaskActivity extends ApplicationActivity {
         updatePlannedTasks();
       }
     });
+    
     builder.show();
   }
 
