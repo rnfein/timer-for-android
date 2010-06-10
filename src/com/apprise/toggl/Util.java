@@ -92,16 +92,20 @@ public class Util {
   }
   
   public static String joinStringArray(String[] array, String separator){
-    List<String> list = Arrays.asList(array);
-    JSONArray jsonArray = new JSONArray(list);
-    String string = null;    
-    try {
-      string = jsonArray.join(separator);
-      string = string.replaceAll("\"", "");
-    } catch (JSONException e) {
-      e.printStackTrace();
+    if (array != null) {
+      List<String> list = Arrays.asList(array);
+      JSONArray jsonArray = new JSONArray(list);
+      String string = null;    
+      try {
+        string = jsonArray.join(separator);
+        string = string.replaceAll("\"", "");
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+      return string;
+    } else {
+      return null;
     }
-    return string;
   }
 
 }
