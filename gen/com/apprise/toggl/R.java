@@ -81,8 +81,9 @@ public final class R {
         public static final int task_tags_area=0x7f080015;
         public static final int task_timer_area=0x7f08000a;
         public static final int task_timer_duration=0x7f08000c;
-        public static final int tasks_menu_account=0x7f08001e;
-        public static final int tasks_menu_refresh=0x7f08001d;
+        public static final int tasks_menu_account=0x7f08001f;
+        public static final int tasks_menu_new_task=0x7f08001d;
+        public static final int tasks_menu_refresh=0x7f08001e;
         public static final int timer_trigger=0x7f08000b;
     }
     public static final class layout {
@@ -120,11 +121,12 @@ public final class R {
         public static final int log_out=0x7f06000b;
         public static final int name=0x7f06000d;
         public static final int new_project=0x7f060019;
+        public static final int new_task=0x7f06001c;
         public static final int no_description=0x7f060018;
         public static final int no_project=0x7f060016;
-        public static final int notification_expanded_content=0x7f06001e;
-        public static final int notification_expanded_title=0x7f06001d;
-        public static final int notification_ticker=0x7f06001c;
+        public static final int notification_expanded_content=0x7f06001f;
+        public static final int notification_expanded_title=0x7f06001e;
+        public static final int notification_ticker=0x7f06001d;
         public static final int password=0x7f060011;
         public static final int planned=0x7f060007;
         public static final int project=0x7f060009;

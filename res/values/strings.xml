@@ -32,6 +32,8 @@
     <string name="new_project">New Project</string>
     <string name="client">Client</string>
     <string name="choose_client">Choose Client</string>
+
+    <string name="new_task">New Task</string>
     
     <string name="notification_ticker">Time tracking started</string>
     <string name="notification_expanded_title">Toggl</string>
