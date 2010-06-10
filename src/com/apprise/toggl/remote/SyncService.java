@@ -116,7 +116,9 @@ public class SyncService extends Service {
     sync(dbAdapter.findAllTasks(), api.fetchTasks(), new SyncProxy() {
       
       public void updateRemoteEntry(Model model) {
-        //TODO
+        Log.d(TAG, "updating remote task with: " + ((Task) model));
+        Task createdTask = api.updateTask((Task) model, app);
+        Log.d(TAG, "updated remote task: " + createdTask);
       }
       
       public void updateLocalEntry(Model model) {
@@ -170,9 +172,7 @@ public class SyncService extends Service {
     
     sync(dbAdapter.findAllProjects(), api.fetchProjects(), new SyncProxy() {
       
-      public void updateRemoteEntry(Model model) {
-        
-      }
+      public void updateRemoteEntry(Model model) { }
       
       public void updateLocalEntry(Model model) {
         dbAdapter.updateProject((Project) model);
