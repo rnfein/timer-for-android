@@ -396,6 +396,9 @@ public class DatabaseAdapter {
         values.put(Tasks.PROJECT_LOCAL_ID, task.project._id);
         values.put(Tasks.PROJECT_REMOTE_ID, 0);
       }
+    } else {
+      values.put(Tasks.PROJECT_LOCAL_ID, 0);
+      values.put(Tasks.PROJECT_REMOTE_ID, 0);      
     }
     
     return values;
