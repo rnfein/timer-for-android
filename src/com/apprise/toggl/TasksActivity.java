@@ -8,6 +8,7 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.widget.SectionedAdapter;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -23,9 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class TasksActivity extends ApplicationListActivity {
@@ -82,8 +83,6 @@ public class TasksActivity extends ApplicationListActivity {
     
     int taskRetentionDays = currentUser.task_retention_days;
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
-    String[] fieldsToShow = { Tasks.DURATION, Tasks.DESCRIPTION, Projects.CLIENT_PROJECT_NAME };
-    int[] viewsToFill = { R.id.task_item_duration, R.id.task_item_description, R.id.task_item_client_project_name };
     
     for (int i = 0; i <= taskRetentionDays; i++) {
       Cursor tasksCursor = dbAdapter.findTasksForListByDate(queryCal.getTime());
@@ -91,7 +90,7 @@ public class TasksActivity extends ApplicationListActivity {
       if (tasksCursor.getCount() > 0) {
         startManagingCursor(tasksCursor);
         taskCursors.add(tasksCursor);
-        TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, R.layout.task_item, tasksCursor, fieldsToShow, viewsToFill);
+        TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, tasksCursor);
         String date = Util.smallDateString(queryCal.getTime());
         String headerText = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
         adapter.addSection(headerText, cursorAdapter);
@@ -200,11 +199,10 @@ public class TasksActivity extends ApplicationListActivity {
     }
   };
   
-  public final class TasksCursorAdapter extends SimpleCursorAdapter {
+  private class TasksCursorAdapter extends CursorAdapter {
 
-    public TasksCursorAdapter(Context context, int layout, Cursor c,
-        String[] from, int[] to) {
-      super(context, layout, c, from, to);
+    public TasksCursorAdapter(Context context, Cursor cursor) {
+      super(context, cursor);
     }
 
     @Override

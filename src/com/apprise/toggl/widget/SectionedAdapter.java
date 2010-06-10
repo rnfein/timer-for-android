@@ -16,7 +16,7 @@
 	along with this program.	If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.apprise.toggl;
+package com.apprise.toggl.widget;
 
 import android.view.View;
 import android.view.ViewGroup;

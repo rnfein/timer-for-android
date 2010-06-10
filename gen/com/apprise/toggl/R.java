@@ -38,18 +38,19 @@ public final class R {
     public static final class drawable {
         public static final int arrow=0x7f020000;
         public static final int bg=0x7f020001;
-        public static final int divider=0x7f020002;
-        public static final int icon=0x7f020003;
-        public static final int startup=0x7f020004;
-        public static final int textfield=0x7f020005;
-        public static final int timer_trigger_button=0x7f020006;
-        public static final int toggl_startlogo=0x7f020007;
-        public static final int trigger=0x7f020008;
-        public static final int trigger_active=0x7f020009;
-        public static final int trigger_inactive=0x7f02000a;
-        public static final int txt_bottom=0x7f02000b;
-        public static final int txt_middle=0x7f02000c;
-        public static final int txt_top=0x7f02000d;
+        public static final int dialog_item_current=0x7f020002;
+        public static final int divider=0x7f020003;
+        public static final int icon=0x7f020004;
+        public static final int startup=0x7f020005;
+        public static final int textfield=0x7f020006;
+        public static final int timer_trigger_button=0x7f020007;
+        public static final int toggl_startlogo=0x7f020008;
+        public static final int trigger=0x7f020009;
+        public static final int trigger_active=0x7f02000a;
+        public static final int trigger_inactive=0x7f02000b;
+        public static final int txt_bottom=0x7f02000c;
+        public static final int txt_middle=0x7f02000d;
+        public static final int txt_top=0x7f02000e;
     }
     public static final class id {
         public static final int account_menu_log_out=0x7f08001b;
@@ -87,8 +88,8 @@ public final class R {
     public static final class layout {
         public static final int account=0x7f030000;
         public static final int create_project=0x7f030001;
-        public static final int main=0x7f030002;
-        public static final int simple_list_item=0x7f030003;
+        public static final int dialog_list_item=0x7f030002;
+        public static final int main=0x7f030003;
         public static final int task=0x7f030004;
         public static final int task_item=0x7f030005;
         public static final int tasks=0x7f030006;
@@ -115,12 +116,12 @@ public final class R {
         public static final int create_new=0x7f060017;
         public static final int date=0x7f060005;
         public static final int email=0x7f060010;
-        public static final int leave_empty=0x7f060016;
         public static final int log_in=0x7f060012;
         public static final int log_out=0x7f06000b;
         public static final int name=0x7f06000d;
         public static final int new_project=0x7f060019;
         public static final int no_description=0x7f060018;
+        public static final int none=0x7f060016;
         public static final int notification_expanded_content=0x7f06001e;
         public static final int notification_expanded_title=0x7f06001d;
         public static final int notification_ticker=0x7f06001c;
