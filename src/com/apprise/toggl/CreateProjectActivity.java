@@ -3,6 +3,7 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Clients;
+import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.Project;
 
 import android.app.AlertDialog;
@@ -60,7 +61,7 @@ public class CreateProjectActivity extends ApplicationActivity {
     createButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         project.name = new String( String.valueOf(projectNameView.getText()));
-        project.client_project_name = clientName + " - " + projectNameView.getText();        
+        project.client_project_name = clientName + " - " + projectNameView.getText();
         dbAdapter.updateProject(project);
         Intent intent = getIntent();
         intent.putExtra(CREATED_PROJECT_LOCAL_ID, project._id);
@@ -98,7 +99,9 @@ public class CreateProjectActivity extends ApplicationActivity {
     builder.setAdapter(clientsAdapter, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int pos) {
         long clickedId = clientsAdapter.getItemId(pos);
-        clientName = dbAdapter.findClient(clickedId).name;
+        Client client = dbAdapter.findClient(clickedId); 
+        clientName = client.name;
+        project.client = client;
         project.client_project_name = clientName + " - " + projectNameView.getText();
         dbAdapter.updateProject(project);
         projectClientView.setText(clientName);
