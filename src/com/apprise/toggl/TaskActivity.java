@@ -134,8 +134,7 @@ public class TaskActivity extends ApplicationActivity {
         finish();
         return true;
       case R.id.task_menu_delete_task:
-        dbAdapter.deleteTask(task);
-        finish();
+        showDeleteTaskDialog();
         return true;
     }
     return super.onOptionsItemSelected(item);
@@ -305,6 +304,25 @@ public class TaskActivity extends ApplicationActivity {
       dbAdapter.createTask(task);
     }
   }
+  
+  private void showDeleteTaskDialog() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+    builder.setTitle(R.string.delete_task);
+    builder.setMessage(R.string.are_you_sure);
+
+    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        dbAdapter.deleteTask(task);
+        finish();        
+      }
+    });
+    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+    
+    builder.show();
+  }  
   
   private void setDate(int year, int month, int date) {
     Date start = Util.parseStringToDate(task.start);
