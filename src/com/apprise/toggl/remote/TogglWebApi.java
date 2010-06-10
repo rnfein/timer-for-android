@@ -126,7 +126,12 @@ public class TogglWebApi {
     InputStreamReader reader = postJSON(jsonString, url);    
     try {
       return gson.fromJson(reader, type);
-    } catch (Exception e) {}
+    } catch (Exception e) {
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {}
+    } 
     return null;
   }
   
@@ -150,7 +155,12 @@ public class TogglWebApi {
     InputStreamReader reader = postJSON(jsonString, url);
     try {
       return gson.fromJson(reader, type);
-    } catch (Exception e) {}
+    } catch (Exception e) {
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {}
+    }    
     return null;
   }  
   
@@ -163,7 +173,12 @@ public class TogglWebApi {
     InputStreamReader reader = postJSON(jsonString, url);
     try {
       return gson.fromJson(reader, type);
-    } catch (Exception e) {}
+    } catch (Exception e) {
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {}
+    } 
     return null;
   }  
   
@@ -203,21 +218,17 @@ public class TogglWebApi {
     }
   }
   
-  private InputStreamReader postJSON(String jsonString, String url) {
+  private InputStreamReader postJSON(String jsonString, String url) {      
     if (getSession()) {
       Log.d(TAG, "posting JSON: " + jsonString);
-      HttpResponse response = executeJSONPostRequest(url, jsonString);
+      HttpResponse response = executeJSONPostRequest(url, jsonString);    
       if (ok(response)) {
         Log.d(TAG, "TogglWebApi#createProject got a successful response");
-        InputStreamReader reader = null;
         try {
+          InputStreamReader reader = null;          
           reader = getResponseReader(response);
           return reader;
-        } finally {
-          try {
-            reader.close();
-          } catch (Exception e) {
-          }
+        } catch (Exception e) {
         }
       } else {
         Log.e(TAG, "TogglWebApi#createProject got a failed request: "
@@ -227,6 +238,7 @@ public class TogglWebApi {
     } else {
       return null;
     }
+    return null;
   }  
   
   /*
