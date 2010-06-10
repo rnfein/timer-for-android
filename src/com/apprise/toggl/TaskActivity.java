@@ -2,6 +2,8 @@ package com.apprise.toggl;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
@@ -21,7 +23,9 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -50,6 +54,8 @@ public class TaskActivity extends ApplicationActivity {
   private TextView tagsView;
   private LinearLayout plannedTasksArea;
   private CheckBox billableCheckBox;
+  
+  Timer timer;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -205,6 +211,31 @@ public class TaskActivity extends ApplicationActivity {
         // TODO: planned tasks
       }
     });
+    
+    descriptionView.setOnKeyListener(new View.OnKeyListener() {
+      public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+          task.description = descriptionView.getText().toString();
+          triggerSave(2);
+        }
+        return false;
+      }
+    });
+  }
+
+  public void triggerSave(int seconds) {
+    if (timer != null) {
+      timer.cancel();
+    }
+    timer = new Timer();
+    timer.schedule(new scheduledSave(), seconds * 1000);
+  }
+  
+  class scheduledSave extends TimerTask {
+    public void run() {
+      saveTask();
+      timer.cancel();
+    }
   }
   
   private void showChooseProjectDialog() {
