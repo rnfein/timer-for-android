@@ -37,12 +37,29 @@ public class CreateProjectActivity extends ApplicationActivity {
     app = (Toggl) getApplication();
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
-    project = dbAdapter.createDirtyProject();
+    
     
     initViews();
     attachEvents();
   }
   
+  @Override
+  protected void onResume() {
+    if (project == null) {
+      project = dbAdapter.createDirtyProject();
+    }
+    super.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    if ("".equals(String.valueOf(projectNameView.getText()))) {
+      dbAdapter.deleteProject(project._id);
+      project = null;
+    }
+    super.onPause();
+  }
+
   @Override
   protected void onDestroy() {
     dbAdapter.close();
@@ -59,7 +76,7 @@ public class CreateProjectActivity extends ApplicationActivity {
   private void attachEvents() {
     createButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        project.name = new String( String.valueOf(projectNameView.getText()));
+        project.name = new String(String.valueOf(projectNameView.getText()));
         project.client_project_name = clientName + " - " + projectNameView.getText();
         dbAdapter.updateProject(project);
         Intent intent = getIntent();
