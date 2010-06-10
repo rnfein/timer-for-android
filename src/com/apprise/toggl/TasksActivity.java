@@ -8,6 +8,7 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.widget.SectionedAdapter;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
