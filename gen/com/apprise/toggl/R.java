@@ -121,7 +121,7 @@ public final class R {
         public static final int name=0x7f06000d;
         public static final int new_project=0x7f060019;
         public static final int no_description=0x7f060018;
-        public static final int none=0x7f060016;
+        public static final int no_project=0x7f060016;
         public static final int notification_expanded_content=0x7f06001e;
         public static final int notification_expanded_title=0x7f06001d;
         public static final int notification_ticker=0x7f06001c;

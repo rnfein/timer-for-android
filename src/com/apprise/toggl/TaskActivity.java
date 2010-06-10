@@ -235,16 +235,13 @@ public class TaskActivity extends ApplicationActivity {
         startActivityForResult(intent, CREATE_NEW_PROJECT_REQUEST);
       }
     });
-    builder.setNeutralButton(R.string.none, new DialogInterface.OnClickListener() {
+    builder.setNeutralButton(R.string.no_project, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int which) {
         task.project = null;
         saveTask();
         updateProjectView();
         updatePlannedTasks();
       }
-    });
-    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) { }
     });
     builder.show();
   }

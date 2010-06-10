@@ -25,7 +25,7 @@
     
     <string name="choose_tip">(choose)</string>
     <string name="choose_project">Choose Project</string>
-    <string name="none">None</string>
+    <string name="no_project">No Project</string>
     <string name="create_new">Create New</string>
     <string name="no_description">(no description)</string>
     
