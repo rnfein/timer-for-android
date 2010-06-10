@@ -127,7 +127,7 @@ public class TogglWebApi {
     String jsonString = project.apiJsonString(app.getCurrentUser());
     String url = PROJECTS_URL;
     Gson gson = new Gson();    
-    InputStreamReader reader = putJSON(jsonString, url);    
+    InputStreamReader reader = postJSON(jsonString, url);    
 
     try {
       return gson.fromJson(reader, type);
