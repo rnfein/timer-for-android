@@ -253,6 +253,7 @@ public class TaskActivity extends ApplicationActivity {
     });
   }
 
+  // TODO: remove this? probably move to onPause instead?
   public void triggerSave(int seconds) {
     if (timer != null) {
       timer.cancel();
