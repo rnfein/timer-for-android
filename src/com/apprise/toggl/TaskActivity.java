@@ -9,6 +9,7 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
+import com.apprise.toggl.widget.NumberPicker;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -40,7 +41,7 @@ public class TaskActivity extends ApplicationActivity {
   public static final String TASK_ID = "TASK_ID";
   private static final String TAG = "TaskActivity";
   
-  private static final int DATE_DIALOG_ID = 0;  
+  private static final int DATE_DIALOG_ID = 0;
   static final int CREATE_NEW_PROJECT_REQUEST = 1;  
   
   private DatabaseAdapter dbAdapter;
@@ -199,6 +200,12 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
     
+    durationView.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        showChooseDurationDialog();
+      }
+    });
+    
     findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         showChooseProjectDialog();          
@@ -207,7 +214,6 @@ public class TaskActivity extends ApplicationActivity {
     
     findViewById(R.id.task_date_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        Log.d(TAG, "clicked date");        
         showDialog(DATE_DIALOG_ID);
       }
     });
@@ -295,6 +301,49 @@ public class TaskActivity extends ApplicationActivity {
     });
     
     builder.show();
+  }
+  
+  private void showChooseDurationDialog() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+    View durationPicker = getLayoutInflater().inflate(R.layout.duration_picker, null);
+    
+    final NumberPicker hoursPicker = (NumberPicker) durationPicker.findViewById(R.id.picker_duration_hours);
+    final NumberPicker minutesPicker = (NumberPicker) durationPicker.findViewById(R.id.picker_duration_minutes);
+    hoursPicker.setRange(0, 23);
+    minutesPicker.setRange(0, 59);
+    
+    hoursPicker.setFormatter(NumberPicker.TWO_DIGIT_FORMATTER);
+    minutesPicker.setFormatter(NumberPicker.TWO_DIGIT_FORMATTER);
+    
+    hoursPicker.setCurrent(Util.getHoursFromSeconds(task.duration));
+    minutesPicker.setCurrent(Util.getMinutesFromSeconds(task.duration));
+    
+    builder.setTitle(Util.hoursMinutesSummary(hoursPicker.getCurrent(),
+      minutesPicker.getCurrent(), getResources()));
+    builder.setView(durationPicker);
+    builder.setPositiveButton(R.string.set, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        int hours = hoursPicker.getCurrent();
+        int minutes = minutesPicker.getCurrent();
+        // TODO set duration to task
+        // saveTask();
+      }
+    });
+    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {}
+    });
+    
+    final AlertDialog durationDialog = builder.show();
+    
+    NumberPicker.OnChangedListener numbersListener = new NumberPicker.OnChangedListener() {
+      public void onChanged(NumberPicker picker, int oldVal, int newVal) {
+        durationDialog.setTitle(Util.hoursMinutesSummary(hoursPicker.getCurrent(),
+          minutesPicker.getCurrent(), getResources()));
+      }
+    }; 
+
+    hoursPicker.setOnChangeListener(numbersListener);
+    minutesPicker.setOnChangeListener(numbersListener);
   }
 
   protected void saveTask() {

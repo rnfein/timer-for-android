@@ -17,8 +17,14 @@
     <string name="name">Name</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
+    <string name="set">Set</string>
     <string name="yes">Yes</string>
     <string name="are_you_sure">Are you sure?</string>
+    
+    <string name="hour">hour</string>
+    <string name="hours">hours</string>
+    <string name="minute">minute</string>
+    <string name="minutes">minutes</string>
 
     <string name="email">E-mail</string>
     <string name="password">Password</string>
