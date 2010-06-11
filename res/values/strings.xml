@@ -17,6 +17,7 @@
     <string name="name">Name</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
+    <string name="save">Save</string>
     <string name="yes">Yes</string>
     <string name="are_you_sure">Are you sure?</string>
 
@@ -27,6 +28,7 @@
     
     <string name="choose_tip">(choose)</string>
     <string name="choose_project">Choose Project</string>
+    <string name="choose_tags">Choose Tags</string>
     <string name="no_project">No Project</string>
     <string name="create_new">Create New</string>
     <string name="no_description">(no description)</string>

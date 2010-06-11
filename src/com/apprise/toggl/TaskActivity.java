@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
+import com.apprise.toggl.storage.DatabaseAdapter.Tags;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 
@@ -223,7 +224,7 @@ public class TaskActivity extends ApplicationActivity {
     findViewById(R.id.task_tags_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked tags");
-        // TODO: tags
+        showChooseTagsDialog();
       }
     });
 
@@ -293,6 +294,68 @@ public class TaskActivity extends ApplicationActivity {
         updatePlannedTasks();
       }
     });
+    
+    builder.show();
+  }
+  
+  private void showChooseTagsDialog() {
+    final Cursor tagsCursor = dbAdapter.findAllTags();
+    startManagingCursor(tagsCursor);
+
+    final boolean[] checkedItems = new boolean[tagsCursor.getCount()];
+    final CharSequence[] items = new CharSequence[tagsCursor.getCount()];
+    if (tagsCursor.moveToFirst()) {
+      for (int i = 0; i < items.length; i++) {
+        items[i] = tagsCursor.getString(tagsCursor.getColumnIndex(Tags.NAME));
+        if (task.tag_names != null) {
+          for (int j = 0; j < task.tag_names.length; j++) {
+            if (items[i].equals(task.tag_names[j])) {
+              checkedItems[i] = true;
+              break;
+            } else {
+              checkedItems[i] = false;
+            }
+          }
+        }
+        tagsCursor.moveToNext();
+      }
+    }
+    
+    AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+    builder.setTitle(R.string.choose_tags);
+
+    builder.setMultiChoiceItems(items, checkedItems,
+        new DialogInterface.OnMultiChoiceClickListener() {
+          public void onClick(DialogInterface dialog, int which,
+              boolean isChecked) {
+            checkedItems[which] = isChecked;
+          }
+        });
+    builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        int count = 0;
+        for (int i = 0; i < checkedItems.length; i++){
+          if (checkedItems[i])
+            count += 1;
+        }
+        String[] newTagNames = new String[count];
+        for (int i = 0; i < newTagNames.length; i++) {
+          for (int j = i; j < checkedItems.length; j++) {
+            if (checkedItems[j]) {
+              newTagNames[i] = (String) items[j];
+              break;
+            }
+          }
+        }
+        task.tag_names = newTagNames;
+        saveTask();
+        
+      }
+    });
+    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });    
     
     builder.show();
   }
