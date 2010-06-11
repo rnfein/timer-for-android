@@ -3,13 +3,13 @@
   <item
     android:id="@+id/tasks_menu_new_task"
     android:title="@string/new_task"
-    android:icon="@drawable/android:ic_menu_preferences" />
+    android:icon="@drawable/android:ic_menu_add" />
   <item
     android:id="@+id/tasks_menu_refresh"
     android:title="@string/refresh"
-    android:icon="@drawable/android:ic_menu_preferences" />
+    android:icon="@drawable/ic_menu_refresh" />
   <item
     android:id="@+id/tasks_menu_account"
     android:title="@string/account"
-    android:icon="@drawable/android:ic_menu_preferences" />
+    android:icon="@drawable/ic_menu_login" />
 </menu>

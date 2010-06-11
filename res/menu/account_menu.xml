@@ -3,5 +3,5 @@
   <item
     android:id="@+id/account_menu_log_out"
     android:title="@string/log_out"
-    android:icon="@drawable/android:ic_menu_preferences" />
+    android:icon="@drawable/android:ic_lock_power_off" />
 </menu>
