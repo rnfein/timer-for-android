@@ -32,6 +32,7 @@ import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.storage.models.Tag;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
@@ -54,6 +55,7 @@ public class TogglWebApi {
   private static final String PROJECTS_URL = API_URL + "/projects.json";
   private static final String PLANNED_TASKS_URL = API_URL + "/planned_tasks.json";
   private static final String CLIENTS_URL = API_URL + "/clients.json";
+  private static final String TAGS_URL = API_URL + "/tags.json";
   private static final String EMAIL = "email";
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
@@ -194,6 +196,12 @@ public class TogglWebApi {
   public LinkedList<Client> fetchClients() {
     Type collectionType = new TypeToken<LinkedList<Client>>() {}.getType();
     return (LinkedList<Client>) fetchCollection(collectionType, CLIENTS_URL);    
+  }
+  
+  @SuppressWarnings("unchecked")
+  public LinkedList<Tag> fetchTags() {
+    Type collectionType = new TypeToken<LinkedList<Tag>>() {}.getType();
+    return (LinkedList<Tag>) fetchCollection(collectionType, TAGS_URL);    
   }
   
   private LinkedList<? extends Model> fetchCollection(Type collectionType, String url) {

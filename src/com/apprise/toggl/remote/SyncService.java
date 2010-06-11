@@ -32,6 +32,7 @@ import com.apprise.toggl.storage.models.DeletedModel;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.storage.models.Tag;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.Workspace;
 
@@ -51,6 +52,7 @@ public class SyncService extends Service {
   public static final String PROJECTS_COMPLETED = "com.apprise.toggl.remote.PROJECTS_COMPLETED";
   public static final String TASKS_COMPLETED = "com.apprise.toggl.remote.TASKS_COMPLETED";
   public static final String CLIENTS_COMPLETED = "com.apprise.toggl.remote.CLIENTS_COMPLETED";
+  public static final String TAGS_COMPLETED = "com.apprise.toggl.remote.TAGS_COMPLETED";
   public static final String WORKSPACES_COMPLETED = "com.apprise.toggl.remote.WORKSPACES_COMPLETED";
   public static final String PLANNED_TASKS_COMPLETED = "com.apprise.toggl.remote.PLANNED_TASKS_COMPLETED";
   
@@ -100,7 +102,8 @@ public class SyncService extends Service {
   
   public void syncAll() {
     syncWorkspaces();
-    syncClients();    
+    syncClients();   
+    syncTags();
     syncProjects();     
     syncTasks();
     syncPlannedTasks();
@@ -278,6 +281,55 @@ public class SyncService extends Service {
       public void broadcastSyncCompleted() {
         Intent intent = new Intent(SYNC_COMPLETED);
         intent.putExtra(COLLECTION, CLIENTS_COMPLETED);
+        sendBroadcast(intent);
+      }      
+      
+    });
+  }
+  
+  public void syncTags() {
+    Log.d(TAG, "#syncTags starting to sync.");
+    
+    sync(dbAdapter.findAllTags(), api.fetchTags(), new SyncProxy() {
+      
+      public void updateRemoteEntry(Model model) {
+        
+      }
+      
+      public void updateLocalEntry(Model model) {
+        dbAdapter.updateTag((Tag) model);
+      }
+      
+      public Model getLocalEntry(long remoteId) {
+        return dbAdapter.findTagByRemoteId(remoteId);
+      }
+      
+      public DeletedModel getLocalDeletedEntry(long remoteId) {
+        return null;
+      }
+      
+      public void deleteRemoteEntry(long id) { }
+      
+      public void deleteLocalEntry(long _id) {
+        dbAdapter.deleteTag(_id);
+      }
+      
+      public void deleteLocalDeletedEntry(long _id) { }
+      
+      public void createRemoteEntry(Model model) { }
+      
+      public Model createLocalEntry(Model model) {
+        Log.d(TAG, "creating local tag: " + ((Tag) model).name);        
+        return dbAdapter.createTag((Tag) model);
+      }
+      
+      public Model mapEntryFromCursor(Cursor cursor) {
+        return ORM.mapTag(cursor, dbAdapter);
+      }
+      
+      public void broadcastSyncCompleted() {
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, TAGS_COMPLETED);
         sendBroadcast(intent);
       }      
       
