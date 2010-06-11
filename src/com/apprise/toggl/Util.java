@@ -13,6 +13,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.content.res.Resources;
+
 public class Util {
 
   public static String inputStreamToString(InputStream is) {
@@ -74,8 +76,8 @@ public class Util {
   } 
   
   public static String secondsToHM(long time){
-    int minutes = (int)((time/60) % 60);
-    int hours = (int)((time/3600) % 24);
+    int minutes = getMinutesFromSeconds(time);
+    int hours = getHoursFromSeconds(time);
     String minutesStr = (minutes<10 ? "0" : "")+ minutes;
     String hoursStr = (hours<10 ? "0" : "")+ hours;
     return new String(hoursStr + ":" + minutesStr);
@@ -83,12 +85,20 @@ public class Util {
   
   public static String secondsToHMS(long time){
     int seconds = (int)(time % 60);    
-    int minutes = (int)((time/60) % 60);
-    int hours = (int)((time/3600) % 24);
+    int minutes = getMinutesFromSeconds(time);
+    int hours = getHoursFromSeconds(time);
     String secondsStr = (seconds<10 ? "0" : "")+ seconds;    
     String minutesStr = (minutes<10 ? "0" : "")+ minutes;
     String hoursStr = (hours<10 ? "0" : "")+ hours;
     return new String(hoursStr + ":" + minutesStr + ":" + secondsStr);
+  }
+  
+  public static int getMinutesFromSeconds(long time) {
+    return (int) ((time/60) % 60);
+  }
+
+  public static int getHoursFromSeconds(long time) {
+    return (int) ((time/3600) % 24);
   }
   
   public static String joinStringArray(String[] array, String separator){
@@ -106,6 +116,21 @@ public class Util {
     } else {
       return null;
     }
+  }
+  
+  public static String hoursMinutesSummary(int hours, int minutes, Resources r) {
+    int hoursResource = hours == 1 ? R.string.hour : R.string.hours;
+    int minutesResource = minutes == 1 ? R.string.minute : R.string.minutes;
+    StringBuilder s = new StringBuilder();
+    s.append(hours).
+      append(" ").
+      append(r.getString(hoursResource)).
+      append(", ").
+      append(minutes).
+      append(" ").
+      append(r.getString(minutesResource));
+
+    return s.toString();
   }
 
 }

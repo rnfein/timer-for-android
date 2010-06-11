@@ -10,6 +10,7 @@ import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tags;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
+import com.apprise.toggl.widget.NumberPicker;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -40,10 +41,10 @@ public class TaskActivity extends ApplicationActivity {
 
   public static final String TASK_ID = "TASK_ID";
   private static final String TAG = "TaskActivity";
-  
-  private static final int DATE_DIALOG_ID = 0;  
-  static final int CREATE_NEW_PROJECT_REQUEST = 1;  
-  
+
+  private static final int DATE_DIALOG_ID = 0;
+  static final int CREATE_NEW_PROJECT_REQUEST = 1;
+
   private DatabaseAdapter dbAdapter;
   private TimeTrackingService trackingService;
   private Task task;
@@ -56,9 +57,9 @@ public class TaskActivity extends ApplicationActivity {
   private TextView tagsView;
   private LinearLayout plannedTasksArea;
   private CheckBox billableCheckBox;
-  
+
   Timer timer;
-  
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -75,21 +76,22 @@ public class TaskActivity extends ApplicationActivity {
 
     Intent intent = new Intent(this, TimeTrackingService.class);
     if (!TimeTrackingService.isAlive()) {
-      startService(intent);      
+      startService(intent);
     }
     bindService(intent, trackingConnection, BIND_AUTO_CREATE);
 
     initViews();
     attachEvents();
   }
-  
+
   @Override
   protected void onStart() {
-    IntentFilter filter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
+    IntentFilter filter = new IntentFilter(
+        TimeTrackingService.BROADCAST_SECOND_ELAPSED);
     registerReceiver(updateReceiver, filter);
     super.onStart();
   }
-  
+
   @Override
   protected void onStop() {
     unregisterReceiver(updateReceiver);
@@ -107,13 +109,13 @@ public class TaskActivity extends ApplicationActivity {
     updateTagsView();
     super.onResume();
   }
-  
+
   @Override
   protected void onPause() {
     // TODO: save field states (like description edittext)
     super.onPause();
   }
-  
+
   @Override
   protected void onDestroy() {
     dbAdapter.close();
@@ -125,23 +127,23 @@ public class TaskActivity extends ApplicationActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.task_menu, menu);
     return super.onCreateOptionsMenu(menu);
-  }   
+  }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case R.id.task_menu_new_task:
-        Intent intent = new Intent(this, TaskActivity.class);
-        startActivity(intent);
-        finish();
-        return true;
-      case R.id.task_menu_delete_task:
-        showDeleteTaskDialog();
-        return true;
+    case R.id.task_menu_new_task:
+      Intent intent = new Intent(this, TaskActivity.class);
+      startActivity(intent);
+      finish();
+      return true;
+    case R.id.task_menu_delete_task:
+      showDeleteTaskDialog();
+      return true;
     }
     return super.onOptionsItemSelected(item);
-  }  
-  
+  }
+
   protected void initViews() {
     timeTrackingButton = (Button) findViewById(R.id.timer_trigger);
     durationView = (TextView) findViewById(R.id.task_timer_duration);
@@ -160,12 +162,12 @@ public class TaskActivity extends ApplicationActivity {
     } else {
       projectView.setText(R.string.choose_tip);
     }
-  }        
+  }
 
   private void updateDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
   }
-  
+
   private void updateTagsView() {
     tagsView.setText(Util.joinStringArray(task.tag_names, ", "));
   }
@@ -192,32 +194,38 @@ public class TaskActivity extends ApplicationActivity {
           trackingService.stopTracking();
           // TODO: set task stop date
           saveTask();
-          timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
-        }
-        else if (trackingService.isTracking()) {
+          timeTrackingButton
+              .setBackgroundResource(R.drawable.timer_trigger_button);
+        } else if (trackingService.isTracking()) {
           // is tracking another task
           // stop the other or notify user?
-        }
-        else {
+        } else {
           trackingService.startTracking(task);
           timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
         }
       }
     });
-    
-    findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
+
+    durationView.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        showChooseProjectDialog();          
+        showChooseDurationDialog();
       }
     });
-    
-    findViewById(R.id.task_date_area).setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Log.d(TAG, "clicked date");        
-        showDialog(DATE_DIALOG_ID);
-      }
-    });
-    
+
+    findViewById(R.id.task_project_area).setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            showChooseProjectDialog();
+          }
+        });
+
+    findViewById(R.id.task_date_area).setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            showDialog(DATE_DIALOG_ID);
+          }
+        });
+
     billableCheckBox.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Log.d(TAG, "clicked billable cb");
@@ -226,20 +234,22 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
 
-    findViewById(R.id.task_tags_area).setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Log.d(TAG, "clicked tags");
-        showChooseTagsDialog();
-      }
-    });
+    findViewById(R.id.task_tags_area).setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            Log.d(TAG, "clicked tags");
+            showChooseTagsDialog();
+          }
+        });
 
-    findViewById(R.id.task_planned_tasks_area).setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Log.d(TAG, "clicked planned tasks");
-        // TODO: planned tasks
-      }
-    });
-    
+    findViewById(R.id.task_planned_tasks_area).setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            Log.d(TAG, "clicked planned tasks");
+            // TODO: planned tasks
+          }
+        });
+
     descriptionView.setOnKeyListener(new View.OnKeyListener() {
       public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_UP) {
@@ -258,51 +268,57 @@ public class TaskActivity extends ApplicationActivity {
     timer = new Timer();
     timer.schedule(new scheduledSave(), seconds * 1000);
   }
-  
+
   class scheduledSave extends TimerTask {
     public void run() {
       saveTask();
       timer.cancel();
     }
   }
-  
+
   private void showChooseProjectDialog() {
     final Cursor projectsCursor = dbAdapter.findAllProjects();
     startManagingCursor(projectsCursor);
-    
+
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.choose_project);
-    
-    builder.setSingleChoiceItems(projectsCursor, getCheckedItem(projectsCursor, task.project),
-      Projects.CLIENT_PROJECT_NAME, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        projectsCursor.moveToPosition(which);
-        long clickedId = projectsCursor.getLong(projectsCursor.getColumnIndex(Projects._ID));;
-        task.project = dbAdapter.findProject(clickedId);
-        saveTask();
-        updateProjectView();
-        updatePlannedTasks();
-        dialog.dismiss();
-      }
-    });
-    builder.setPositiveButton(R.string.create_new, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        Intent intent = new Intent(TaskActivity.this, CreateProjectActivity.class);
-        startActivityForResult(intent, CREATE_NEW_PROJECT_REQUEST);
-      }
-    });
-    builder.setNeutralButton(R.string.no_project, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        task.project = null;
-        saveTask();
-        updateProjectView();
-        updatePlannedTasks();
-      }
-    });
-    
+
+    builder.setSingleChoiceItems(projectsCursor, getCheckedItem(projectsCursor,
+        task.project), Projects.CLIENT_PROJECT_NAME,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            projectsCursor.moveToPosition(which);
+            long clickedId = projectsCursor.getLong(projectsCursor
+                .getColumnIndex(Projects._ID));
+            ;
+            task.project = dbAdapter.findProject(clickedId);
+            saveTask();
+            updateProjectView();
+            updatePlannedTasks();
+            dialog.dismiss();
+          }
+        });
+    builder.setPositiveButton(R.string.create_new,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            Intent intent = new Intent(TaskActivity.this,
+                CreateProjectActivity.class);
+            startActivityForResult(intent, CREATE_NEW_PROJECT_REQUEST);
+          }
+        });
+    builder.setNeutralButton(R.string.no_project,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            task.project = null;
+            saveTask();
+            updateProjectView();
+            updatePlannedTasks();
+          }
+        });
+
     builder.show();
   }
-  
+
   private void showChooseTagsDialog() {
     final Cursor tagsCursor = dbAdapter.findAllTags();
     startManagingCursor(tagsCursor);
@@ -325,7 +341,7 @@ public class TaskActivity extends ApplicationActivity {
         tagsCursor.moveToNext();
       }
     }
-    
+
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.choose_tags);
 
@@ -336,33 +352,84 @@ public class TaskActivity extends ApplicationActivity {
             checkedItems[which] = isChecked;
           }
         });
-    builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        int count = 0;
-        for (int i = 0; i < checkedItems.length; i++){
-          if (checkedItems[i])
-            count += 1;
-        }
-        String[] newTagNames = new String[count];
-        for (int i = 0; i < newTagNames.length; i++) {
-          for (int j = i; j < checkedItems.length; j++) {
-            if (checkedItems[j]) {
-              newTagNames[i] = (String) items[j];
-              break;
+    builder.setPositiveButton(R.string.save,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            int count = 0;
+            for (int i = 0; i < checkedItems.length; i++) {
+              if (checkedItems[i])
+                count += 1;
             }
+            String[] newTagNames = new String[count];
+            for (int i = 0; i < newTagNames.length; i++) {
+              for (int j = i; j < checkedItems.length; j++) {
+                if (checkedItems[j]) {
+                  newTagNames[i] = (String) items[j];
+                  break;
+                }
+              }
+            }
+            task.tag_names = newTagNames;
+            saveTask();
+            updateTagsView();
           }
-        }
-        task.tag_names = newTagNames;
-        saveTask();
-        updateTagsView();
-      }
-    });
-    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-      }
-    });    
-    
+        });
+    builder.setNegativeButton(R.string.cancel,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+          }
+        });
+
     builder.show();
+  }
+
+  private void showChooseDurationDialog() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+    View durationPicker = getLayoutInflater().inflate(R.layout.duration_picker,
+        null);
+
+    final NumberPicker hoursPicker = (NumberPicker) durationPicker
+        .findViewById(R.id.picker_duration_hours);
+    final NumberPicker minutesPicker = (NumberPicker) durationPicker
+        .findViewById(R.id.picker_duration_minutes);
+    hoursPicker.setRange(0, 23);
+    minutesPicker.setRange(0, 59);
+
+    hoursPicker.setFormatter(NumberPicker.TWO_DIGIT_FORMATTER);
+    minutesPicker.setFormatter(NumberPicker.TWO_DIGIT_FORMATTER);
+
+    hoursPicker.setCurrent(Util.getHoursFromSeconds(task.duration));
+    minutesPicker.setCurrent(Util.getMinutesFromSeconds(task.duration));
+
+    builder.setTitle(Util.hoursMinutesSummary(hoursPicker.getCurrent(),
+        minutesPicker.getCurrent(), getResources()));
+    builder.setView(durationPicker);
+    builder.setPositiveButton(R.string.set,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            int hours = hoursPicker.getCurrent();
+            int minutes = minutesPicker.getCurrent();
+            // TODO set duration to task
+            // saveTask();
+          }
+        });
+    builder.setNegativeButton(R.string.cancel,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+          }
+        });
+
+    final AlertDialog durationDialog = builder.show();
+
+    NumberPicker.OnChangedListener numbersListener = new NumberPicker.OnChangedListener() {
+      public void onChanged(NumberPicker picker, int oldVal, int newVal) {
+        durationDialog.setTitle(Util.hoursMinutesSummary(hoursPicker
+            .getCurrent(), minutesPicker.getCurrent(), getResources()));
+      }
+    };
+
+    hoursPicker.setOnChangeListener(numbersListener);
+    minutesPicker.setOnChangeListener(numbersListener);
   }
 
   protected void saveTask() {
@@ -372,26 +439,28 @@ public class TaskActivity extends ApplicationActivity {
       dbAdapter.createTask(task);
     }
   }
-  
+
   private void showDeleteTaskDialog() {
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.delete_task);
     builder.setMessage(R.string.are_you_sure);
 
-    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        dbAdapter.deleteTask(task);
-        finish();        
-      }
-    });
-    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-      }
-    });
-    
+    builder.setPositiveButton(R.string.yes,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            dbAdapter.deleteTask(task);
+            finish();
+          }
+        });
+    builder.setNegativeButton(R.string.cancel,
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+          }
+        });
+
     builder.show();
-  }  
-  
+  }
+
   private void setDate(int year, int month, int date) {
     Date start = Util.parseStringToDate(task.start);
     Date stop = Util.parseStringToDate(task.stop);
@@ -433,21 +502,21 @@ public class TaskActivity extends ApplicationActivity {
     }
     return null;
   }
-  
+
   private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
-    
+
     @Override
     public void onReceive(Context context, Intent intent) {
       if (trackingService.isTracking(task)) {
         task.duration = trackingService.getCurrentDuration();
-        updateDuration();        
+        updateDuration();
       }
     }
 
   };
 
   private ServiceConnection trackingConnection = new ServiceConnection() {
-    
+
     public void onServiceConnected(ComponentName name, IBinder service) {
       TimeTrackingService.TimeTrackingBinder binding = (TimeTrackingService.TimeTrackingBinder) service;
       trackingService = binding.getService();
@@ -464,7 +533,7 @@ public class TaskActivity extends ApplicationActivity {
     }
 
   };
-  
+
   private void updateDuration() {
     durationView.setText(Util.secondsToHMS(task.duration));
   }
@@ -472,7 +541,8 @@ public class TaskActivity extends ApplicationActivity {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == CREATE_NEW_PROJECT_REQUEST) {
       if (resultCode == RESULT_OK) {
-        long createdId = data.getLongExtra(CreateProjectActivity.CREATED_PROJECT_LOCAL_ID, 0);
+        long createdId = data.getLongExtra(
+            CreateProjectActivity.CREATED_PROJECT_LOCAL_ID, 0);
         if (createdId > 0) {
           task.project = dbAdapter.findProject(createdId);
           saveTask();
@@ -481,5 +551,5 @@ public class TaskActivity extends ApplicationActivity {
       }
     }
   }
-  
+
 }
