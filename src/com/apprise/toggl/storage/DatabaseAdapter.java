@@ -13,6 +13,7 @@ import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
+import com.apprise.toggl.storage.models.Tag;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
@@ -430,6 +431,57 @@ public class DatabaseAdapter {
     delete(DeletedTasks.TABLE_NAME, DeletedTasks._ID, _id);    
   }
   
+  public Tag createTag(Tag tag) {
+    ContentValues values = setTagValues(tag);
+    
+    long _id = db.insert(Tags.TABLE_NAME, Tags.NAME, values);
+    return findTag(_id);
+  }
+  
+  public Tag findTag(long _id) {
+    Cursor cursor = getMovedCursor(Tags.TABLE_NAME, Tags._ID, _id);
+    try {
+      return ORM.mapTag(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }
+  }
+  
+  public Tag findTagByRemoteId(long remoteId) {
+    Cursor cursor = getMovedCursor(Tags.TABLE_NAME, Tags.REMOTE_ID, remoteId);
+    try {
+      return ORM.mapTag(cursor, this);
+    } finally {
+      safeClose(cursor);  
+    }    
+  }
+  
+  public Cursor findAllTags() {
+    return db.query(Tags.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);     
+  }
+  
+  public boolean updateTag(Tag tag) {
+    ContentValues values = setTagValues(tag);
+    
+    int affectedRows = db.update(Tags.TABLE_NAME, values, Tags._ID + " = " + tag._id, null);
+    return affectedRows == 1;    
+  } 
+  
+  public void deleteTag(long _id) {
+    delete(Tags.TABLE_NAME, Tags._ID, _id);    
+  } 
+  
+  private ContentValues setTagValues(Tag tag) {
+    ContentValues values = new ContentValues();
+    values.put(Tags.OWNER_USER_ID, app.getCurrentUser()._id);    
+    values.put(Tags.REMOTE_ID, tag.id);
+    values.put(Tags.NAME, tag.name);
+    
+    if(tag.workspace != null) values.put(Tags.WORKSPACE_REMOTE_ID, tag.workspace.id);
+
+    return values;
+  }  
+  
   public PlannedTask createPlannedTask(PlannedTask plannedTask) {
     ContentValues values = setPlannedTaskValues(plannedTask);
 
@@ -641,6 +693,17 @@ public class DatabaseAdapter {
           duration, start, billable, description, stop, tagNamesArr, remote_id, syncDirty);
     }
     
+    public static Tag mapTag(Cursor cursor, DatabaseAdapter dbAdapter) {
+      if (cursor == null) return null;
+      
+      long _id = cursor.getLong(cursor.getColumnIndex(Tags._ID));
+      long remoteId = cursor.getLong(cursor.getColumnIndex(Tags.REMOTE_ID));
+      long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Tags.WORKSPACE_REMOTE_ID));
+      String name = cursor.getString(cursor.getColumnIndex(Tags.NAME));
+      
+      return new Tag(_id, remoteId, name, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId));
+    }
+    
     public static DeletedTask mapDeletedTask(Cursor cursor) {
       if (cursor == null) return null;
       
@@ -739,6 +802,14 @@ public class DatabaseAdapter {
       + Tasks.TAG_NAMES + " TEXT"
       + ");";
     
+    private static final String CREATE_TAGS_TABLE = "CREATE TABLE " + Tags.TABLE_NAME + " ("
+    + Tags._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+    + Tags.REMOTE_ID + " INTEGER NOT NULL,"    
+    + Tags.OWNER_USER_ID + " INTEGER NOT NULL,"    
+    + Tags.WORKSPACE_REMOTE_ID + " INTEGER NOT NULL,"
+    + Tags.NAME + " TEXT"
+    + ");";
+    
     private static final String CREATE_DELETED_TASKS_TABLE = "CREATE TABLE " + DeletedTasks.TABLE_NAME + " ("
     + DeletedTasks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
     + DeletedTasks.OWNER_USER_ID + " INTEGER NOT NULL,"    
@@ -764,6 +835,7 @@ public class DatabaseAdapter {
       db.execSQL(CREATE_PROJECTS_TABLE);
       db.execSQL(CREATE_CLIENTS_TABLE);
       db.execSQL(CREATE_TASKS_TABLE);
+      db.execSQL(CREATE_TAGS_TABLE);
       db.execSQL(CREATE_DELETED_TASKS_TABLE);
       db.execSQL(CREATE_PLANNED_TASKS_TABLE);
     }
@@ -844,6 +916,15 @@ public class DatabaseAdapter {
     public static final String DESCRIPTION = "description";
     public static final String STOP = "stop";
     public static final String TAG_NAMES = "tag_names";
+  }
+  
+  public static final class Tags implements BaseColumns {
+    public static final String TABLE_NAME = "tags";
+    
+    public static final String OWNER_USER_ID = "owner_user_id";
+    public static final String REMOTE_ID = "remote_id";
+    public static final String NAME = "name";
+    public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
   }
   
   public static final class DeletedTasks implements BaseColumns {
