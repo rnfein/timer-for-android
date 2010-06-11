@@ -238,7 +238,7 @@ public class TaskActivity extends ApplicationActivity {
 
     plannedTasksView.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        showChooseTagsDialog();
+        // TODO
       }
     });
 
