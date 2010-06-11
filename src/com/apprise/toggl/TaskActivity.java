@@ -55,7 +55,7 @@ public class TaskActivity extends ApplicationActivity {
   private TextView dateView;
   private TextView plannedTasksView;
   private TextView tagsView;
-  private LinearLayout plannedTasksArea;
+
   private CheckBox billableCheckBox;
 
   Timer timer;
@@ -150,7 +150,6 @@ public class TaskActivity extends ApplicationActivity {
     descriptionView = (EditText) findViewById(R.id.task_description);
     dateView = (TextView) findViewById(R.id.task_date);
     projectView = (TextView) findViewById(R.id.task_project);
-    plannedTasksArea = (LinearLayout) findViewById(R.id.task_planned_tasks_area);
     plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
     tagsView = (TextView) findViewById(R.id.task_tags);
     billableCheckBox = (CheckBox) findViewById(R.id.task_billable_cb);
@@ -177,13 +176,13 @@ public class TaskActivity extends ApplicationActivity {
       long project_remote_id = task.project.id;
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
       if ((cursor == null) || (cursor.getCount() == 0) || !cursor.moveToFirst()) {
-        plannedTasksArea.setVisibility(LinearLayout.GONE);
+        plannedTasksView.setVisibility(LinearLayout.GONE);
       }
       if (cursor != null) {
         cursor.close();
       }
     } else {
-      plannedTasksArea.setVisibility(LinearLayout.GONE);
+      plannedTasksView.setVisibility(LinearLayout.GONE);
     }
   }
 
@@ -212,43 +211,36 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
 
-    findViewById(R.id.task_project_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            showChooseProjectDialog();
-          }
-        });
+    projectView.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        showChooseProjectDialog();
+      }
+    });
 
-    findViewById(R.id.task_date_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            showDialog(DATE_DIALOG_ID);
-          }
-        });
+    dateView.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        showDialog(DATE_DIALOG_ID);
+      }
+    });
 
     billableCheckBox.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        Log.d(TAG, "clicked billable cb");
         task.billable = billableCheckBox.isChecked();
         saveTask();
       }
     });
 
-    findViewById(R.id.task_tags_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            Log.d(TAG, "clicked tags");
-            showChooseTagsDialog();
-          }
-        });
+    tagsView.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        showChooseTagsDialog();
+      }
+    });
 
-    findViewById(R.id.task_planned_tasks_area).setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            Log.d(TAG, "clicked planned tasks");
-            // TODO: planned tasks
-          }
-        });
+    plannedTasksView.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        showChooseTagsDialog();
+      }
+    });
 
     descriptionView.setOnKeyListener(new View.OnKeyListener() {
       public boolean onKey(View v, int keyCode, KeyEvent event) {
