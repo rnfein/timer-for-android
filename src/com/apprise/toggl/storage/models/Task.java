@@ -84,6 +84,7 @@ public class Task extends Model {
     
   public void updateAttributes(Model other) {
     Task otherTask = (Task) other;
+    id = otherTask.id;
     project = otherTask.project;
     workspace = otherTask.workspace;
     duration = otherTask.duration;

@@ -83,6 +83,7 @@ public class Project extends Model {
 
   public void updateAttributes(Model other) {
     Project otherProject = (Project) other;
+    id = otherProject.id;
     fixed_fee = otherProject.fixed_fee;
     estimated_workhours = otherProject.estimated_workhours;
     is_fixed_fee = otherProject.is_fixed_fee;

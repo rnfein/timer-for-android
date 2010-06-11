@@ -51,6 +51,7 @@ public class PlannedTask extends Model {
   public void updateAttributes(Model other) {
     PlannedTask otherPlannedTask = (PlannedTask) other;
     
+    id = otherPlannedTask.id;
     workspace = otherPlannedTask.workspace;
     name = otherPlannedTask.name;
     project = otherPlannedTask.project;

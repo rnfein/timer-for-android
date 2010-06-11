@@ -25,6 +25,7 @@ public class Workspace extends Model {
 
   public void updateAttributes(Model other) {
     Workspace otherWorkspace = (Workspace) other;
+    id = otherWorkspace.id;
     name = otherWorkspace.name;
   }
   

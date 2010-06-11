@@ -40,6 +40,7 @@ public class Client extends Model {
     
   public void updateAttributes(Model other) {
     Client otherClient = (Client) other;
+    id = otherClient.id;
     workspace = otherClient.workspace;
     name = otherClient.name;
     hourly_rate = otherClient.hourly_rate;
