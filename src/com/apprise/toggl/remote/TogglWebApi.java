@@ -97,7 +97,7 @@ public class TogglWebApi {
       try {
         reader = getResponseReader(response);
         User user = gson.fromJson(reader, User.class);            
-        Log.d(TAG, "TogglWebApi#AuthenticationRequest got a successful response for user: " + user.toString());
+        Log.d(TAG, "TogglWebApi#userAuthentication got a successful response for user: " + user.toString());
         this.apiToken = user.api_token;
         return user;          
       } finally {
@@ -107,7 +107,7 @@ public class TogglWebApi {
       }
     } else {
       int statusCode = response.getStatusLine().getStatusCode();
-      Log.e(TAG, "TogglWebApi#AuthenticateWithToken got a failed request: " + statusCode);
+      Log.w(TAG, "TogglWebApi#userAuthentication got a failed request: " + statusCode);
     }
     return null;
   }
@@ -187,7 +187,8 @@ public class TogglWebApi {
     String url = TASKS_URL_BASE + id + ".json";
     HttpResponse response = executeDeleteRequest(url);
     if (ok(response)) {    
-      Log.e(TAG, "TogglWebApi#deleteTask got a successful response");
+      Log.d(TAG, "TogglWebApi#deleteTask got a successful response");
+      return true;
     }
     return false;
   }  
@@ -234,7 +235,7 @@ public class TogglWebApi {
       Log.d(TAG, "put JSON: " + jsonString);
       HttpResponse response = executeJSONPutRequest(url, jsonString);    
       if (ok(response)) {
-        Log.d(TAG, "TogglWebApi#createProject got a successful response");
+        Log.d(TAG, "TogglWebApi#putJSON got a successful response.");
         try {
           InputStreamReader reader = null;          
           reader = getResponseReader(response);
@@ -242,12 +243,12 @@ public class TogglWebApi {
         } catch (Exception e) {
         }
       } else {
-        Log.e(TAG, "TogglWebApi#createProject got a failed request: "
+        Log.w(TAG, "TogglWebApi#putJSON got a failed request: "
             + response.getStatusLine().getStatusCode());
-        return null;
+        throw new FailedResponseException();
       }
     } else {
-      return null;
+      throw new NotSignedInException();
     }
     return null;
   }  
@@ -260,7 +261,7 @@ public class TogglWebApi {
         Log.d(TAG, "TogglWebApi#postJSON got a successful response");
         return getResponseReader(response);
       } else {
-        Log.e(TAG, "TogglWebApi#postJSON got a failed request: "
+        Log.w(TAG, "TogglWebApi#postJSON got a failed request: "
             + response.getStatusLine().getStatusCode());
         throw new FailedResponseException();
       }
