@@ -186,6 +186,7 @@ public class TogglWebApi {
     HttpResponse response = executeDeleteRequest(url);
     if (ok(response)) {    
       Log.e(TAG, "TogglWebApi#deleteTask got a successful response");
+      return true;
     }
     return false;
   }  
