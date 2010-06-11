@@ -48,7 +48,7 @@
 	      android:layout_marginLeft="10dp"
 	      android:textStyle="bold"
 	      android:gravity="center"
-	      android:textColor="@color/black"
+	      android:textColor="@color/timer_duration_selector"
 	      android:textSize="@dimen/task_timer_text_size"
 	      android:text="00:00:00"/>  
 	    <ImageView

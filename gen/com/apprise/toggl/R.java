@@ -12,9 +12,11 @@ public final class R {
     }
     public static final class color {
         public static final int black=0x7f040001;
-        public static final int light_blue=0x7f040004;
-        public static final int light_gray=0x7f040003;
-        public static final int red=0x7f040005;
+        public static final int gray=0x7f040003;
+        public static final int light_blue=0x7f040005;
+        public static final int light_gray=0x7f040004;
+        public static final int red=0x7f040006;
+        public static final int timer_duration_selector=0x7f040007;
         public static final int transparent=0x7f040000;
         public static final int white=0x7f040002;
     }
@@ -72,22 +74,20 @@ public final class R {
         public static final int txt_billable_pressed=0x7f020020;
         public static final int txt_billable_selector=0x7f020021;
         public static final int txt_bottom=0x7f020022;
-        public static final int txt_client_normal=0x7f020023;
-        public static final int txt_client_pressed=0x7f020024;
-        public static final int txt_date=0x7f020025;
-        public static final int txt_date_pressed=0x7f020026;
-        public static final int txt_date_selector=0x7f020027;
-        public static final int txt_middle=0x7f020028;
-        public static final int txt_planned=0x7f020029;
-        public static final int txt_planned_pressed=0x7f02002a;
-        public static final int txt_planned_selector=0x7f02002b;
-        public static final int txt_project=0x7f02002c;
-        public static final int txt_project_pressed=0x7f02002d;
-        public static final int txt_project_selector=0x7f02002e;
-        public static final int txt_tags=0x7f02002f;
-        public static final int txt_tags_pressed=0x7f020030;
-        public static final int txt_tags_selector=0x7f020031;
-        public static final int txt_top=0x7f020032;
+        public static final int txt_date=0x7f020023;
+        public static final int txt_date_pressed=0x7f020024;
+        public static final int txt_date_selector=0x7f020025;
+        public static final int txt_middle=0x7f020026;
+        public static final int txt_planned=0x7f020027;
+        public static final int txt_planned_pressed=0x7f020028;
+        public static final int txt_planned_selector=0x7f020029;
+        public static final int txt_project=0x7f02002a;
+        public static final int txt_project_pressed=0x7f02002b;
+        public static final int txt_project_selector=0x7f02002c;
+        public static final int txt_tags=0x7f02002d;
+        public static final int txt_tags_pressed=0x7f02002e;
+        public static final int txt_tags_selector=0x7f02002f;
+        public static final int txt_top=0x7f020030;
     }
     public static final class id {
         public static final int account_menu_log_out=0x7f08001c;
