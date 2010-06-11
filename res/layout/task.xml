@@ -230,8 +230,9 @@
 		    android:layout_weight="4"
 		    android:gravity="right"
 		    android:paddingTop="@dimen/label_padding_top"
+		    android:singleLine="true"
 		    android:textSize="@dimen/label_text_size"           
-		    android:textColor="@color/light_gray"/>          
+		    android:textColor="@color/black"/>          
 	    <ImageView
 	      android:src="@drawable/arrow"
 	      android:layout_width="15dp"

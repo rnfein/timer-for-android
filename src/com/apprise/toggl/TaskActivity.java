@@ -104,6 +104,7 @@ public class TaskActivity extends ApplicationActivity {
     updatePlannedTasks();
     updateDuration();
     updateDateView();
+    updateTagsView();
     super.onResume();
   }
   
@@ -163,6 +164,10 @@ public class TaskActivity extends ApplicationActivity {
 
   private void updateDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
+  }
+  
+  private void updateTagsView() {
+    tagsView.setText(Util.joinStringArray(task.tag_names, ", "));
   }
 
   private void updatePlannedTasks() {
@@ -349,7 +354,7 @@ public class TaskActivity extends ApplicationActivity {
         }
         task.tag_names = newTagNames;
         saveTask();
-        
+        updateTagsView();
       }
     });
     builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
