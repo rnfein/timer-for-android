@@ -3,12 +3,12 @@
   <item
     android:state_enabled="true"
     android:state_pressed="true"
-    android:drawable="@drawable/txt_tags_pressed" />
+    android:drawable="@drawable/txt_middle_pressed" />
   <item
     android:state_enabled="true"
     android:state_focused="true"
-    android:drawable="@drawable/txt_tags_pressed" />
+    android:drawable="@drawable/txt_middle_pressed" />
   <item
     android:state_enabled="true"
-    android:drawable="@drawable/txt_tags" />
+    android:drawable="@drawable/txt_middle" />
 </selector>

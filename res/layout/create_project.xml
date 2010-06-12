@@ -32,10 +32,10 @@
       android:layout_height="wrap_content">
       <LinearLayout
         android:background="@drawable/txt_top"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 	      <TextView
-					android:layout_width="30dp"
+					android:layout_width="wrap_content"
 					android:layout_height="fill_parent"
 					android:layout_weight="1"
 					android:textStyle="bold"	          
@@ -46,9 +46,9 @@
 					android:text="@string/name"/>
 	      <EditText
 					android:id="@+id/project_name"
-					android:layout_width="fill_parent"
+					android:layout_width="wrap_content"
 					android:layout_height="fill_parent"
-					android:layout_weight="3"
+					android:layout_weight="4"
           android:paddingTop="@dimen/label_padding_top" 					
 					android:gravity="right"
 					android:maxWidth="97dp"
@@ -56,45 +56,37 @@
 					android:textSize="@dimen/login_edittext_size"
 					android:background="@color/transparent"
 					android:paddingRight="45dp"/>        
-      </LinearLayout>      
-      <LinearLayout
-        android:background="@drawable/txt_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-	      <TextView
-					android:layout_width="50dp"
-					android:layout_height="fill_parent"
-					android:layout_weight="1"
-					android:textStyle="bold"
-					android:textSize="@dimen/label_text_size"
-					android:gravity="center_vertical"
-					android:paddingLeft="@dimen/label_padding_left"           
-					android:textColor="@color/black"          
-					android:text="@string/client"/>
-		    <LinearLayout
-		      android:id="@+id/new_project_client_area"
-		      android:layout_height="fill_parent"
-		      android:layout_width="50dp"
-		      android:layout_weight="5">       
-		      <TextView
-		        android:id="@+id/project_client"
-		        android:layout_width="30dp"
-		        android:layout_height="fill_parent"
-		        android:layout_weight="4"
-		        android:gravity="right"
-            android:singleLine="true"		        
-		        android:paddingTop="@dimen/label_padding_top"        
-		        android:textSize="@dimen/label_text_size"           
-		        android:textColor="@color/black"/>   
-		      <ImageView
-		        android:src="@drawable/arrow"
-		        android:layout_width="15dp"
-		        android:layout_height="wrap_content"
-		        android:paddingLeft="15dp"        
-		        android:layout_gravity="center"
-		        android:layout_weight="1"/>   
-		    </LinearLayout>      
       </LinearLayout>
+		  <LinearLayout
+		    android:id="@+id/new_project_client_area"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@drawable/txt_bottom_selector"
+		    android:clickable="true"
+		    android:focusable="true">
+		    <TextView
+		      android:layout_width="wrap_content"
+		      android:layout_height="fill_parent"    
+		      android:layout_weight="1"
+		      android:textStyle="bold"            
+		      android:gravity="center_vertical"
+		      android:paddingLeft="@dimen/label_padding_left"
+		      android:textSize="@dimen/label_text_size"           
+		      android:textColor="@color/black"
+		      android:text="@string/client"/>
+		    <TextView
+		      android:id="@+id/project_client"
+		      android:layout_width="wrap_content"
+		      android:layout_height="fill_parent"
+		      android:layout_weight="4"
+		      android:gravity="right"
+		      android:singleLine="true"
+		      android:paddingTop="@dimen/label_padding_top"
+		      android:paddingRight="@dimen/label_padding_right"
+		      android:textSize="@dimen/label_text_size"
+		      android:textColor="@color/black"
+		      android:maxLines="1"/>
+		  </LinearLayout>       
       <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
