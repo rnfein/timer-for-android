@@ -12,6 +12,7 @@
     <string name="tags">Tags</string>
     <string name="project">Project</string>
     <string name="projects">Projects</string>
+    <string name="planned_task">Planned Task</string>    
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
     <string name="name">Name</string>
@@ -33,8 +34,6 @@
     <string name="create_account">Create a new account</string>
     
     <string name="choose_tip">(choose)</string>
-    <string name="choose_project">Choose Project</string>
-    <string name="choose_tags">Choose Tags</string>
     <string name="no_project">No Project</string>
     <string name="create_new">Create New</string>
     <string name="no_description">(no description)</string>
