@@ -6,12 +6,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
+import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tags;
+import com.apprise.toggl.storage.models.PlannedTask;
+import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 import com.apprise.toggl.widget.NumberPicker;
 
+import android.R.anim;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -35,6 +39,7 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class TaskActivity extends ApplicationActivity {
@@ -100,8 +105,8 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onResume() {
-    descriptionView.setText(task.description);
     billableCheckBox.setChecked(task.billable);
+    updateDescriptionView();
     updateProjectView();
     updatePlannedTasks();
     updateDuration();
@@ -162,6 +167,10 @@ public class TaskActivity extends ApplicationActivity {
       projectView.setText(R.string.choose_tip);
     }
   }
+
+  private void updateDescriptionView() {
+    descriptionView.setText(task.description);
+  }  
 
   private void updateDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
@@ -238,7 +247,7 @@ public class TaskActivity extends ApplicationActivity {
 
     plannedTasksView.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        // TODO
+        showChoosePlannedTaskDialog();
       }
     });
 
@@ -274,7 +283,7 @@ public class TaskActivity extends ApplicationActivity {
     startManagingCursor(projectsCursor);
 
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-    builder.setTitle(R.string.choose_project);
+    builder.setTitle(R.string.project);
 
     builder.setSingleChoiceItems(projectsCursor, getCheckedItem(projectsCursor,
         task.project), Projects.CLIENT_PROJECT_NAME,
@@ -310,6 +319,40 @@ public class TaskActivity extends ApplicationActivity {
 
     builder.show();
   }
+  
+  private void showChoosePlannedTaskDialog() {
+    final Cursor plannedTasksCursor = dbAdapter.findAllPlannedTasks();
+    startManagingCursor(plannedTasksCursor);
+    
+    String[] from = new String[] { PlannedTasks.NAME };
+    int[] to = new int[] { R.id.item_name };
+    final SimpleCursorAdapter plannedTasksAdapter = new SimpleCursorAdapter(
+        TaskActivity.this, R.layout.dialog_list_item, plannedTasksCursor, from, to);    
+    
+    AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+    builder.setTitle(R.string.planned_task);
+    
+    builder.setAdapter(plannedTasksAdapter, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int pos) {
+        long clickedId = plannedTasksAdapter.getItemId(pos);
+        PlannedTask plannedTask = dbAdapter.findPlannedTask(clickedId);
+        Log.d(TAG, "clicked plannedTask: " + plannedTask);
+        task.project = plannedTask.project;
+        task.description = plannedTask.name;
+        //TODO: should we bind the plannedTask to the task somehow?
+        updateProjectView();
+        updateDescriptionView();
+        saveTask();
+      }
+    });
+    builder.setNegativeButton(R.string.cancel,
+        new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+    
+    builder.show();
+  }
 
   private void showChooseTagsDialog() {
     final Cursor tagsCursor = dbAdapter.findAllTags();
@@ -335,7 +378,7 @@ public class TaskActivity extends ApplicationActivity {
     }
 
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-    builder.setTitle(R.string.choose_tags);
+    builder.setTitle(R.string.tags);
 
     builder.setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
       public void onClick(DialogInterface dialog, int which,

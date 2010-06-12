@@ -6,10 +6,10 @@
   <TextView 
     android:id="@+id/item_name"
     android:layout_width="fill_parent"
-    android:layout_height="42dp"
+    android:layout_height="wrap_content"
+    android:minHeight="42dp"
+    android:padding="5dp"
+    android:textSize="20dp"
     android:textColor="@color/black"
-    android:textStyle="bold"       
-    android:gravity="center_vertical"
-    android:paddingLeft="@dimen/listitem_padding_left"
-    android:textSize="@dimen/listitem_text_size"/>
+    android:gravity="center_vertical"/>
 </LinearLayout>
