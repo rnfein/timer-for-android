@@ -182,6 +182,7 @@ public class AccountActivity extends Activity {
           public void run() {
             Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed),
                 Toast.LENGTH_SHORT).show(); 
+            setProgressBarIndeterminateVisibility(false);            
           }
         });
       }
