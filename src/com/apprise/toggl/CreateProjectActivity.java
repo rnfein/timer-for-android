@@ -77,7 +77,13 @@ public class CreateProjectActivity extends ApplicationActivity {
     createButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         project.name = new String(String.valueOf(projectNameView.getText()));
-        project.client_project_name = clientName + " - " + projectNameView.getText();
+        String clientProjectName;        
+        if (clientName != null) {
+          clientProjectName = clientName + " - " + projectNameView.getText();          
+        } else {
+          clientProjectName = projectNameView.getText().toString();
+        }
+        project.client_project_name = clientProjectName;
         dbAdapter.updateProject(project);
         Intent intent = getIntent();
         intent.putExtra(CREATED_PROJECT_LOCAL_ID, project._id);
