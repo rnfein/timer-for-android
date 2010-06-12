@@ -50,12 +50,12 @@ public class AccountActivity extends Activity {
     setContentView(R.layout.account);
     
     initViews();
-    initFields();
     attachEvents();
   }
   
   @Override
-  protected void onResume() {    
+  protected void onResume() {
+    initFields();    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);    
     super.onResume();
