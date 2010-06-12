@@ -16,7 +16,7 @@
 		  <TextView 
 		    android:id="@+id/task_item_description"
 		    android:layout_width="fill_parent"
-		    android:layout_height="24dp"
+		    android:layout_height="28dp"
 		    android:textColor="@color/black"
 		    android:textStyle="bold"       
 		    android:singleLine="true"
@@ -25,13 +25,13 @@
 		    android:textSize="@dimen/listitem_text_size"     
 		    android:background="@color/transparent"/>  
 		  <TextView 
-		    android:text="Apprise - Toggl Android"
 		    android:id="@+id/task_item_client_project_name"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:textColor="@color/light_gray"
 		    android:gravity="center_vertical"
 		    android:paddingLeft="@dimen/listitem_padding_left"
+		    android:paddingBottom="4dp"
 		    android:textSize="@dimen/listitem_note_text_size"     
 		    android:background="@color/transparent"/>  
     </LinearLayout>	    
