@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -132,7 +133,9 @@ public class AccountActivity extends Activity {
   protected void attachEvents() {
     loginButton.setOnClickListener(new View.OnClickListener() {
 
-      public void onClick(View v) {  
+      public void onClick(View v) {
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(passwordEditText.getWindowToken(), 0);
         setProgressBarIndeterminateVisibility(true);
         new Thread(authenticateInBackground).start();
       }
