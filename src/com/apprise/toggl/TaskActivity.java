@@ -283,7 +283,6 @@ public class TaskActivity extends ApplicationActivity {
             projectsCursor.moveToPosition(which);
             long clickedId = projectsCursor.getLong(projectsCursor
                 .getColumnIndex(Projects._ID));
-            ;
             task.project = dbAdapter.findProject(clickedId);
             saveTask();
             updateProjectView();
