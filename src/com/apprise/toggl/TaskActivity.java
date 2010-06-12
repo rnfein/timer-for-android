@@ -262,6 +262,7 @@ public class TaskActivity extends ApplicationActivity {
     });
   }
 
+  // TODO: remove this? probably move to onPause instead?
   public void triggerSave(int seconds) {
     if (timer != null) {
       timer.cancel();
@@ -357,63 +358,56 @@ public class TaskActivity extends ApplicationActivity {
   private void showChooseTagsDialog() {
     final Cursor tagsCursor = dbAdapter.findAllTags();
     startManagingCursor(tagsCursor);
-
+    
     final boolean[] checkedItems = new boolean[tagsCursor.getCount()];
-    final CharSequence[] items = new CharSequence[tagsCursor.getCount()];
+    final String[] items = new String[tagsCursor.getCount()];
     if (tagsCursor.moveToFirst()) {
-      for (int i = 0; i < items.length; i++) {
+      // collect all tag names
+      for (int i = 0; i < items.length; tagsCursor.moveToNext(), i++) {
         items[i] = tagsCursor.getString(tagsCursor.getColumnIndex(Tags.NAME));
+        
         if (task.tag_names != null) {
+          // find match
           for (int j = 0; j < task.tag_names.length; j++) {
             if (items[i].equals(task.tag_names[j])) {
               checkedItems[i] = true;
               break;
-            } else {
-              checkedItems[i] = false;
             }
           }
         }
-        tagsCursor.moveToNext();
       }
     }
 
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
     builder.setTitle(R.string.tags);
 
-    builder.setMultiChoiceItems(items, checkedItems,
-        new DialogInterface.OnMultiChoiceClickListener() {
-          public void onClick(DialogInterface dialog, int which,
-              boolean isChecked) {
-            checkedItems[which] = isChecked;
+    builder.setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+      public void onClick(DialogInterface dialog, int which,
+          boolean isChecked) {
+        checkedItems[which] = isChecked;
+      }
+    });
+    builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        int count = 0;
+        // collect amount of checked tags
+        for (int i = 0; i < checkedItems.length; i++) if (checkedItems[i]) count += 1;
+
+        String[] newTagNames = new String[count];
+        for (int i = 0, j = 0; i < items.length; i++) {
+          if (checkedItems[i]) {
+            newTagNames[j++] = items[i];
           }
-        });
-    builder.setPositiveButton(R.string.save,
-        new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            int count = 0;
-            for (int i = 0; i < checkedItems.length; i++) {
-              if (checkedItems[i])
-                count += 1;
-            }
-            String[] newTagNames = new String[count];
-            for (int i = 0; i < newTagNames.length; i++) {
-              for (int j = i; j < checkedItems.length; j++) {
-                if (checkedItems[j]) {
-                  newTagNames[i] = (String) items[j];
-                  break;
-                }
-              }
-            }
-            task.tag_names = newTagNames;
-            saveTask();
-            updateTagsView();
-          }
-        });
-    builder.setNegativeButton(R.string.cancel,
-        new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-          }
-        });
+        }
+
+        task.tag_names = newTagNames;
+        saveTask();
+        updateTagsView();
+      }
+    });
+    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {}
+    });
 
     builder.show();
   }
