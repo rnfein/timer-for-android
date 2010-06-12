@@ -292,7 +292,6 @@ public class TaskActivity extends ApplicationActivity {
             projectsCursor.moveToPosition(which);
             long clickedId = projectsCursor.getLong(projectsCursor
                 .getColumnIndex(Projects._ID));
-            ;
             task.project = dbAdapter.findProject(clickedId);
             saveTask();
             updateProjectView();
@@ -414,8 +413,7 @@ public class TaskActivity extends ApplicationActivity {
 
   private void showChooseDurationDialog() {
     AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-    View durationPicker = getLayoutInflater().inflate(R.layout.duration_picker,
-        null);
+    View durationPicker = getLayoutInflater().inflate(R.layout.duration_picker, null);
 
     final NumberPicker hoursPicker = (NumberPicker) durationPicker
         .findViewById(R.id.picker_duration_hours);
@@ -429,7 +427,7 @@ public class TaskActivity extends ApplicationActivity {
 
     hoursPicker.setCurrent(Util.getHoursFromSeconds(task.duration));
     minutesPicker.setCurrent(Util.getMinutesFromSeconds(task.duration));
-
+    
     builder.setTitle(Util.hoursMinutesSummary(hoursPicker.getCurrent(),
         minutesPicker.getCurrent(), getResources()));
     builder.setView(durationPicker);
@@ -438,8 +436,17 @@ public class TaskActivity extends ApplicationActivity {
           public void onClick(DialogInterface dialog, int which) {
             int hours = hoursPicker.getCurrent();
             int minutes = minutesPicker.getCurrent();
-            // TODO set duration to task
-            // saveTask();
+            // only hours and minutes are picker, hence get the
+            // seconds from existing task duration
+            int seconds = (int) task.duration % 60;
+
+            long duration = (hours * 60 * 60) + (minutes * 60) + seconds;
+            task.duration = duration;
+            saveTask();
+            updateDuration();
+            if (trackingService.isTracking(task)) {
+              trackingService.setCurrentDuration(duration);
+            }
           }
         });
     builder.setNegativeButton(R.string.cancel,
@@ -464,7 +471,9 @@ public class TaskActivity extends ApplicationActivity {
   protected void saveTask() {
     Log.d(TAG, "saving task: " + task);
     task.sync_dirty = true;
-    if (!dbAdapter.updateTask(task)) {
+    if (task._id > 0) {
+      dbAdapter.updateTask(task);
+    } else {
       dbAdapter.createTask(task);
     }
   }
