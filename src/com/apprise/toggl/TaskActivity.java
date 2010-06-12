@@ -105,6 +105,7 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onResume() {
+    super.onResume();    
     billableCheckBox.setChecked(task.billable);
     updateDescriptionView();
     updateProjectView();
@@ -112,7 +113,6 @@ public class TaskActivity extends ApplicationActivity {
     updateDuration();
     updateDateView();
     updateTagsView();
-    super.onResume();
   }
 
   @Override

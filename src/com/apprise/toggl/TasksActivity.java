@@ -54,11 +54,11 @@ public class TasksActivity extends ApplicationListActivity {
   
   @Override
   protected void onResume() {
+    super.onResume();    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
     adapter.clearSections();
     populateList();
-    super.onResume();
   }
   
   @Override

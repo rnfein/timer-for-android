@@ -45,10 +45,10 @@ public class CreateProjectActivity extends ApplicationActivity {
   
   @Override
   protected void onResume() {
+    super.onResume();    
     if (project == null) {
       project = dbAdapter.createDirtyProject();
     }
-    super.onResume();
   }
 
   @Override
