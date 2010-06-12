@@ -87,6 +87,10 @@ public class TimeTrackingService extends Service {
     pullFromForeground();
     isTracking = false;
   }
+
+  public Task getTrackedTask() {
+    return task;
+  }
   
   public long getCurrentDuration() {
     return seconds;
@@ -129,7 +133,7 @@ public class TimeTrackingService extends Service {
       getString(R.string.notification_expanded_title),
       getString(R.string.notification_expanded_content),
       launchIntent);
-
+ 
     startForeground(NOTIFICATION_ID, notification);
   }
   

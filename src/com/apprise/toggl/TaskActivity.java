@@ -196,18 +196,27 @@ public class TaskActivity extends ApplicationActivity {
   protected void attachEvents() {
     timeTrackingButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
+        boolean startTracking = false;
         if (trackingService.isTracking(task)) {
           trackingService.stopTracking();
-          // TODO: set task stop date
+          task.stop = Util.formatDateToString(Util.currentDate());
           saveTask();
-          timeTrackingButton
-              .setBackgroundResource(R.drawable.timer_trigger_button);
+          timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
         } else if (trackingService.isTracking()) {
-          // is tracking another task
-          // stop the other or notify user?
+          // is tracking another task, stop it and save
+          Task currentlyTracked = trackingService.getTrackedTask();
+          trackingService.stopTracking();
+          currentlyTracked.stop = Util.formatDateToString(Util.currentDate());
+          saveTask(currentlyTracked);
+
+          startTracking = true;
         } else {
+          startTracking = true;
+        }
+        
+        if (startTracking) {
           trackingService.startTracking(task);
-          timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
+          timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);          
         }
       }
     });
@@ -467,6 +476,10 @@ public class TaskActivity extends ApplicationActivity {
   }
 
   protected void saveTask() {
+    saveTask(task);
+  }
+  
+  protected void saveTask(Task task) {
     Log.d(TAG, "saving task: " + task);
     task.sync_dirty = true;
     if (task._id > 0) {

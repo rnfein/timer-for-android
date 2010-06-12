@@ -47,5 +47,5 @@
     
     <string name="notification_ticker">Time tracking started</string>
     <string name="notification_expanded_title">Toggl</string>
-    <string name="notification_expanded_content">Time elapsed...</string>
+    <string name="notification_expanded_content">Task timer is ticking. Tap to get details.</string>
 </resources>
