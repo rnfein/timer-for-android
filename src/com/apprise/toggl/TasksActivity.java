@@ -180,7 +180,7 @@ public class TasksActivity extends ApplicationListActivity {
       try {
         syncService.syncAll();
       } catch (FailedResponseException e) {
-        Log.e(TAG, "FailedResponseException" + e);
+        Log.e(TAG, "FailedResponseException", e);
         runOnUiThread(new Runnable() {
           public void run() {
             Toast.makeText(TasksActivity.this, getString(R.string.sync_failed),

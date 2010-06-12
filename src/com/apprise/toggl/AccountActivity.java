@@ -220,7 +220,7 @@ public class AccountActivity extends Activity {
       try {
         syncService.syncAll();
       } catch (FailedResponseException e) {
-        Log.e(TAG, "FailedResponseException" + e);
+        Log.e(TAG, "FailedResponseException", e);
         runOnUiThread(new Runnable() {
           public void run() {
             Toast.makeText(AccountActivity.this, getString(R.string.sync_failed),
