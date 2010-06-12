@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 
 import com.apprise.toggl.remote.SyncService;
+import com.apprise.toggl.remote.exception.FailedResponseException;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
@@ -19,6 +20,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +30,7 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class TasksActivity extends ApplicationListActivity {
 
@@ -36,6 +39,8 @@ public class TasksActivity extends ApplicationListActivity {
   private Toggl app;
   private User currentUser;
   private LinkedList<Cursor> taskCursors = new LinkedList<Cursor>();
+  
+  private static final String TAG = "TasksActivity";
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -54,11 +59,11 @@ public class TasksActivity extends ApplicationListActivity {
   
   @Override
   protected void onResume() {
+    super.onResume();    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
     adapter.clearSections();
     populateList();
-    super.onResume();
   }
   
   @Override
@@ -172,7 +177,18 @@ public class TasksActivity extends ApplicationListActivity {
   protected Runnable syncAllInBackground = new Runnable() {
     
     public void run() {
-      syncService.syncAll();
+      try {
+        syncService.syncAll();
+      } catch (FailedResponseException e) {
+        Log.e(TAG, "FailedResponseException", e);
+        runOnUiThread(new Runnable() {
+          public void run() {
+            Toast.makeText(TasksActivity.this, getString(R.string.sync_failed),
+                Toast.LENGTH_SHORT).show(); 
+            setProgressBarIndeterminateVisibility(false);            
+          }
+        });        
+      }
     }
   };
   

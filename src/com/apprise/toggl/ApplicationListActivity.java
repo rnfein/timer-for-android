@@ -9,8 +9,9 @@ public class ApplicationListActivity extends ListActivity {
   @Override
   protected void onResume() {
     app = (Toggl) getApplication();
-    if (app.getCurrentUser() == null)
+    if (app.getCurrentUser() == null) {
       finish();
+    }
     super.onResume();
   }  
 }
