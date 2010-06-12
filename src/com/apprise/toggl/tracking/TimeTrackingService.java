@@ -91,6 +91,10 @@ public class TimeTrackingService extends Service {
   public long getCurrentDuration() {
     return seconds;
   }
+  
+  public void setCurrentDuration(long seconds) {
+    this.seconds = seconds;
+  }
 
   /**
    * Returns true if any task is currently being tracked. 
