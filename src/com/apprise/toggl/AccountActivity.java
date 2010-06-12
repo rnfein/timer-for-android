@@ -178,7 +178,12 @@ public class AccountActivity extends Activity {
         Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());
         new Thread(syncAllInBackground).start();        
       } else {
-        Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();        
+        runOnUiThread(new Runnable() {
+          public void run() {
+            Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed),
+                Toast.LENGTH_SHORT).show(); 
+          }
+        });
       }
     }
   };
