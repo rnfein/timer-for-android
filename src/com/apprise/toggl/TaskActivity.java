@@ -428,7 +428,9 @@ public class TaskActivity extends ApplicationActivity {
   protected void saveTask() {
     Log.d(TAG, "saving task: " + task);
     task.sync_dirty = true;
-    if (!dbAdapter.updateTask(task)) {
+    if (task._id > 0) {
+      dbAdapter.updateTask(task);
+    } else {
       dbAdapter.createTask(task);
     }
   }
