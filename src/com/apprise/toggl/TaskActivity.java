@@ -98,6 +98,10 @@ public class TaskActivity extends ApplicationActivity {
   @Override
   protected void onStop() {
     unregisterReceiver(updateReceiver);
+    if (trackingService.isTracking(task)) {
+      // new activity started when notification is tapped
+      finish();
+    }
     super.onStop();
   }
 
