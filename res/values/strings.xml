@@ -15,6 +15,7 @@
     <string name="planned_task">Planned Task</string>    
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
+    <string name="sync_failed">Synchronization failed</string>
     <string name="name">Name</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>

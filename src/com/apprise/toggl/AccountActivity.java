@@ -2,6 +2,7 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.remote.TogglWebApi;
+import com.apprise.toggl.remote.exception.FailedResponseException;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
 
@@ -216,7 +217,18 @@ public class AccountActivity extends Activity {
     
     public void run() {
       syncService.setApiToken(app.getAPIToken());
-      syncService.syncAll();
+      try {
+        syncService.syncAll();
+      } catch (FailedResponseException e) {
+        Log.e(TAG, "FailedResponseException" + e);
+        runOnUiThread(new Runnable() {
+          public void run() {
+            Toast.makeText(AccountActivity.this, getString(R.string.sync_failed),
+                Toast.LENGTH_SHORT).show(); 
+            setProgressBarIndeterminateVisibility(false);            
+          }
+        });    
+      }
     }
   };  
   
