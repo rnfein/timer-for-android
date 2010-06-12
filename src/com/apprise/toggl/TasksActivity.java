@@ -11,6 +11,7 @@ import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.widget.SectionedAdapter;
 
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -32,7 +33,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TasksActivity extends ApplicationListActivity {
+public class TasksActivity extends ListActivity {
 
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
@@ -52,7 +53,7 @@ public class TasksActivity extends ApplicationListActivity {
     app = (Toggl) getApplication();    
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
-    currentUser = app.getCurrentUser();
+
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);
   }
@@ -60,6 +61,7 @@ public class TasksActivity extends ApplicationListActivity {
   @Override
   protected void onResume() {
     super.onResume();    
+    currentUser = app.getCurrentUser();    
     IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, filter);
     adapter.clearSections();
@@ -86,7 +88,13 @@ public class TasksActivity extends ApplicationListActivity {
     }
     taskCursors.clear();
     
-    int taskRetentionDays = currentUser.task_retention_days;
+    int taskRetentionDays;
+    if (currentUser != null) {
+      taskRetentionDays = currentUser.task_retention_days;
+    } else {
+      taskRetentionDays = -1; // never touch the db
+    }
+    
     Calendar queryCal = (Calendar) Calendar.getInstance().clone();
     
     for (int i = 0; i <= taskRetentionDays; i++) {

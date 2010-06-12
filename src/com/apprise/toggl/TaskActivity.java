@@ -3,7 +3,6 @@ package com.apprise.toggl;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
@@ -119,7 +118,7 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onPause() {
-    // TODO: save field states (like description edittext)
+    saveTask();
     super.onPause();
   }
 
@@ -266,27 +265,11 @@ public class TaskActivity extends ApplicationActivity {
       public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_UP) {
           task.description = descriptionView.getText().toString();
-          triggerSave(2);
         }
         return false;
       }
     });
-  }
 
-  // TODO: remove this? probably move to onPause instead?
-  public void triggerSave(int seconds) {
-    if (timer != null) {
-      timer.cancel();
-    }
-    timer = new Timer();
-    timer.schedule(new scheduledSave(), seconds * 1000);
-  }
-
-  class scheduledSave extends TimerTask {
-    public void run() {
-      saveTask();
-      timer.cancel();
-    }
   }
 
   private void showChooseProjectDialog() {

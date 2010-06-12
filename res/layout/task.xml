@@ -91,6 +91,7 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="fill_parent"
 	    android:layout_weight="4"
+	    android:maxWidth="180dp"
 	    android:gravity="right"
 	    android:singleLine="true"
 	    android:paddingTop="@dimen/label_padding_top"
@@ -133,8 +134,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="right"
-    android:paddingRight="@dimen/label_padding_right"
-    android:background="@drawable/txt_middle">
+    android:background="@drawable/txt_middle_clean">
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="fill_parent"    
@@ -173,6 +173,7 @@
       android:layout_width="wrap_content"
       android:layout_height="fill_parent"
       android:layout_weight="4"
+      android:maxWidth="180dp"      
       android:gravity="right"
       android:singleLine="true"
       android:paddingTop="@dimen/label_padding_top"
@@ -204,6 +205,7 @@
       android:layout_width="wrap_content"
       android:layout_height="fill_parent"
       android:layout_weight="4"
+      android:maxWidth="180dp"      
       android:gravity="right"
       android:singleLine="true"
       android:paddingTop="@dimen/label_padding_top"
