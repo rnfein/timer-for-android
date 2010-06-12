@@ -9,6 +9,7 @@ import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tags;
 import com.apprise.toggl.storage.models.PlannedTask;
+import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 import com.apprise.toggl.widget.NumberPicker;
@@ -110,6 +111,7 @@ public class TaskActivity extends ApplicationActivity {
     updateDuration();
     updateDateView();
     updateTagsView();
+    updateTrackingButton();
   }
 
   @Override
@@ -176,6 +178,23 @@ public class TaskActivity extends ApplicationActivity {
   private void updateTagsView() {
     tagsView.setText(Util.joinStringArray(task.tag_names, ", "));
   }
+  
+  private void updateTrackingButton() {
+    if (!todaysTask()) {
+      timeTrackingButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.timer_trigger_button_continue_today));
+    }
+  }
+  
+  private boolean todaysTask() {
+    Date startDate = Util.parseStringToDate(task.start);
+    Calendar cal = (Calendar) Calendar.getInstance().clone();
+    cal.set(Calendar.HOUR, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    Date beginningOfToday = cal.getTime();
+    
+    return startDate.after(beginningOfToday);
+  }
 
   private void updatePlannedTasks() {
     if (task.project != null) {
@@ -195,27 +214,10 @@ public class TaskActivity extends ApplicationActivity {
   protected void attachEvents() {
     timeTrackingButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        boolean startTracking = false;
-        if (trackingService.isTracking(task)) {
-          trackingService.stopTracking();
-          task.stop = Util.formatDateToString(Util.currentDate());
-          saveTask();
-          timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
-        } else if (trackingService.isTracking()) {
-          // is tracking another task, stop it and save
-          Task currentlyTracked = trackingService.getTrackedTask();
-          trackingService.stopTracking();
-          currentlyTracked.stop = Util.formatDateToString(Util.currentDate());
-          saveTask(currentlyTracked);
-
-          startTracking = true;
+        if (todaysTask()) {
+          triggerTracking();
         } else {
-          startTracking = true;
-        }
-        
-        if (startTracking) {
-          trackingService.startTracking(task);
-          timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);          
+          continueToday();
         }
       }
     });
@@ -268,6 +270,48 @@ public class TaskActivity extends ApplicationActivity {
 
   }
 
+  private void triggerTracking() {
+    boolean startTracking = false;
+    if (trackingService.isTracking(task)) {
+      trackingService.stopTracking();
+      task.stop = Util.formatDateToString(Util.currentDate());
+      saveTask();
+      timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
+    } else if (trackingService.isTracking()) {
+      // is tracking another task, stop it and save
+      Task currentlyTracked = trackingService.getTrackedTask();
+      trackingService.stopTracking();
+      currentlyTracked.stop = Util.formatDateToString(Util.currentDate());
+      saveTask(currentlyTracked);
+
+      startTracking = true;
+    } else {
+      startTracking = true;
+    }
+    
+    if (startTracking) {
+      trackingService.startTracking(task);
+      timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);          
+    }
+  }
+  
+  private void continueToday() {
+    Task continueTask = dbAdapter.createDirtyTask();
+    continueTask.updateAttributes(task);
+    String now = Util.formatDateToString(Util.currentDate());
+    
+    continueTask.start = now;
+    continueTask.stop = now;
+    continueTask.duration = 0;
+    continueTask.id = 0;
+    dbAdapter.updateTask(continueTask);
+    
+    Intent intent = new Intent(this, TaskActivity.class);
+    intent.putExtra(TASK_ID, continueTask._id);
+    startActivity(intent);
+    finish();
+  }
+  
   private void showChooseProjectDialog() {
     final Cursor projectsCursor = dbAdapter.findAllProjects();
     startManagingCursor(projectsCursor);

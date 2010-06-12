@@ -66,20 +66,22 @@ public final class R {
         public static final int timepicker_up_pressed=0x7f020018;
         public static final int timepicker_up_selected=0x7f020019;
         public static final int timer_trigger_button=0x7f02001a;
-        public static final int toggl_startlogo=0x7f02001b;
-        public static final int trigger=0x7f02001c;
-        public static final int trigger_active=0x7f02001d;
-        public static final int trigger_inactive=0x7f02001e;
-        public static final int txt_bottom=0x7f02001f;
-        public static final int txt_bottom_pressed=0x7f020020;
-        public static final int txt_bottom_selector=0x7f020021;
-        public static final int txt_middle=0x7f020022;
-        public static final int txt_middle_clean=0x7f020023;
-        public static final int txt_middle_pressed=0x7f020024;
-        public static final int txt_middle_selector=0x7f020025;
-        public static final int txt_top=0x7f020026;
-        public static final int txt_top_pressed=0x7f020027;
-        public static final int txt_top_selector=0x7f020028;
+        public static final int timer_trigger_button_continue_today=0x7f02001b;
+        public static final int toggl_startlogo=0x7f02001c;
+        public static final int trigger=0x7f02001d;
+        public static final int trigger_active=0x7f02001e;
+        public static final int trigger_continue_today=0x7f02001f;
+        public static final int trigger_inactive=0x7f020020;
+        public static final int txt_bottom=0x7f020021;
+        public static final int txt_bottom_pressed=0x7f020022;
+        public static final int txt_bottom_selector=0x7f020023;
+        public static final int txt_middle=0x7f020024;
+        public static final int txt_middle_clean=0x7f020025;
+        public static final int txt_middle_pressed=0x7f020026;
+        public static final int txt_middle_selector=0x7f020027;
+        public static final int txt_top=0x7f020028;
+        public static final int txt_top_pressed=0x7f020029;
+        public static final int txt_top_selector=0x7f02002a;
     }
     public static final class id {
         public static final int account_menu_log_out=0x7f080020;
