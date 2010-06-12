@@ -10,14 +10,6 @@ public class ApplicationActivity extends Activity {
 
   private Toggl app;
 
-  @Override
-  protected void onResume() {
-    app = (Toggl) getApplication();
-    if (app.getCurrentUser() == null)
-      finish();
-    super.onResume();
-  }
-  
   /**
    * Helper method to get the index of the cursor item that matches:
    *   model._id == item._id
