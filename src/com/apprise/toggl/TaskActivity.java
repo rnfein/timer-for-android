@@ -10,12 +10,10 @@ import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tags;
 import com.apprise.toggl.storage.models.PlannedTask;
-import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 import com.apprise.toggl.widget.NumberPicker;
 
-import android.R.anim;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -220,13 +218,13 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
 
-    projectView.setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.task_project_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         showChooseProjectDialog();
       }
     });
 
-    dateView.setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.task_date_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         showDialog(DATE_DIALOG_ID);
       }
@@ -239,13 +237,13 @@ public class TaskActivity extends ApplicationActivity {
       }
     });
 
-    tagsView.setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.task_tags_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         showChooseTagsDialog();
       }
     });
 
-    plannedTasksView.setOnClickListener(new View.OnClickListener() {
+    findViewById(R.id.task_planned_tasks_area).setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         showChoosePlannedTaskDialog();
       }

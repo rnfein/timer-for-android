@@ -68,60 +68,148 @@
     android:layout_marginBottom="5dp"
     android:background="@drawable/textfield"
     android:textColor="@color/black"/>
-	<TextView
-	  android:id="@+id/task_project"
-	  android:layout_width="fill_parent"
-	  android:layout_height="wrap_content"
-	  android:gravity="right"
-	  android:singleLine="true"
-	  android:paddingTop="@dimen/label_padding_top"
-	  android:paddingRight="@dimen/label_padding_right"
-	  android:textSize="@dimen/label_text_size"
-	  android:textColor="@color/black"
-	  android:maxLines="1"
-	  android:background="@drawable/txt_project_selector"/>
-  <TextView
-    android:id="@+id/task_date"
+  
+  <LinearLayout
+    android:id="@+id/task_project_area"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:gravity="right"
-    android:paddingTop="@dimen/label_padding_top"
-    android:paddingRight="@dimen/label_padding_right"
-    android:textSize="@dimen/label_text_size"
-    android:textColor="@color/black"
-    android:background="@drawable/txt_date_selector"/>
+    android:background="@drawable/txt_top_selector"
+    android:clickable="true"
+    android:focusable="true">
+    <TextView
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"    
+			android:layout_weight="1"
+			android:textStyle="bold"            
+			android:gravity="center_vertical"
+			android:paddingLeft="@dimen/label_padding_left"
+			android:textSize="@dimen/label_text_size"           
+			android:textColor="@color/black"
+			android:text="@string/project"/>
+	  <TextView
+	    android:id="@+id/task_project"
+	    android:layout_width="wrap_content"
+	    android:layout_height="fill_parent"
+	    android:layout_weight="4"
+	    android:gravity="right"
+	    android:singleLine="true"
+	    android:paddingTop="@dimen/label_padding_top"
+	    android:paddingRight="@dimen/label_padding_right"
+	    android:textSize="@dimen/label_text_size"
+	    android:textColor="@color/black"
+	    android:maxLines="1"/>
+  </LinearLayout>
+  <LinearLayout
+    android:id="@+id/task_date_area"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/txt_middle_selector"
+    android:clickable="true"
+    android:focusable="true">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"    
+      android:layout_weight="1"
+      android:textStyle="bold"            
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"
+      android:textSize="@dimen/label_text_size"           
+      android:textColor="@color/black"
+      android:text="@string/date"/>
+    <TextView
+      android:id="@+id/task_date"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_weight="4"
+      android:gravity="right"
+      android:singleLine="true"
+      android:paddingTop="@dimen/label_padding_top"
+      android:paddingRight="@dimen/label_padding_right"
+      android:textSize="@dimen/label_text_size"
+      android:textColor="@color/black"
+      android:maxLines="1"/>
+  </LinearLayout>  
   <LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="right"
     android:paddingRight="@dimen/label_padding_right"
-    android:background="@drawable/txt_billable_selector">
+    android:background="@drawable/txt_middle">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"    
+      android:layout_weight="1"
+      android:textStyle="bold"            
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"
+      android:textSize="@dimen/label_text_size"           
+      android:textColor="@color/black"
+      android:text="@string/billable"/>
     <CheckBox
       android:id="@+id/task_billable_cb"
       android:layout_marginTop="2dp"
       android:layout_width="46dp"
       android:layout_height="36dp"/>     
   </LinearLayout>    
-  <TextView
-    android:id="@+id/task_planned_tasks"
+  <LinearLayout
+    android:id="@+id/task_planned_tasks_area"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:gravity="right"
-    android:paddingTop="@dimen/label_padding_top"
-    android:paddingRight="@dimen/label_padding_right"
-    android:textSize="@dimen/label_text_size"
-    android:textColor="@color/light_gray"
-    android:text="(optional)"
-    android:background="@drawable/txt_planned_selector"/>
-  <TextView
-   android:id="@+id/task_tags"
-   android:layout_width="fill_parent"
-   android:layout_height="wrap_content"
-   android:gravity="right"
-   android:paddingTop="@dimen/label_padding_top"
-   android:paddingRight="@dimen/label_padding_right"
-   android:singleLine="true"
-   android:textSize="@dimen/label_text_size"
-   android:textColor="@color/black"
-   android:background="@drawable/txt_tags_selector"/>
+    android:background="@drawable/txt_middle_selector"
+    android:clickable="true"
+    android:focusable="true">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"    
+      android:layout_weight="1"
+      android:textStyle="bold"            
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"
+      android:textSize="@dimen/label_text_size"           
+      android:textColor="@color/black"
+      android:text="@string/planned"/>
+    <TextView
+      android:id="@+id/task_planned_tasks"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_weight="4"
+      android:gravity="right"
+      android:singleLine="true"
+      android:paddingTop="@dimen/label_padding_top"
+      android:paddingRight="@dimen/label_padding_right"
+      android:textSize="@dimen/label_text_size"
+	    android:textColor="@color/light_gray"
+	    android:text="(optional)"
+      android:maxLines="1"/>
+  </LinearLayout>  
+  <LinearLayout
+    android:id="@+id/task_tags_area"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/txt_bottom_selector"
+    android:clickable="true"
+    android:focusable="true">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"    
+      android:layout_weight="1"
+      android:textStyle="bold"            
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/label_padding_left"
+      android:textSize="@dimen/label_text_size"           
+      android:textColor="@color/black"
+      android:text="@string/tags"/>
+    <TextView
+      android:id="@+id/task_tags"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_weight="4"
+      android:gravity="right"
+      android:singleLine="true"
+      android:paddingTop="@dimen/label_padding_top"
+      android:paddingRight="@dimen/label_padding_right"
+      android:textSize="@dimen/label_text_size"
+      android:textColor="@color/black"
+      android:maxLines="1"/>
+  </LinearLayout>  
 </LinearLayout>
