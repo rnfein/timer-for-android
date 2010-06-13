@@ -11,12 +11,11 @@ import com.apprise.toggl.storage.models.Task;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-public class TimeTrackingService extends Service {
+public class TimeTrackingService extends ServiceCompat {
 
   public static final String BROADCAST_SECOND_ELAPSED = "com.apprise.toggl.tracking.BROADCAST_SECOND_ELAPSED";
   public static final int NOTIFICATION_ID = 1;
@@ -34,6 +33,7 @@ public class TimeTrackingService extends Service {
   @Override
   public void onCreate() {
     isAlive = true;
+    initCompat();
     super.onCreate();
   }
 
@@ -134,11 +134,11 @@ public class TimeTrackingService extends Service {
       getString(R.string.notification_expanded_content),
       launchIntent);
  
-    startForeground(NOTIFICATION_ID, notification);
+    startForegroundCompat(NOTIFICATION_ID, notification);
   }
   
   private void pullFromForeground() {
-    stopForeground(true);
+    stopForegroundCompat(NOTIFICATION_ID);
   }
   
 }
