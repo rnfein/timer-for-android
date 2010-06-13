@@ -31,7 +31,7 @@
       android:layout_width="fill_parent"           
       android:layout_height="wrap_content">
       <LinearLayout
-        android:background="@drawable/txt_top"
+        android:background="@drawable/txt_top_clean"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 	      <TextView
@@ -57,7 +57,7 @@
 	          android:paddingRight="@dimen/login_edittext_padding_right"/>        
       </LinearLayout>      
       <LinearLayout
-        android:background="@drawable/txt_bottom"
+        android:background="@drawable/txt_bottom_clean"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 	      <TextView
