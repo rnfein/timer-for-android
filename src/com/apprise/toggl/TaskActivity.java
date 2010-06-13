@@ -370,6 +370,7 @@ public class TaskActivity extends ApplicationActivity {
         PlannedTask plannedTask = dbAdapter.findPlannedTask(clickedId);
         Log.d(TAG, "clicked plannedTask: " + plannedTask);
         task.project = plannedTask.project;
+        task.workspace = plannedTask.workspace;
         task.description = plannedTask.name;
         //TODO: should we bind the plannedTask to the task somehow?
         updateProjectView();

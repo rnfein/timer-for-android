@@ -23,6 +23,8 @@ package com.apprise.toggl.remote;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.storage.DatabaseAdapter;
@@ -62,6 +64,9 @@ public class SyncService extends Service {
   private TogglWebApi api;
   private DatabaseAdapter dbAdapter;
   
+  private Timer syncTimer;  
+  private long syncRate = 10; //min
+  
   @Override
   public void onCreate() {
     super.onCreate();
@@ -69,6 +74,9 @@ public class SyncService extends Service {
     api = new TogglWebApi(app.getAPIToken());
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
+    
+    syncTimer = new Timer("syncSchedule");    
+    syncTimer.scheduleAtFixedRate(scheduledSync, 0, syncRate*60*1000);
   }
   
   @Override
@@ -99,6 +107,13 @@ public class SyncService extends Service {
   public void setApiToken(String apiToken) {
     api.setApiToken(apiToken);
   }
+
+  private TimerTask scheduledSync = new TimerTask() {
+    public void run() {
+      Log.d(TAG, "scheduled sync called");
+      syncAll();
+    }
+  };
   
   public void syncAll() {
     syncWorkspaces();
