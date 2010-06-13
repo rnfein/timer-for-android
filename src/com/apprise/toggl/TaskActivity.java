@@ -9,7 +9,6 @@ import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tags;
 import com.apprise.toggl.storage.models.PlannedTask;
-import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 import com.apprise.toggl.widget.NumberPicker;
