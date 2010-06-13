@@ -31,7 +31,7 @@
       android:layout_width="fill_parent"           
       android:layout_height="wrap_content">
       <LinearLayout
-        android:background="@drawable/txt_top"
+        android:background="@drawable/txt_top_clean"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 	      <TextView
