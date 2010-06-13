@@ -75,15 +75,17 @@ public final class R {
         public static final int trigger_continue_today=0x7f020021;
         public static final int trigger_inactive=0x7f020022;
         public static final int txt_bottom=0x7f020023;
-        public static final int txt_bottom_pressed=0x7f020024;
-        public static final int txt_bottom_selector=0x7f020025;
-        public static final int txt_middle=0x7f020026;
-        public static final int txt_middle_clean=0x7f020027;
-        public static final int txt_middle_pressed=0x7f020028;
-        public static final int txt_middle_selector=0x7f020029;
-        public static final int txt_top=0x7f02002a;
-        public static final int txt_top_pressed=0x7f02002b;
-        public static final int txt_top_selector=0x7f02002c;
+        public static final int txt_bottom_clean=0x7f020024;
+        public static final int txt_bottom_pressed=0x7f020025;
+        public static final int txt_bottom_selector=0x7f020026;
+        public static final int txt_middle=0x7f020027;
+        public static final int txt_middle_clean=0x7f020028;
+        public static final int txt_middle_pressed=0x7f020029;
+        public static final int txt_middle_selector=0x7f02002a;
+        public static final int txt_top=0x7f02002b;
+        public static final int txt_top_clean=0x7f02002c;
+        public static final int txt_top_pressed=0x7f02002d;
+        public static final int txt_top_selector=0x7f02002e;
     }
     public static final class id {
         public static final int account_menu_log_out=0x7f080021;
