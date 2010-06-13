@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -40,6 +41,7 @@ public class TasksActivity extends ListActivity {
   private Toggl app;
   private User currentUser;
   private LinkedList<Cursor> taskCursors = new LinkedList<Cursor>();
+  private Button newTaskButton;
   
   private static final String TAG = "TasksActivity";
   
@@ -56,6 +58,9 @@ public class TasksActivity extends ListActivity {
 
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);
+    
+    initViews();
+    attachEvents();
   }
   
   @Override
@@ -80,8 +85,22 @@ public class TasksActivity extends ListActivity {
     unbindService(syncConnection);
     super.onDestroy();
   }
+
+  private void initViews() {
+    newTaskButton = (Button) findViewById(R.id.new_task_button);
+  }
   
-  public void populateList() {
+  private void attachEvents() {
+    newTaskButton.setOnClickListener(new View.OnClickListener() {
+      
+      public void onClick(View v) {
+        Intent intent = new Intent(TasksActivity.this, TaskActivity.class);
+        startActivity(intent);
+      }
+    });
+  }
+  
+  private void populateList() {
     for (Cursor c : taskCursors) {
       stopManagingCursor(c);
       c.close();
@@ -149,10 +168,6 @@ public class TasksActivity extends ListActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case R.id.tasks_menu_new_task:
-        Intent intent = new Intent(this, TaskActivity.class);
-        startActivity(intent);
-        return true;
       case R.id.tasks_menu_refresh:
         setProgressBarIndeterminateVisibility(true);
         new Thread(syncAllInBackground).start();

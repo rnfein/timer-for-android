@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
   <item
-    android:id="@+id/tasks_menu_new_task"
-    android:title="@string/new_task"
-    android:icon="@drawable/android:ic_menu_add" />
-  <item
     android:id="@+id/tasks_menu_refresh"
     android:title="@string/refresh"
     android:icon="@drawable/ic_menu_refresh" />

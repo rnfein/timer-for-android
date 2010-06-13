@@ -139,11 +139,6 @@ public class TaskActivity extends ApplicationActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-    case R.id.task_menu_new_task:
-      Intent intent = new Intent(this, TaskActivity.class);
-      startActivity(intent);
-      finish();
-      return true;
     case R.id.task_menu_delete_task:
       showDeleteTaskDialog();
       return true;

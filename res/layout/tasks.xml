@@ -9,18 +9,26 @@
   android:paddingBottom="@dimen/layout_padding_bottom"
   android:paddingLeft="@dimen/layout_padding_left"
   android:paddingRight="@dimen/layout_padding_right">
-  <LinearLayout
+  <RelativeLayout
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"    
+    android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:orientation="horizontal">
     <TextView
-      android:layout_height="fill_parent"
+      android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:textColor="@color/red"
-      android:textStyle="bold"
-      android:text="@string/tasks"/>  
-  </LinearLayout>
+      android:textStyle="bold"        
+      android:text="@string/tasks"
+      android:layout_centerInParent="true"/>
+    <Button
+      android:id="@+id/new_task_button"
+      android:layout_width="35dp"
+      android:layout_height="35dp"
+      android:layout_marginRight="10dp"
+      android:background="@drawable/add_selector"
+      android:layout_alignParentRight="true"/>
+  </RelativeLayout>  
   <LinearLayout
     android:background="@drawable/divider"
     android:layout_marginRight="10dp"    

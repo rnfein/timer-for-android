@@ -43,7 +43,6 @@
     <string name="client">Client</string>
     <string name="choose_client">Choose Client</string>
 
-    <string name="new_task">New Task</string>
     <string name="delete_task">Delete Task</string>
     
     <string name="notification_ticker">Time tracking started</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <dimen name="layout_padding_top">25dp</dimen>
+  <dimen name="layout_padding_top">20dp</dimen>
   <dimen name="layout_padding_right">15dp</dimen>
   <dimen name="layout_padding_bottom">20dp</dimen>
   <dimen name="layout_padding_left">20dp</dimen>
