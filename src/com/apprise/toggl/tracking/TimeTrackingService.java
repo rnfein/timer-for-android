@@ -18,6 +18,9 @@ import android.os.IBinder;
 public class TimeTrackingService extends ServiceCompat {
 
   public static final String BROADCAST_SECOND_ELAPSED = "com.apprise.toggl.tracking.BROADCAST_SECOND_ELAPSED";
+  public static final String TRACKED_TASK_DURATION = "com.apprise.toggl.TRACKED_TASK_DURATION";
+  public static final String TRACKED_TASK_ID = "com.apprise.toggl.tracking.TRACKED_TASK_ID";
+  
   public static final int NOTIFICATION_ID = 1;
   private static boolean isAlive = false; 
   
@@ -72,6 +75,8 @@ public class TimeTrackingService extends ServiceCompat {
       public void run() {
         seconds += 1l;
         Intent intent = new Intent(BROADCAST_SECOND_ELAPSED);
+        intent.putExtra(TRACKED_TASK_ID, TimeTrackingService.this.task._id);
+        intent.putExtra(TRACKED_TASK_DURATION, seconds);
         sendBroadcast(intent);
       }
     }, new Date(System.currentTimeMillis() + 1000), 1000);
