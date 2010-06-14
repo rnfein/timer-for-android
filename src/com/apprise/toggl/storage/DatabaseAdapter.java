@@ -2,7 +2,6 @@ package com.apprise.toggl.storage;
 
 import java.util.Date;
 
-
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.models.Client;

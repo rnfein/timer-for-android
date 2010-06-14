@@ -8,6 +8,8 @@ import com.apprise.toggl.storage.models.User;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,7 +24,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +34,8 @@ public class AccountActivity extends Activity {
   
   private static final String STATE_EMAIL = "com.apprise.toggl.STATE_EMAIL";
   private static final String STATE_PASSWORD = "com.apprise.toggl.STATE_PASSWORD";
+  private static final int DIALOG_LOGGING_IN = 1;
+  private static final int DIALOG_SYNCING = 2;
 
   private TogglWebApi webApi;
   private SyncService syncService;
@@ -109,8 +112,6 @@ public class AccountActivity extends Activity {
   }    
   
   protected void init() {    
-    requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-    setProgressBarIndeterminate(true);    
     app = (Toggl) getApplication();
     webApi = new TogglWebApi(app.getAPIToken());
     Intent intent = new Intent(this, SyncService.class);
@@ -137,14 +138,15 @@ public class AccountActivity extends Activity {
     loginButton.setOnClickListener(new View.OnClickListener() {
 
       public void onClick(View v) {
+        // hide keyboard
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(passwordEditText.getWindowToken(), 0);
-        setProgressBarIndeterminateVisibility(true);
+
         if (app.isConnected()) {
+          showDialog(DIALOG_LOGGING_IN);
           new Thread(authenticateInBackground).start();
         } else {
           showNoConnectionDialog();
-          setProgressBarIndeterminateVisibility(false);
         }
       }
     });
@@ -158,6 +160,23 @@ public class AccountActivity extends Activity {
     });
   }
   
+  @Override
+  protected Dialog onCreateDialog(int id) {
+    ProgressDialog progressDialog = new ProgressDialog(this);
+    progressDialog.setIndeterminate(true);
+    progressDialog.setCancelable(false);
+    
+    switch (id) {
+    case DIALOG_LOGGING_IN:
+      progressDialog.setMessage(getString(R.string.logging_in));
+      break;
+    case DIALOG_SYNCING:
+      progressDialog.setMessage(getString(R.string.syncing));
+      break;
+    }
+    return progressDialog;
+  }
+
   private void showNoConnectionDialog() {
     AlertDialog.Builder builder = new AlertDialog.Builder(AccountActivity.this);
     builder.setTitle(R.string.no_internet_connection);
@@ -176,7 +195,7 @@ public class AccountActivity extends Activity {
     builder.show();    
   }
   
-  public void startTasksActivity() {
+  private void startTasksActivity() {
     startActivity(new Intent(AccountActivity.this, TasksActivity.class));
   }
   
@@ -194,44 +213,52 @@ public class AccountActivity extends Activity {
     return user;
   }
   
-  protected Runnable authenticateInBackground = new Runnable() {
+  private Runnable authenticateInBackground = new Runnable() {
     
     public void run() {
       String email = emailEditText.getText().toString();
       String password = passwordEditText.getText().toString();
       User user = webApi.authenticateWithCredentials(email, password);
 
+      dismissDialog(DIALOG_LOGGING_IN);
+
       if (user != null) {
         user = saveCurrentUser(user);        
         app.logIn(user);
         webApi.setApiToken(user.api_token);
         Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());
+
+        runOnUiThread(new Runnable() {
+          public void run() {
+            showDialog(DIALOG_SYNCING);
+          }
+        });
+
         new Thread(syncAllInBackground).start();        
       } else {
         runOnUiThread(new Runnable() {
           public void run() {
             Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed),
                 Toast.LENGTH_SHORT).show(); 
-            setProgressBarIndeterminateVisibility(false);            
           }
         });
       }
     }
   };
   
-  protected BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+  private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
     
     @Override
     public void onReceive(Context context, Intent intent) {
       Log.d(TAG, "sync completed on: " + intent.getStringExtra(SyncService.COLLECTION));
       if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED)) {
-        setProgressBarIndeterminateVisibility(false);        
-        startTasksActivity();      
+        dismissDialog(DIALOG_SYNCING);
+        startTasksActivity();
       }
     }
   };  
   
-  protected ServiceConnection syncConnection = new ServiceConnection() {
+  private ServiceConnection syncConnection = new ServiceConnection() {
     
     public void onServiceDisconnected(ComponentName name) {}
     
@@ -242,7 +269,7 @@ public class AccountActivity extends Activity {
 
   };
   
-  protected Runnable syncAllInBackground = new Runnable() {
+  private Runnable syncAllInBackground = new Runnable() {
     
     public void run() {
       syncService.setApiToken(app.getAPIToken());
@@ -254,7 +281,7 @@ public class AccountActivity extends Activity {
           public void run() {
             Toast.makeText(AccountActivity.this, getString(R.string.sync_failed),
                 Toast.LENGTH_SHORT).show(); 
-            setProgressBarIndeterminateVisibility(false);            
+            dismissDialog(DIALOG_SYNCING);            
           }
         });    
       }

@@ -27,7 +27,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -120,6 +119,7 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onPause() {
+    task.description = descriptionView.getText().toString();
     saveTask();
     super.onPause();
   }
@@ -265,16 +265,6 @@ public class TaskActivity extends ApplicationActivity {
         showChoosePlannedTaskDialog();
       }
     });
-
-    descriptionView.setOnKeyListener(new View.OnKeyListener() {
-      public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-          task.description = descriptionView.getText().toString();
-        }
-        return false;
-      }
-    });
-
   }
 
   private void triggerTracking() {
@@ -476,9 +466,13 @@ public class TaskActivity extends ApplicationActivity {
     builder.setPositiveButton(R.string.set,
         new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
+            // make sure last values are validated and stored
+            hoursPicker.onFocusChange(hoursPicker.findViewById(R.id.timepicker_input), false);
+            minutesPicker.onFocusChange(minutesPicker.findViewById(R.id.timepicker_input), false);
+            
             int hours = hoursPicker.getCurrent();
             int minutes = minutesPicker.getCurrent();
-            // only hours and minutes are picker, hence get the
+            // only hours and minutes are picked, hence get the
             // seconds from existing task duration
             int seconds = (int) task.duration % 60;
 
@@ -486,6 +480,7 @@ public class TaskActivity extends ApplicationActivity {
             task.duration = duration;
             saveTask();
             updateDuration();
+
             if (trackingService.isTracking(task)) {
               trackingService.setCurrentDuration(duration);
             }
