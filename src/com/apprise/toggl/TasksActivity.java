@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.LinkedList;
 
 import com.apprise.toggl.remote.SyncService;
-import com.apprise.toggl.remote.exception.FailedResponseException;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
@@ -36,8 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class TasksActivity extends ListActivity {
-
-  private ConnectivityManager connectivityManager;  
+ 
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
   private Toggl app;
@@ -53,7 +51,6 @@ public class TasksActivity extends ListActivity {
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
-    connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);    
     
     app = (Toggl) getApplication();    
     dbAdapter = new DatabaseAdapter(this, app);
@@ -196,8 +193,7 @@ public class TasksActivity extends ListActivity {
   protected Runnable syncAllInBackground = new Runnable() {
 
     public void run() {
-      if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting()
-          || connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+      if (app.isConnected()) {
         try {
           syncService.syncAll();
         } catch (Exception e) {

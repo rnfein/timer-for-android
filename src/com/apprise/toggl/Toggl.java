@@ -5,6 +5,7 @@ import com.apprise.toggl.storage.models.User;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
 
 public class Toggl extends Application {
 
@@ -13,6 +14,7 @@ public class Toggl extends Application {
 
   private Toggl singleton;
   private SharedPreferences settings;
+  private ConnectivityManager connectivityManager;
   private User currentUser;
 
   public Toggl getInstance() {
@@ -50,6 +52,11 @@ public class Toggl extends Application {
     clearCurrentUser();
     storeAPIToken(null);
   }
+  
+  public boolean isConnected() {
+    return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting() ||
+        connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+  }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
@@ -61,6 +68,7 @@ public class Toggl extends Application {
     super.onCreate();
     singleton = this;
     settings = getSharedPreferences(TOGGL_PREFS, MODE_PRIVATE);
+    connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
   }
 
   @Override
