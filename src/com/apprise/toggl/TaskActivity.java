@@ -27,7 +27,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -119,6 +118,7 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onPause() {
+    task.description = descriptionView.getText().toString();
     saveTask();
     super.onPause();
   }
@@ -256,16 +256,6 @@ public class TaskActivity extends ApplicationActivity {
         showChoosePlannedTaskDialog();
       }
     });
-
-    descriptionView.setOnKeyListener(new View.OnKeyListener() {
-      public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-          task.description = descriptionView.getText().toString();
-        }
-        return false;
-      }
-    });
-
   }
 
   private void triggerTracking() {
