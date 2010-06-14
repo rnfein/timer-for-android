@@ -133,8 +133,9 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     
     Cursor allUsers = dbAdapter.findAllUsers();
     assertNotNull(allUsers);
-    assertEquals(2, allUsers.getCount());
+    assertEquals(3, allUsers.getCount()); //consider current user created in setUp
     allUsers.moveToFirst();
+    allUsers.moveToNext(); //step over current user
     assertEquals(user1._id, allUsers.getLong(allUsers.getColumnIndex(Users._ID)));
     allUsers.moveToNext();
     assertEquals(user2._id, allUsers.getLong(allUsers.getColumnIndex(Users._ID)));
@@ -143,9 +144,9 @@ public class DatabaseAdapterTest extends AndroidTestCase {
   
   public void testDeleteUser() {
     User user = dbAdapter.createUser(new User());
-    int deletedId = dbAdapter.deleteUser(user._id);
+    int deletedCount = dbAdapter.deleteUser(user._id);
     
-    assertEquals(user._id, deletedId);
+    assertEquals(1, deletedCount);
     assertNull(dbAdapter.findUser(user._id));
   }
   
@@ -293,8 +294,8 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertTrue(foundProject.billable);
     assertEquals("Big Client - Supersystem", foundProject.client_project_name);
     assertEquals(3200, foundProject.estimated_workhours);
-    assertEquals(320000, foundProject.fixed_fee);
-    assertEquals(100, foundProject.hourly_rate);
+    assertEquals(320000F, foundProject.fixed_fee);
+    assertEquals(100F, foundProject.hourly_rate);
     assertEquals("Supersystem", foundProject.name);
     assertTrue(foundProject.is_fixed_fee);
     assertEquals(workspace._id, foundProject.workspace._id);
