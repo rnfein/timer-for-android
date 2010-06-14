@@ -9,6 +9,7 @@ public class Task extends Model {
 
   public Project project;
   public Workspace workspace;
+  public PlannedTask planned_task;
   public long duration;
   public String start;
   public boolean billable;
@@ -18,12 +19,13 @@ public class Task extends Model {
 
   public Task() {}
   
-  public Task(long _id, Project project, Workspace workspace, long duration,
+  public Task(long _id, Project project, Workspace workspace, PlannedTask plannedTask, long duration,
       String start, boolean billable, String description, String stop,
       String[] tagNames, long remote_id, boolean syncDirty) {
     this._id = _id;
     this.project = project;
     this.workspace = workspace;
+    this.planned_task = plannedTask;
     this.duration = duration;
     this.start = start;
     this.billable = billable;
@@ -34,12 +36,13 @@ public class Task extends Model {
     this.sync_dirty = syncDirty;
   }
 
-  public static Task dirty(Project project, Workspace workspace, long duration,
+  public static Task dirty(Project project, Workspace workspace , PlannedTask plannedTask, long duration,
       String start, boolean billable, String description, String stop,
       String[] tagNames, long remote_id) {
     Task task = new Task();
     task.project = project;
     task.workspace = workspace;
+    task.planned_task = plannedTask;    
     task.duration = duration;
     task.start = start;
     task.billable = billable;
@@ -54,11 +57,14 @@ public class Task extends Model {
   public String toString() {
     Long project_id = null;
     Long workspace_id = null;
+    Long planned_task_id = null;
     
     if (project != null)
-      project_id = new Long(project._id);
+      project_id = new Long(project.id);
     if (workspace != null)
-      workspace_id = new Long(workspace._id);
+      workspace_id = new Long(workspace.id);
+    if (planned_task != null)
+      planned_task_id = new Long(planned_task.id);
 
     String tagNames = null;
     if (this.tag_names != null) {
@@ -67,6 +73,7 @@ public class Task extends Model {
     
     return "project_id: " + project_id
       + ", workspace_id: " + workspace_id
+      + ", planned_task_id: " + planned_task_id
       + ", duration: " + duration
       + ", start: " + start
       + ", billable: " + billable
@@ -87,6 +94,7 @@ public class Task extends Model {
     id = otherTask.id;
     project = otherTask.project;
     workspace = otherTask.workspace;
+    planned_task = otherTask.planned_task;
     duration = otherTask.duration;
     start = otherTask.start;
     billable = otherTask.billable;

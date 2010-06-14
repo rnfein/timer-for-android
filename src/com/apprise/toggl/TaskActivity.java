@@ -2,7 +2,6 @@ package com.apprise.toggl;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Timer;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
@@ -41,6 +40,7 @@ import android.widget.TextView;
 public class TaskActivity extends ApplicationActivity {
 
   public static final String TASK_ID = "TASK_ID";
+  public static final String NEW_TASK = "NEW_TASK";
   private static final String TAG = "TaskActivity";
 
   private static final int DATE_DIALOG_ID = 0;
@@ -56,23 +56,29 @@ public class TaskActivity extends ApplicationActivity {
   private TextView dateView;
   private TextView plannedTasksView;
   private TextView tagsView;
-
+  
+  private Toggl app;
   private CheckBox billableCheckBox;
-
-  Timer timer;
+  
+  private boolean startAutomatically = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.task);
-
+    app = (Toggl) getApplication();
+    
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
+    
+    boolean newTask = false;
     if (_id > 0) {
       task = dbAdapter.findTask(_id);
+      newTask = getIntent().getBooleanExtra(NEW_TASK, false);
     } else {
       task = dbAdapter.createDirtyTask();
+      newTask = true;
     }
 
     Intent intent = new Intent(this, TimeTrackingService.class);
@@ -83,6 +89,10 @@ public class TaskActivity extends ApplicationActivity {
 
     initViews();
     attachEvents();
+    
+    if (app.getCurrentUser().new_tasks_start_automatically && newTask) {
+      startAutomatically = true;
+    }
   }
 
   @Override
@@ -110,6 +120,7 @@ public class TaskActivity extends ApplicationActivity {
     updateDescriptionView();
     updateProjectView();
     updatePlannedTasks();
+    updatePlannedTaskView();
     updateDuration();
     updateDateView();
     updateTagsView();
@@ -172,6 +183,12 @@ public class TaskActivity extends ApplicationActivity {
   private void updateDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
   }
+  
+  private void updatePlannedTaskView() {
+    if (task.planned_task != null) {
+      plannedTasksView.setText(task.planned_task.name);
+    }
+  }
 
   private void updateTagsView() {
     tagsView.setText(Util.joinStringArray(task.tag_names, ", "));
@@ -186,7 +203,7 @@ public class TaskActivity extends ApplicationActivity {
   private boolean todaysTask() {
     Date startDate = Util.parseStringToDate(task.start);
     Calendar cal = (Calendar) Calendar.getInstance().clone();
-    cal.set(Calendar.HOUR, 0);
+    cal.set(Calendar.HOUR_OF_DAY, 0);
     cal.set(Calendar.MINUTE, 0);
     cal.set(Calendar.SECOND, 0);
     Date beginningOfToday = cal.getTime();
@@ -200,6 +217,8 @@ public class TaskActivity extends ApplicationActivity {
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
       if ((cursor == null) || (cursor.getCount() == 0) || !cursor.moveToFirst()) {
         findViewById(R.id.task_planned_tasks_area).setVisibility(LinearLayout.GONE);
+      } else {
+        findViewById(R.id.task_planned_tasks_area).setVisibility(LinearLayout.VISIBLE);        
       }
       if (cursor != null) {
         cursor.close();
@@ -296,6 +315,7 @@ public class TaskActivity extends ApplicationActivity {
     
     Intent intent = new Intent(this, TaskActivity.class);
     intent.putExtra(TASK_ID, continueTask._id);
+    intent.putExtra(NEW_TASK, true);
     startActivity(intent);
     finish();
   }
@@ -343,7 +363,7 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   private void showChoosePlannedTaskDialog() {
-    final Cursor plannedTasksCursor = dbAdapter.findAllPlannedTasks();
+    final Cursor plannedTasksCursor = dbAdapter.findPlannedTasksByProjectId(task.project.id);
     startManagingCursor(plannedTasksCursor);
     
     String[] from = new String[] { PlannedTasks.NAME };
@@ -358,13 +378,13 @@ public class TaskActivity extends ApplicationActivity {
       public void onClick(DialogInterface dialog, int pos) {
         long clickedId = plannedTasksAdapter.getItemId(pos);
         PlannedTask plannedTask = dbAdapter.findPlannedTask(clickedId);
-        Log.d(TAG, "clicked plannedTask: " + plannedTask);
         task.project = plannedTask.project;
         task.workspace = plannedTask.workspace;
         task.description = plannedTask.name;
-        //TODO: should we bind the plannedTask to the task somehow?
+        task.planned_task = plannedTask;
         updateProjectView();
         updateDescriptionView();
+        updatePlannedTaskView();
         saveTask();
       }
     });
@@ -595,6 +615,8 @@ public class TaskActivity extends ApplicationActivity {
         task.duration = trackingService.getCurrentDuration();
         updateDuration();
         timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
+      } else if (startAutomatically) {
+        triggerTracking();
       }
     }
 
