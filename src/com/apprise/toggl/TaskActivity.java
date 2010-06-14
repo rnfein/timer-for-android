@@ -58,8 +58,9 @@ public class TaskActivity extends ApplicationActivity {
   private TextView tagsView;
   
   private Toggl app;
-
   private CheckBox billableCheckBox;
+  
+  private boolean startAutomatically = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -90,8 +91,7 @@ public class TaskActivity extends ApplicationActivity {
     attachEvents();
     
     if (app.getCurrentUser().new_tasks_start_automatically && newTask) {
-      // TODO: trigger tracking if isn't tracking already
-      //      triggerTracking();
+      startAutomatically = true;
     }
   }
 
@@ -203,7 +203,7 @@ public class TaskActivity extends ApplicationActivity {
   private boolean todaysTask() {
     Date startDate = Util.parseStringToDate(task.start);
     Calendar cal = (Calendar) Calendar.getInstance().clone();
-    cal.set(Calendar.HOUR, 0);
+    cal.set(Calendar.HOUR_OF_DAY, 0);
     cal.set(Calendar.MINUTE, 0);
     cal.set(Calendar.SECOND, 0);
     Date beginningOfToday = cal.getTime();
@@ -615,6 +615,8 @@ public class TaskActivity extends ApplicationActivity {
         task.duration = trackingService.getCurrentDuration();
         updateDuration();
         timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
+      } else if (startAutomatically) {
+        triggerTracking();
       }
     }
 
