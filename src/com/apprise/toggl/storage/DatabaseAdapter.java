@@ -1,11 +1,6 @@
 package com.apprise.toggl.storage;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.Util;
