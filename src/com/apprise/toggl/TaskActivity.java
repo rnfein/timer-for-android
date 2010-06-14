@@ -199,13 +199,13 @@ public class TaskActivity extends ApplicationActivity {
       long project_remote_id = task.project.id;
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
       if ((cursor == null) || (cursor.getCount() == 0) || !cursor.moveToFirst()) {
-        plannedTasksView.setVisibility(LinearLayout.GONE);
+        findViewById(R.id.task_planned_tasks_area).setVisibility(LinearLayout.GONE);
       }
       if (cursor != null) {
         cursor.close();
       }
     } else {
-      plannedTasksView.setVisibility(LinearLayout.GONE);
+      findViewById(R.id.task_planned_tasks_area).setVisibility(LinearLayout.GONE);
     }
   }
 
