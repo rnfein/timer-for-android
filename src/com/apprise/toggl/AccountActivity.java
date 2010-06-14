@@ -15,7 +15,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -37,7 +36,6 @@ public class AccountActivity extends Activity {
 
   private TogglWebApi webApi;
   private SyncService syncService;
-  private ConnectivityManager connectivityManager;
 
   private EditText emailEditText;
   private EditText passwordEditText;
@@ -115,7 +113,6 @@ public class AccountActivity extends Activity {
     setProgressBarIndeterminate(true);    
     app = (Toggl) getApplication();
     webApi = new TogglWebApi(app.getAPIToken());
-    connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);     
   }
@@ -143,8 +140,7 @@ public class AccountActivity extends Activity {
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(passwordEditText.getWindowToken(), 0);
         setProgressBarIndeterminateVisibility(true);
-        if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting() ||
-            connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+        if (app.isConnected()) {
           new Thread(authenticateInBackground).start();
         } else {
           showNoConnectionDialog();
