@@ -1,13 +1,17 @@
 package com.apprise.toggl;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
+import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.tracking.TimeTrackingService;
 import com.apprise.toggl.widget.SectionedAdapter;
 
 import android.app.ListActivity;
@@ -18,7 +22,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -36,14 +39,17 @@ import android.widget.Toast;
 
 public class TasksActivity extends ListActivity {
  
+  private static final String TAG = "TasksActivity";
+  
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
   private Toggl app;
   private User currentUser;
-  private LinkedList<Cursor> taskCursors = new LinkedList<Cursor>();
+  private LinkedList<TasksCursorAdapter> taskAdapters = new LinkedList<TasksCursorAdapter>();
   private Button newTaskButton;
   
-  private static final String TAG = "TasksActivity";
+  private long trackedTaskId;
+  private long trackedTaskDurationSeconds;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -66,9 +72,14 @@ public class TasksActivity extends ListActivity {
   @Override
   protected void onResume() {
     super.onResume();    
-    currentUser = app.getCurrentUser();    
-    IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
-    registerReceiver(updateReceiver, filter);
+    currentUser = app.getCurrentUser();
+
+    IntentFilter syncFilter = new IntentFilter(SyncService.SYNC_COMPLETED);
+    registerReceiver(updateReceiver, syncFilter);
+    
+    IntentFilter timerFilter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
+    registerReceiver(updateReceiver, timerFilter);
+
     adapter.clearSections();
     populateList();
   }
@@ -101,11 +112,11 @@ public class TasksActivity extends ListActivity {
   }
   
   private void populateList() {
-    for (Cursor c : taskCursors) {
-      stopManagingCursor(c);
-      c.close();
+    for (TasksCursorAdapter taskAdapter : taskAdapters) {
+      stopManagingCursor(taskAdapter.getCursor());
+      taskAdapter.getCursor().close();
     }
-    taskCursors.clear();
+    taskAdapters.clear();
     
     int taskRetentionDays;
     if (currentUser != null) {
@@ -121,8 +132,9 @@ public class TasksActivity extends ListActivity {
 
       if (tasksCursor.getCount() > 0) {
         startManagingCursor(tasksCursor);
-        taskCursors.add(tasksCursor);
         TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, tasksCursor);
+        taskAdapters.add(cursorAdapter);
+
         String date = Util.smallDateString(queryCal.getTime());
         String headerText = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
         adapter.addSection(headerText, cursorAdapter);
@@ -223,10 +235,24 @@ public class TasksActivity extends ListActivity {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED)) {
-        adapter.clearSections();
-        populateList();
-        setProgressBarIndeterminateVisibility(false);      
+      if (SyncService.SYNC_COMPLETED.equals(intent.getAction())) {
+        if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED)) {
+          adapter.clearSections();
+          populateList();
+          setProgressBarIndeterminateVisibility(false);      
+        }        
+      }
+      else if (TimeTrackingService.BROADCAST_SECOND_ELAPSED.equals(intent.getAction())) {
+        trackedTaskId = intent.getLongExtra(TimeTrackingService.TRACKED_TASK_ID, -1);
+        trackedTaskDurationSeconds = intent.getLongExtra(TimeTrackingService.TRACKED_TASK_DURATION, -1);
+        
+        for (TasksCursorAdapter taskAdapter : taskAdapters) {
+          TextView durationView = taskAdapter.getDurationView(trackedTaskId); 
+          if (durationView != null) {
+            durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
+            break;
+          }
+        }
       }
     }
   };
@@ -248,15 +274,26 @@ public class TasksActivity extends ListActivity {
   
   private class TasksCursorAdapter extends CursorAdapter {
 
+    private Map<Long, TextView> durationViewsMap;
+    
     public TasksCursorAdapter(Context context, Cursor cursor) {
       super(context, cursor);
+      durationViewsMap = new HashMap<Long, TextView>();
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
       TextView durationView = (TextView) view.findViewById(R.id.task_item_duration);
-      long seconds = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
-      durationView.setText(Util.secondsToHMS(seconds));
+      long id = cursor.getLong(cursor.getColumnIndex(Tasks._ID));
+      
+      if (id == trackedTaskId) {
+        durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
+      } else {
+        long seconds = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
+        durationView.setText(Util.secondsToHMS(seconds));        
+      }
+
+      durationViewsMap.put(id, durationView);
 
       TextView descriprionView = (TextView) view.findViewById(R.id.task_item_description);
       String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
@@ -271,13 +308,18 @@ public class TasksActivity extends ListActivity {
       String clientProjectName = cursor.getString(cursor.getColumnIndex(Projects.CLIENT_PROJECT_NAME));
       clientProjectNameView.setText(clientProjectName);
     }
-
+    
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
       View view = getLayoutInflater().inflate(R.layout.task_item, null);
       bindView(view, context, cursor);
       return view;
     }
+    
+    public TextView getDurationView(long taskId) {
+      return durationViewsMap.get(new Long(taskId));
+    }
+
   }  
 
 }
