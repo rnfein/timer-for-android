@@ -2,7 +2,6 @@ package com.apprise.toggl;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Timer;
 
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
@@ -41,6 +40,7 @@ import android.widget.TextView;
 public class TaskActivity extends ApplicationActivity {
 
   public static final String TASK_ID = "TASK_ID";
+  public static final String NEW_TASK = "NEW_TASK";
   private static final String TAG = "TaskActivity";
 
   private static final int DATE_DIALOG_ID = 0;
@@ -56,23 +56,28 @@ public class TaskActivity extends ApplicationActivity {
   private TextView dateView;
   private TextView plannedTasksView;
   private TextView tagsView;
+  
+  private Toggl app;
 
   private CheckBox billableCheckBox;
-
-  Timer timer;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.task);
-
+    app = (Toggl) getApplication();
+    
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
     long _id = getIntent().getLongExtra(TASK_ID, -1);
+    
+    boolean newTask = false;
     if (_id > 0) {
       task = dbAdapter.findTask(_id);
+      newTask = getIntent().getBooleanExtra(NEW_TASK, false);
     } else {
       task = dbAdapter.createDirtyTask();
+      newTask = true;
     }
 
     Intent intent = new Intent(this, TimeTrackingService.class);
@@ -83,6 +88,11 @@ public class TaskActivity extends ApplicationActivity {
 
     initViews();
     attachEvents();
+    
+    if (app.getCurrentUser().new_tasks_start_automatically && newTask) {
+      // TODO: trigger tracking if isn't tracking already
+      //      triggerTracking();
+    }
   }
 
   @Override
@@ -305,6 +315,7 @@ public class TaskActivity extends ApplicationActivity {
     
     Intent intent = new Intent(this, TaskActivity.class);
     intent.putExtra(TASK_ID, continueTask._id);
+    intent.putExtra(NEW_TASK, true);
     startActivity(intent);
     finish();
   }
