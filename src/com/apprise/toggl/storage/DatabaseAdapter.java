@@ -1,11 +1,7 @@
 package com.apprise.toggl.storage;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.Util;
@@ -398,6 +394,7 @@ public class DatabaseAdapter {
     values.put(Tasks.TAG_NAMES, tagNames);
 
     if (task.workspace != null) values.put(Tasks.WORKSPACE_REMOTE_ID, task.workspace.id);
+    if (task.planned_task != null) values.put(Tasks.PLANNED_TASK_REMOTE_ID, task.planned_task.id);
     if (task.project != null) { 
       if (task.project.id > 0) {
         values.put(Tasks.PROJECT_REMOTE_ID, task.project.id);
@@ -671,6 +668,7 @@ public class DatabaseAdapter {
       long projectRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_REMOTE_ID));
       long projectLocalId = cursor.getLong(cursor.getColumnIndex(Tasks.PROJECT_LOCAL_ID));
       long workspaceRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.WORKSPACE_REMOTE_ID));
+      long plannedTaskRemoteId = cursor.getLong(cursor.getColumnIndex(Tasks.PLANNED_TASK_REMOTE_ID));
       String start = cursor.getString(cursor.getColumnIndex(Tasks.START));
       String stop = cursor.getString(cursor.getColumnIndex(Tasks.STOP));
       long remote_id = cursor.getLong(cursor.getColumnIndex(Tasks.REMOTE_ID));
@@ -689,7 +687,7 @@ public class DatabaseAdapter {
         project = dbAdapter.findProject(projectLocalId);
       }
       
-      return new Task(_id, project, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId),
+      return new Task(_id, project, dbAdapter.findWorkspaceByRemoteId(workspaceRemoteId), dbAdapter.findPlannedTaskByRemoteId(plannedTaskRemoteId),
           duration, start, billable, description, stop, tagNamesArr, remote_id, syncDirty);
     }
     
@@ -793,6 +791,7 @@ public class DatabaseAdapter {
       + Tasks.SYNC_DIRTY + " INTEGER NOT NULL,"  
       + Tasks.PROJECT_REMOTE_ID + " INTEGER,"
       + Tasks.PROJECT_LOCAL_ID + " INTEGER,"
+      + Tasks.PLANNED_TASK_REMOTE_ID + " INTEGER,"
       + Tasks.WORKSPACE_REMOTE_ID + " INTEGER,"
       + Tasks.DURATION + " INTEGER,"
       + Tasks.START + " TEXT,"
@@ -910,6 +909,7 @@ public class DatabaseAdapter {
     public static final String PROJECT_REMOTE_ID = "project_remote_id";
     public static final String PROJECT_LOCAL_ID = "project_local_id";
     public static final String WORKSPACE_REMOTE_ID = "workspace_remote_id";
+    public static final String PLANNED_TASK_REMOTE_ID = "planned_task_remote_id";
     public static final String DURATION = "duration";
     public static final String START = "start";
     public static final String BILLABLE = "billable";
