@@ -111,6 +111,7 @@ public class TaskActivity extends ApplicationActivity {
     updateDescriptionView();
     updateProjectView();
     updatePlannedTasks();
+    updatePlannedTaskView();
     updateDuration();
     updateDateView();
     updateTagsView();
@@ -172,6 +173,12 @@ public class TaskActivity extends ApplicationActivity {
   private void updateDateView() {
     dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
   }
+  
+  private void updatePlannedTaskView() {
+    if (task.planned_task != null) {
+      plannedTasksView.setText(task.planned_task.name);
+    }
+  }
 
   private void updateTagsView() {
     tagsView.setText(Util.joinStringArray(task.tag_names, ", "));
@@ -200,6 +207,8 @@ public class TaskActivity extends ApplicationActivity {
       Cursor cursor = dbAdapter.findPlannedTasksByProjectId(project_remote_id);
       if ((cursor == null) || (cursor.getCount() == 0) || !cursor.moveToFirst()) {
         findViewById(R.id.task_planned_tasks_area).setVisibility(LinearLayout.GONE);
+      } else {
+        findViewById(R.id.task_planned_tasks_area).setVisibility(LinearLayout.VISIBLE);        
       }
       if (cursor != null) {
         cursor.close();
@@ -353,7 +362,7 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   private void showChoosePlannedTaskDialog() {
-    final Cursor plannedTasksCursor = dbAdapter.findAllPlannedTasks();
+    final Cursor plannedTasksCursor = dbAdapter.findPlannedTasksByProjectId(task.project.id);
     startManagingCursor(plannedTasksCursor);
     
     String[] from = new String[] { PlannedTasks.NAME };
@@ -368,13 +377,13 @@ public class TaskActivity extends ApplicationActivity {
       public void onClick(DialogInterface dialog, int pos) {
         long clickedId = plannedTasksAdapter.getItemId(pos);
         PlannedTask plannedTask = dbAdapter.findPlannedTask(clickedId);
-        Log.d(TAG, "clicked plannedTask: " + plannedTask);
         task.project = plannedTask.project;
         task.workspace = plannedTask.workspace;
         task.description = plannedTask.name;
-        //TODO: should we bind the plannedTask to the task somehow?
+        task.planned_task = plannedTask;
         updateProjectView();
         updateDescriptionView();
+        updatePlannedTaskView();
         saveTask();
       }
     });

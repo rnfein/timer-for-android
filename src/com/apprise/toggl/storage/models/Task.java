@@ -121,11 +121,6 @@ public class Task extends Model {
       workspaceObj.addProperty("id", this.workspace.id);      
     }
     
-    taskObj.remove("planned_task");
-    if (this.planned_task != null) {
-      taskObj.addProperty("planned_task_id", this.planned_task.id);
-    }    
-    
     taskObj.add("workspace", workspaceObj);
     taskObj.remove("tag_names");
     taskObj.addProperty("created_with", "Toggl Android Client.");
