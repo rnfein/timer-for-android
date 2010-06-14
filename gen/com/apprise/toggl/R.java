@@ -171,10 +171,12 @@ public final class R {
         public static final int name=0x7f06000f;
         public static final int new_project=0x7f060022;
         public static final int no_description=0x7f060021;
+        public static final int no_internet_connection=0x7f060026;
+        public static final int no_internet_msg=0x7f060027;
         public static final int no_project=0x7f06001f;
-        public static final int notification_expanded_content=0x7f060028;
-        public static final int notification_expanded_title=0x7f060027;
-        public static final int notification_ticker=0x7f060026;
+        public static final int notification_expanded_content=0x7f06002b;
+        public static final int notification_expanded_title=0x7f06002a;
+        public static final int notification_ticker=0x7f060029;
         public static final int password=0x7f06001b;
         public static final int planned=0x7f060007;
         public static final int planned_task=0x7f06000b;
@@ -183,6 +185,7 @@ public final class R {
         public static final int refresh=0x7f060001;
         public static final int save=0x7f060012;
         public static final int set=0x7f060013;
+        public static final int settings=0x7f060028;
         public static final int sync_failed=0x7f06000e;
         public static final int tags=0x7f060008;
         public static final int task=0x7f060003;

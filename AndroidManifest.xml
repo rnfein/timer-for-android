@@ -3,7 +3,8 @@
 	package="com.apprise.toggl"
 	android:versionCode="1"
 	android:versionName="1.0">
-  <uses-permission android:name="android.permission.INTERNET" />      
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <application 
     android:name="Toggl"
     android:icon="@drawable/icon" 

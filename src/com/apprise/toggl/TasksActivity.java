@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 
 public class TasksActivity extends ListActivity {
 
+  private ConnectivityManager connectivityManager;  
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
   private Toggl app;
@@ -51,6 +53,7 @@ public class TasksActivity extends ListActivity {
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
+    connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);    
     
     app = (Toggl) getApplication();    
     dbAdapter = new DatabaseAdapter(this, app);
@@ -190,27 +193,32 @@ public class TasksActivity extends ListActivity {
 
   };
   
-  protected Runnable refreshTasksInBackground = new Runnable() {
-    
-    public void run() {
-      syncService.syncTasks();
-    }
-  };
-  
   protected Runnable syncAllInBackground = new Runnable() {
-    
+
     public void run() {
-      try {
-        syncService.syncAll();
-      } catch (FailedResponseException e) {
-        Log.e(TAG, "FailedResponseException", e);
+      if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting()
+          || connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+        try {
+          syncService.syncAll();
+        } catch (Exception e) {
+          Log.e(TAG, "Exception", e);
+          runOnUiThread(new Runnable() {
+            public void run() {
+              Toast.makeText(TasksActivity.this,
+                  getString(R.string.sync_failed), Toast.LENGTH_SHORT).show();
+              setProgressBarIndeterminateVisibility(false);
+            }
+          });
+        }
+      } else {
         runOnUiThread(new Runnable() {
           public void run() {
-            Toast.makeText(TasksActivity.this, getString(R.string.sync_failed),
-                Toast.LENGTH_SHORT).show(); 
-            setProgressBarIndeterminateVisibility(false);            
+            Toast.makeText(TasksActivity.this,
+                getString(R.string.no_internet_connection), Toast.LENGTH_SHORT)
+                .show();
+            setProgressBarIndeterminateVisibility(false);
           }
-        });        
+        });
       }
     }
   };

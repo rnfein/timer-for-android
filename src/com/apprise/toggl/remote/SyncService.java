@@ -39,8 +39,10 @@ import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.Workspace;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.provider.BaseColumns;
@@ -60,6 +62,7 @@ public class SyncService extends Service {
   
   public static final String TAG = "SyncService";
   
+  ConnectivityManager connectivityManager;
   private Toggl app;
   private TogglWebApi api;
   private DatabaseAdapter dbAdapter;
@@ -70,6 +73,7 @@ public class SyncService extends Service {
   @Override
   public void onCreate() {
     super.onCreate();
+    connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
     app = (Toggl) getApplication();
     api = new TogglWebApi(app.getAPIToken());
     dbAdapter = new DatabaseAdapter(this, app);
@@ -114,20 +118,24 @@ public class SyncService extends Service {
       syncAll();
     }
   };
-  
+
   public void syncAll() {
-    syncWorkspaces();
-    syncClients();   
-    syncTags();
-    syncProjects();     
-    syncTasks();
-    syncPlannedTasks();
-    
-    Intent intent = new Intent(SYNC_COMPLETED);
-    intent.putExtra(COLLECTION, ALL_COMPLETED);
-    sendBroadcast(intent);    
+    if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting()
+        || connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+      Log.d(TAG, "connection found, starting sync.");
+      syncWorkspaces();
+      syncClients();
+      syncTags();
+      syncProjects();
+      syncTasks();
+      syncPlannedTasks();
+
+      Intent intent = new Intent(SYNC_COMPLETED);
+      intent.putExtra(COLLECTION, ALL_COMPLETED);
+      sendBroadcast(intent);
+    }
   }
-  
+
   public void syncTasks() {
     Log.d(TAG, "#syncTasks starting to sync.");
 

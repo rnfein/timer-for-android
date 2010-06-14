@@ -7,14 +7,18 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +37,7 @@ public class AccountActivity extends Activity {
 
   private TogglWebApi webApi;
   private SyncService syncService;
+  private ConnectivityManager connectivityManager;
 
   private EditText emailEditText;
   private EditText passwordEditText;
@@ -110,6 +115,7 @@ public class AccountActivity extends Activity {
     setProgressBarIndeterminate(true);    
     app = (Toggl) getApplication();
     webApi = new TogglWebApi(app.getAPIToken());
+    connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
     Intent intent = new Intent(this, SyncService.class);
     bindService(intent, syncConnection, BIND_AUTO_CREATE);     
   }
@@ -137,7 +143,13 @@ public class AccountActivity extends Activity {
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(passwordEditText.getWindowToken(), 0);
         setProgressBarIndeterminateVisibility(true);
-        new Thread(authenticateInBackground).start();
+        if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting() ||
+            connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+          new Thread(authenticateInBackground).start();
+        } else {
+          showNoConnectionDialog();
+          setProgressBarIndeterminateVisibility(false);
+        }
       }
     });
 
@@ -148,6 +160,24 @@ public class AccountActivity extends Activity {
         startActivity(intent);
       }
     });
+  }
+  
+  private void showNoConnectionDialog() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(AccountActivity.this);
+    builder.setTitle(R.string.no_internet_connection);
+    builder.setMessage(R.string.no_internet_msg);
+    builder.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
+      
+      public void onClick(DialogInterface dialog, int which) {
+        Intent settingsIntent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+        startActivity(settingsIntent);
+      }
+    });
+    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) { }
+    });
+    builder.setCancelable(false);
+    builder.show();    
   }
   
   public void startTasksActivity() {

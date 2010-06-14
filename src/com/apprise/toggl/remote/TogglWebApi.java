@@ -105,9 +105,12 @@ public class TogglWebApi {
           reader.close();
         } catch (IOException e) {}
       }
-    } else {
+    } else if (response != null) {
       int statusCode = response.getStatusLine().getStatusCode();
-      Log.w(TAG, "TogglWebApi#userAuthentication got a failed request: " + statusCode);
+      Log.w(TAG, "TogglWebApi#userAuthentication got a failed request: "
+          + statusCode);
+    } else {
+      Log.w(TAG, "TogglWebApi#userAuthentication got no response.");      
     }
     return null;
   }
@@ -220,10 +223,13 @@ public class TogglWebApi {
             reader.close();
           } catch (IOException e) {}
         }
-      } else {
+      } else if (response != null) {
         Log.e(TAG, "TogglWebApi#fetchCollection got a failed request: "
             + response.getStatusLine().getStatusCode());
         throw new FailedResponseException();
+      } else {
+        Log.w(TAG, "TogglWebApi#fetchCollection got no response"); 
+        throw new FailedResponseException();        
       }
     } else {
       throw new NotSignedInException();
@@ -242,10 +248,13 @@ public class TogglWebApi {
           return reader;
         } catch (Exception e) {
         }
-      } else {
+      } else if (response != null) {
         Log.w(TAG, "TogglWebApi#putJSON got a failed request: "
             + response.getStatusLine().getStatusCode());
         throw new FailedResponseException();
+      } else {
+        Log.w(TAG, "TogglWebApi#putJSON got no response"); 
+        throw new FailedResponseException();        
       }
     } else {
       throw new NotSignedInException();
@@ -260,10 +269,13 @@ public class TogglWebApi {
       if (ok(response)) {
         Log.d(TAG, "TogglWebApi#postJSON got a successful response");
         return getResponseReader(response);
-      } else {
+      } else if (response != null) {
         Log.w(TAG, "TogglWebApi#postJSON got a failed request: "
             + response.getStatusLine().getStatusCode());
         throw new FailedResponseException();
+      } else {
+        Log.w(TAG, "TogglWebApi#putJSON got no response"); 
+        throw new FailedResponseException();        
       }
     } else {
       throw new NotSignedInException();
