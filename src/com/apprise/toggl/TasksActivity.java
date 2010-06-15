@@ -1,6 +1,7 @@
 package com.apprise.toggl;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -44,7 +45,8 @@ public class TasksActivity extends ListActivity {
   private SyncService syncService;
   private Toggl app;
   private User currentUser;
-  private LinkedList<TasksCursorAdapter> taskAdapters = new LinkedList<TasksCursorAdapter>();
+  private SectionedTasksAdapter adapter;
+  private LinkedList<TasksCursorAdapter> taskAdapters;
   private Button newTaskButton;
   
   private long trackedTaskId;
@@ -56,8 +58,11 @@ public class TasksActivity extends ListActivity {
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     setProgressBarIndeterminate(true);
     setContentView(R.layout.tasks);
+
+    adapter = new SectionedTasksAdapter();
+    taskAdapters = new LinkedList<TasksCursorAdapter>();
     
-    app = (Toggl) getApplication();    
+    app = (Toggl) getApplication();
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
 
@@ -133,10 +138,7 @@ public class TasksActivity extends ListActivity {
         startManagingCursor(tasksCursor);
         TasksCursorAdapter cursorAdapter = new TasksCursorAdapter(this, tasksCursor);
         taskAdapters.add(cursorAdapter);
-
-        String date = Util.smallDateString(queryCal.getTime());
-        String headerText = date + " (" + Util.secondsToHM(getDurationTotal(tasksCursor)) + " h)";
-        adapter.addSection(headerText, cursorAdapter);
+        adapter.addSection(queryCal.getTime(), cursorAdapter);
       }
       else {
         tasksCursor.close();
@@ -151,9 +153,21 @@ public class TasksActivity extends ListActivity {
   private long getDurationTotal(Cursor tasksCursor) {
     long duration_total = 0;
     long duration = 0;
-    while (tasksCursor.moveToNext()) {
-      duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));
-      if (duration > 0) duration_total += duration; 
+    long id = 0;
+
+    tasksCursor.moveToFirst();
+
+    while (!tasksCursor.isAfterLast()) {
+      id = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks._ID));
+      
+      if (id == trackedTaskId) {
+        duration = Util.convertIfRunningTime(trackedTaskDurationSeconds);
+      } else {
+        duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));  
+      }
+
+      duration_total += duration;
+      tasksCursor.moveToNext();
     }
     return duration_total;
   }
@@ -223,8 +237,7 @@ public class TasksActivity extends ListActivity {
         runOnUiThread(new Runnable() {
           public void run() {
             Toast.makeText(TasksActivity.this,
-                getString(R.string.no_internet_connection), Toast.LENGTH_SHORT)
-                .show();
+                getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
             setProgressBarIndeterminateVisibility(false);
           }
         });
@@ -248,17 +261,31 @@ public class TasksActivity extends ListActivity {
         trackedTaskDurationSeconds = intent.getLongExtra(TimeTrackingService.TRACKED_TASK_DURATION, -1);
         
         for (TasksCursorAdapter taskAdapter : taskAdapters) {
-          TextView durationView = taskAdapter.getDurationView(trackedTaskId); 
+          TextView durationView = taskAdapter.getDurationView(trackedTaskId);
           if (durationView != null) {
             durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
+
+            SectionedHeader header = adapter.getHeader(taskAdapters.indexOf(taskAdapter));
+            header.cursor = taskAdapter.getCursor();
+            header.update();
             break;
           }
         }
       }
     }
   };
+  
+  private class SectionedTasksAdapter extends SectionedAdapter {
+    
+    private LinkedList<SectionedHeader> headers = new LinkedList<SectionedHeader>();
+    
+    public void addSection(Date tasksDate, CursorAdapter adapter) {
+      SectionedHeader header = new SectionedHeader(tasksDate, adapter.getCursor());
 
-  SectionedAdapter adapter = new SectionedAdapter() {
+      headers.add(header);
+      addSection(header.toString(), adapter);
+    }
+
     protected View getHeaderView(String caption, int index, View convertView, ViewGroup parent) {
       LinearLayout result = (LinearLayout) convertView;
 
@@ -266,12 +293,40 @@ public class TasksActivity extends ListActivity {
         result = (LinearLayout) getLayoutInflater().inflate(R.layout.tasks_group_header, null);
       }
 
-      TextView header = (TextView) result.findViewById(R.id.task_list_header_text);      
-      header.setText(caption);
+      TextView headerView = (TextView) result.findViewById(R.id.task_list_header_text);      
+      headerView.setText(caption);
+      headers.get(index).textView = headerView;
 
       return result;
     }
+    
+    public SectionedHeader getHeader(int index) {
+      return headers.get(index);
+    }
+    
   };
+  
+  private class SectionedHeader {
+
+    public TextView textView;
+    public Date tasksDate;
+    public Cursor cursor;
+    
+    public SectionedHeader(Date tasksDate, Cursor cursor) {
+      this.tasksDate = tasksDate;
+      this.cursor = cursor;
+    }
+
+    public void update() {
+      textView.setText(toString());
+    }
+    
+    public String toString() {
+      String prettyDate = Util.smallDateString(tasksDate);
+      String prettyTotal = Util.secondsToHM(getDurationTotal(cursor)); 
+      return prettyDate + " (" + prettyTotal + " h)";
+    }
+  }
   
   private class TasksCursorAdapter extends CursorAdapter {
 
