@@ -23,8 +23,6 @@ package com.apprise.toggl.remote;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.storage.DatabaseAdapter;
@@ -39,6 +37,8 @@ import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.Workspace;
 import com.apprise.toggl.tracking.TimeTrackingService;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -46,6 +46,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -68,8 +69,8 @@ public class SyncService extends Service {
   private TogglWebApi api;
   private DatabaseAdapter dbAdapter;
   
-  private Timer syncTimer;  
-  private long syncRate = 60; //min
+  AlarmManager alarms;
+  PendingIntent alarmIntent;
   
   @Override
   public void onCreate() {
@@ -86,9 +87,7 @@ public class SyncService extends Service {
 
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
-    
-    syncTimer = new Timer("syncSchedule");    
-    syncTimer.scheduleAtFixedRate(scheduledSync, 0, syncRate*60*1000);
+    initSyncSchedule();
   }
   
   @Override
@@ -121,12 +120,20 @@ public class SyncService extends Service {
     api.setApiToken(apiToken);
   }
 
-  private TimerTask scheduledSync = new TimerTask() {
-    public void run() {
-      Log.d(TAG, "scheduled sync called");
-      syncAll();
-    }
-  };
+  private void initSyncSchedule() {
+    Log.d(TAG, "initing schedule");
+    Intent intent = new Intent(SyncService.this, SyncAlarmReceiver.class);
+    PendingIntent sender = PendingIntent.getBroadcast(SyncService.this,
+            0, intent, 0);
+
+    long timeToRefresh = SystemClock.elapsedRealtime() + 
+    30*1000;
+
+    // Schedule the alarm!
+    AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+    am.setRepeating(AlarmManager.ELAPSED_REALTIME,
+                    timeToRefresh, 30*1000, sender);    
+  }
 
   public void syncAll() {
     if (app.isConnected()) {
