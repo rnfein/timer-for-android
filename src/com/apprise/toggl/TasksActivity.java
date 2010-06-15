@@ -215,6 +215,8 @@ public class TasksActivity extends ListActivity {
 
   };
   
+  
+  
   protected Runnable syncAllInBackground = new Runnable() {
 
     public void run() {
