@@ -9,7 +9,6 @@ import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
-import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.tracking.TimeTrackingService;
 import com.apprise.toggl.widget.SectionedAdapter;
@@ -201,6 +200,8 @@ public class TasksActivity extends ListActivity {
     }
 
   };
+  
+  
   
   protected Runnable syncAllInBackground = new Runnable() {
 

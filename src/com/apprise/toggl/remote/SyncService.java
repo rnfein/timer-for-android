@@ -134,6 +134,25 @@ public class SyncService extends Service {
       sendBroadcast(intent);
     }
   }
+  
+  public void createOrUpdateRemoteTask(Task task) {
+    if (app.isConnected()) {    
+      Log.d(TAG, "connection found, #createOrUpdateRemoteTask starting.");
+      if (task.id > 0) {
+        Task updatedTask = api.updateTask(task, app);
+        task.updateAttributes(updatedTask);
+        task.sync_dirty = false;
+        dbAdapter.updateTask(task);
+      } else {
+        Task createdTask = api.createTask(task, app);
+        task.updateAttributes(createdTask);
+        task.sync_dirty = false;
+        dbAdapter.updateTask(task);        
+      }
+      // sync projects in case user created one
+      syncProjects();
+    }
+  }
 
   public void syncTasks() {
     Log.d(TAG, "#syncTasks starting to sync.");

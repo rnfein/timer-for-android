@@ -3,6 +3,7 @@ package com.apprise.toggl;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
@@ -46,6 +47,7 @@ public class TaskActivity extends ApplicationActivity {
   private static final int DATE_DIALOG_ID = 0;
   static final int CREATE_NEW_PROJECT_REQUEST = 1;
 
+  private SyncService syncService;
   private DatabaseAdapter dbAdapter;
   private TimeTrackingService trackingService;
   private Task task;
@@ -67,6 +69,9 @@ public class TaskActivity extends ApplicationActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.task);
     app = (Toggl) getApplication();
+
+    Intent syncServiceIntent = new Intent(this, SyncService.class);
+    bindService(syncServiceIntent, syncConnection, BIND_AUTO_CREATE);    
     
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
@@ -81,11 +86,11 @@ public class TaskActivity extends ApplicationActivity {
       newTask = true;
     }
 
-    Intent intent = new Intent(this, TimeTrackingService.class);
+    Intent timeTrackingServiceIntent = new Intent(this, TimeTrackingService.class);
     if (!TimeTrackingService.isAlive()) {
-      startService(intent);
+      startService(timeTrackingServiceIntent);
     }
-    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
+    bindService(timeTrackingServiceIntent, trackingConnection, BIND_AUTO_CREATE);
 
     initViews();
     attachEvents();
@@ -131,6 +136,7 @@ public class TaskActivity extends ApplicationActivity {
   protected void onPause() {
     task.description = descriptionView.getText().toString();
     saveTask();
+    new Thread(postTaskInBackground).start();    
     super.onPause();
   }
 
@@ -138,6 +144,7 @@ public class TaskActivity extends ApplicationActivity {
   protected void onDestroy() {
     dbAdapter.close();
     unbindService(trackingConnection);
+    unbindService(syncConnection);    
     super.onDestroy();
   }
 
@@ -645,5 +652,30 @@ public class TaskActivity extends ApplicationActivity {
       }
     }
   }
+  
+  protected ServiceConnection syncConnection = new ServiceConnection() {
+    
+    public void onServiceDisconnected(ComponentName name) {}
+    
+    public void onServiceConnected(ComponentName name, IBinder serviceBinding) {
+      SyncService.SyncBinder binding = (SyncService.SyncBinder) serviceBinding;
+      syncService = binding.getService();
+    }
 
+  };  
+
+  
+  protected Runnable postTaskInBackground = new Runnable() {
+
+    public void run() {
+      if (app.isConnected()) {
+        try {
+          syncService.createOrUpdateRemoteTask(task);
+        } catch (Exception e) {
+          Log.e(TAG, "Exception", e);
+        }
+      }
+    }
+  };  
+  
 }
