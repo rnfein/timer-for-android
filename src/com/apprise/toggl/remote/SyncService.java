@@ -96,6 +96,12 @@ public class SyncService extends Service {
     unbindService(trackingConnection);
     super.onDestroy();
   }
+  
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    new Thread(syncAllInBackground).start();
+    return super.onStartCommand(intent, flags, startId);
+  }
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -122,17 +128,16 @@ public class SyncService extends Service {
 
   private void initSyncSchedule() {
     Log.d(TAG, "initing schedule");
-    Intent intent = new Intent(SyncService.this, SyncAlarmReceiver.class);
+    Intent intent = new Intent(SyncAlarmReceiver.ACTION_SYNC_ALARM);
     PendingIntent sender = PendingIntent.getBroadcast(SyncService.this,
             0, intent, 0);
 
-    long timeToRefresh = SystemClock.elapsedRealtime() + 
-    30*1000;
+    long timeToRefresh = SystemClock.elapsedRealtime() + 1000;
 
     // Schedule the alarm!
     AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
     am.setRepeating(AlarmManager.ELAPSED_REALTIME,
-                    timeToRefresh, 30*1000, sender);    
+                    timeToRefresh, 1*60*1000, sender);    
   }
 
   public void syncAll() {
@@ -150,6 +155,18 @@ public class SyncService extends Service {
       sendBroadcast(intent);
     }
   }
+
+  protected Runnable syncAllInBackground = new Runnable() {
+
+    public void run() {
+      try {
+        syncAll();
+      } catch (Exception e) {
+        Log.e(TAG, "Exception", e);
+      }
+    }
+  };
+  
   
   public void createOrUpdateRemoteTask(Task task) {
     if (app.isConnected()) {    
