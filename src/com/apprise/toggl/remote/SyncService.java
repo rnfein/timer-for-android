@@ -68,7 +68,7 @@ public class SyncService extends Service {
   private DatabaseAdapter dbAdapter;
   
   private Timer syncTimer;  
-  private long syncRate = 10; //min
+  private long syncRate = 60; //min
   
   @Override
   public void onCreate() {
@@ -120,8 +120,7 @@ public class SyncService extends Service {
   };
 
   public void syncAll() {
-    if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting()
-        || connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+    if (app.isConnected()) {
       Log.d(TAG, "connection found, starting sync.");
       syncWorkspaces();
       syncClients();
@@ -149,6 +148,8 @@ public class SyncService extends Service {
       
       public void updateLocalEntry(Model model) {
         dbAdapter.updateTask((Task) model);
+        // TODO: 1) start tracking if duration is neg. value
+        // 2) stop tracking if duration is pos. value and isTracking(task)
       }
       
       public Model getLocalEntry(long remoteId) {
@@ -181,6 +182,7 @@ public class SyncService extends Service {
       public Model createLocalEntry(Model model) {
         Log.d(TAG, "creating local task: " + ((Task) model).description);        
         return dbAdapter.createTask((Task) model);
+        // TODO: start tracking if duration is neg. value
       }
       
       public Model mapEntryFromCursor(Cursor cursor) {
