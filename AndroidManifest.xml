@@ -32,6 +32,11 @@
       </intent-filter>    
     </activity>
     <activity android:name="SignUpActivity"/>
+    <receiver android:name=".remote.SyncAlarmReceiver">
+      <intent-filter>
+        <action android:name="com.apprise.toggl.remote.ACTION_SYNC_ALARM"/>
+      </intent-filter>
+    </receiver>    
     <service android:enabled="true" android:name=".remote.SyncService" />
     <service android:enabled="true" android:name=".tracking.TimeTrackingService" />
   </application>
