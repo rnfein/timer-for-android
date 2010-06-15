@@ -486,16 +486,17 @@ public class TaskActivity extends ApplicationActivity {
             int minutes = minutesPicker.getCurrent();
             // only hours and minutes are picked, hence get the
             // seconds from existing task duration
-            int seconds = (int) task.duration % 60;
+            int seconds = (int) Util.convertIfRunningTime(task.duration) % 60;
 
             long duration = (hours * 60 * 60) + (minutes * 60) + seconds;
+            if (trackingService.isTracking(task)) {
+              duration = Util.getRunningTimeStart(duration);              
+              trackingService.setCurrentDuration(duration);
+            }
+            
             task.duration = duration;
             saveTask();
             updateDuration();
-
-            if (trackingService.isTracking(task)) {
-              trackingService.setCurrentDuration(duration);
-            }
           }
         });
     builder.setNegativeButton(R.string.cancel,

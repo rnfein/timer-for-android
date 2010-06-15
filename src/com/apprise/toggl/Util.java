@@ -105,6 +105,10 @@ public class Util {
     return (int) ((time/3600) % 24);
   }
 
+  /*
+   *  neg. value provided means "running time's start" in seconds since epoch * -1
+   *  this function gives back seconds since "running time's start"
+   */
   public static long convertIfRunningTime(long time) {
     if (time < 0) {
       long currentTimeSeconds = System.currentTimeMillis() / 1000;
@@ -113,6 +117,10 @@ public class Util {
     return time;
   }  
   
+  /*
+   * Calculates the start of "running time" in seconds since epoch.
+   * Makes it a neg. value to distinguish its meaning.
+   */
   public static long getRunningTimeStart(long time) {
     long currentTimeSeconds = System.currentTimeMillis() / 1000;
     long trackingStartSinceEpoch = currentTimeSeconds - time;

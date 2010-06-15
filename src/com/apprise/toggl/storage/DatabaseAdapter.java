@@ -315,6 +315,24 @@ public class DatabaseAdapter {
     }
   }
   
+  public Task findRunningTask() { // TODO: tests
+    Cursor cursor = db.rawQuery("SELECT * " + " FROM " + Tasks.TABLE_NAME
+        + " WHERE " + Tasks.DURATION + " < 0 " + " AND " + Tasks.TABLE_NAME
+        + "." + Tasks.OWNER_USER_ID + " = ?", new String[] { String.valueOf(app
+        .getCurrentUser()._id) });
+
+    if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
+      cursor.close();
+      return null;
+    } else {
+      try {
+        return ORM.mapTask(cursor, this);
+      } finally {
+        safeClose(cursor);
+      }
+    }
+  }
+  
   public Task findTaskByRemoteId(long remoteId) {
     Cursor cursor = getMovedCursor(Tasks.TABLE_NAME, Tasks.REMOTE_ID, remoteId);
     try {
