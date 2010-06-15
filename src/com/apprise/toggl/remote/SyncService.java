@@ -37,12 +37,13 @@ import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Tag;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.Workspace;
+import com.apprise.toggl.tracking.TimeTrackingService;
 
 import android.app.Service;
-import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.provider.BaseColumns;
@@ -62,7 +63,7 @@ public class SyncService extends Service {
   
   public static final String TAG = "SyncService";
   
-  ConnectivityManager connectivityManager;
+  private TimeTrackingService trackingService;
   private Toggl app;
   private TogglWebApi api;
   private DatabaseAdapter dbAdapter;
@@ -73,9 +74,16 @@ public class SyncService extends Service {
   @Override
   public void onCreate() {
     super.onCreate();
-    connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+    Intent intent = new Intent(this, TimeTrackingService.class);
+    if (!TimeTrackingService.isAlive()) {
+      startService(intent);
+    }
+    bindService(intent, trackingConnection, BIND_AUTO_CREATE);
+    
     app = (Toggl) getApplication();
     api = new TogglWebApi(app.getAPIToken());
+
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
     
@@ -86,6 +94,7 @@ public class SyncService extends Service {
   @Override
   public void onDestroy() {
     dbAdapter.close();
+    unbindService(trackingConnection);
     super.onDestroy();
   }
 
@@ -137,7 +146,7 @@ public class SyncService extends Service {
 
   public void syncTasks() {
     Log.d(TAG, "#syncTasks starting to sync.");
-
+    
     sync(dbAdapter.findAllTasks(), api.fetchTasks(), new SyncProxy() {
       
       public void updateRemoteEntry(Model model) {
@@ -147,9 +156,19 @@ public class SyncService extends Service {
       }
       
       public void updateLocalEntry(Model model) {
-        dbAdapter.updateTask((Task) model);
-        // TODO: 1) start tracking if duration is neg. value
-        // 2) stop tracking if duration is pos. value and isTracking(task)
+        Task task = (Task) model;
+        dbAdapter.updateTask(task);
+        
+        // negative number means that the task is currently
+        // being tracked
+        if (task.duration < 0) {
+          triggerTracking(task);
+        }
+        else if (trackingService.isTracking(task)) {
+          // tracking has been stopped from the api
+          // close it locally as well
+          trackingService.stopTracking();
+        }
       }
       
       public Model getLocalEntry(long remoteId) {
@@ -180,9 +199,17 @@ public class SyncService extends Service {
       }
       
       public Model createLocalEntry(Model model) {
-        Log.d(TAG, "creating local task: " + ((Task) model).description);        
-        return dbAdapter.createTask((Task) model);
-        // TODO: start tracking if duration is neg. value
+        Task task = (Task) model;
+        Log.d(TAG, "creating local task: " + task.description);
+
+        task = dbAdapter.createTask(task);
+        
+        // if is tracking remotely
+        if (task.duration < 0) {
+          triggerTracking(task);
+        }
+        
+        return task;
       }
       
       public Model mapEntryFromCursor(Cursor cursor) {
@@ -515,6 +542,27 @@ public class SyncService extends Service {
 
     localCursor.close();
     proxy.broadcastSyncCompleted();
+  }
+  
+  private ServiceConnection trackingConnection = new ServiceConnection() {
+
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      TimeTrackingService.TimeTrackingBinder binding = (TimeTrackingService.TimeTrackingBinder) service;
+      trackingService = binding.getService();
+    }
+
+    public void onServiceDisconnected(ComponentName name) {}
+
+  };
+  
+  /**
+   * Only starts tracking if timer service is not already tracking
+   * a task, any task. 
+   */
+  private void triggerTracking(Task task) {
+    if (!trackingService.isTracking()) {
+      trackingService.startTracking(task);
+    }
   }
   
 }

@@ -289,6 +289,7 @@ public class TaskActivity extends ApplicationActivity {
       Task currentlyTracked = trackingService.getTrackedTask();
       currentlyTracked.duration = trackingService.stopTracking();
       currentlyTracked.stop = Util.formatDateToString(Util.currentDate());
+
       saveTask(currentlyTracked);
 
       startTracking = true;
@@ -299,6 +300,7 @@ public class TaskActivity extends ApplicationActivity {
     if (startTracking) {
       task.duration = trackingService.startTracking(task);
       saveTask();
+
       timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);          
     }
   }
