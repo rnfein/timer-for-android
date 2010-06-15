@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import com.apprise.toggl.R;
 import com.apprise.toggl.TaskActivity;
+import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.models.Task;
 
 import android.app.Notification;
@@ -62,9 +63,9 @@ public class TimeTrackingService extends ServiceCompat {
 
   }
   
-  public void startTracking(Task task) {
+  public long startTracking(Task task) {
     this.task = task;
-    seconds = this.task.duration;
+    setCurrentDuration(this.task.duration);
     
     timer = new Timer();
     timer.schedule(new TimerTask() {
@@ -78,14 +79,17 @@ public class TimeTrackingService extends ServiceCompat {
 
     pushToForeground();
     isTracking = true;
+    return Util.getRunningTimeStart(seconds);
   }
   
-  public void stopTracking() {
+  public long stopTracking() {
+    long endDuration = seconds;
     timer.cancel();
     task = null;
     seconds = 0;
     pullFromForeground();
     isTracking = false;
+    return endDuration;
   }
 
   public Task getTrackedTask() {
@@ -93,11 +97,15 @@ public class TimeTrackingService extends ServiceCompat {
   }
   
   public long getCurrentDuration() {
-    return seconds;
+    if (isTracking) {
+      return Util.getRunningTimeStart(seconds);
+    } else {
+      return seconds;
+    }
   }
   
   public void setCurrentDuration(long seconds) {
-    this.seconds = seconds;
+    this.seconds = Util.convertIfRunningTime(seconds);
   }
 
   /**

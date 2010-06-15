@@ -84,6 +84,8 @@ public class Util {
   }  
   
   public static String secondsToHMS(long time){
+    time = convertIfRunningTime(time);
+    
     int seconds = (int)(time % 60);    
     int minutes = getMinutesFromSeconds(time);
     int hours = getHoursFromSeconds(time);
@@ -94,12 +96,28 @@ public class Util {
   }
   
   public static int getMinutesFromSeconds(long time) {
+    time = convertIfRunningTime(time);
     return (int) ((time/60) % 60);
   }
 
   public static int getHoursFromSeconds(long time) {
+    time = convertIfRunningTime(time);    
     return (int) ((time/3600) % 24);
   }
+
+  public static long convertIfRunningTime(long time) {
+    if (time < 0) {
+      long currentTimeSeconds = System.currentTimeMillis() / 1000;
+      time = currentTimeSeconds + time;
+    }
+    return time;
+  }  
+  
+  public static long getRunningTimeStart(long time) {
+    long currentTimeSeconds = System.currentTimeMillis() / 1000;
+    long trackingStartSinceEpoch = currentTimeSeconds - time;
+    return -(trackingStartSinceEpoch);
+  }  
   
   public static String joinStringArray(String[] array, String separator){
     if (array != null) {

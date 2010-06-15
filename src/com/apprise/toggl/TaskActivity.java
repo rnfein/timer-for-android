@@ -280,14 +280,14 @@ public class TaskActivity extends ApplicationActivity {
   private void triggerTracking() {
     boolean startTracking = false;
     if (trackingService.isTracking(task)) {
-      trackingService.stopTracking();
+      task.duration = trackingService.stopTracking();
       task.stop = Util.formatDateToString(Util.currentDate());
       saveTask();
       timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
     } else if (trackingService.isTracking()) {
       // is tracking another task, stop it and save
       Task currentlyTracked = trackingService.getTrackedTask();
-      trackingService.stopTracking();
+      currentlyTracked.duration = trackingService.stopTracking();
       currentlyTracked.stop = Util.formatDateToString(Util.currentDate());
       saveTask(currentlyTracked);
 
@@ -297,7 +297,8 @@ public class TaskActivity extends ApplicationActivity {
     }
     
     if (startTracking) {
-      trackingService.startTracking(task);
+      task.duration = trackingService.startTracking(task);
+      saveTask();
       timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);          
     }
   }

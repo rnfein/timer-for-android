@@ -15,7 +15,7 @@
     <string name="planned_task">Planned Task</string>    
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
-    <string name="syncing">Fetching your tasks...</string>
+    <string name="syncing">Synchronizing tasks...</string>
     <string name="sync_failed">Synchronization failed</string>
     <string name="name">Name</string>
     <string name="cancel">Cancel</string>
@@ -34,7 +34,7 @@
     <string name="password">Password</string>
     <string name="log_in">Log in</string>
     <string name="create_account">Create a new account</string>
-    <string name="logging_in">Signing you in...</string>
+    <string name="logging_in">Signing in...</string>
     
     <string name="choose_tip">(choose)</string>
     <string name="no_project">No Project</string>
