@@ -549,6 +549,9 @@ public class TaskActivity extends ApplicationActivity {
     builder.setPositiveButton(R.string.yes,
         new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
+            if (trackingService.isTracking(task)) {
+              trackingService.stopTracking();
+            }
             dbAdapter.deleteTask(task);
             finish();
           }
