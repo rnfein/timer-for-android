@@ -104,28 +104,26 @@ public class SyncService extends Service {
     // explicitly started, not bound by an activity,
     // hence start complete sync immediately
 
-    // to avoid interfering with explicitly started sync  
+    // to avoid interfering with explicitly started sync
     if (!isSyncingAll) {
       isSyncingAll = true;
 
-      try {
-        new Thread(new Runnable() {
-          public void run() {
-            try {
-              
-              syncAllModels();
-              
-              Intent intent = new Intent(SYNC_COMPLETED);
-              intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);        
-              sendBroadcast(intent);
-            } catch(Exception e) {
-              Log.e(TAG, "Error while syncing implicitly.", e);
-            }
+      new Thread(new Runnable() {
+        public void run() {
+          try {
+
+            syncAllModels();
+
+            Intent intent = new Intent(SYNC_COMPLETED);
+            intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);
+            sendBroadcast(intent);
+          } catch (Exception e) {
+            Log.e(TAG, "Error while syncing implicitly.", e);
+          } finally {
+            isSyncingAll = false;
           }
-        }).start();        
-      } finally {
-        isSyncingAll = false;
-      }
+        }
+      }).start();
     }
 
     return START_NOT_STICKY;
@@ -155,6 +153,7 @@ public class SyncService extends Service {
   }
 
   public void syncAll() {
+    Log.d(TAG, "isSyncingAll: " + isSyncingAll);
     if (app.isConnected() && !isSyncingAll) {
       isSyncingAll = true;
       Log.d(TAG, "connection found, starting sync.");
