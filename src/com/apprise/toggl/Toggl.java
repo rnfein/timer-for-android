@@ -1,11 +1,18 @@
 package com.apprise.toggl;
 
+import com.apprise.toggl.remote.SyncAlarmReceiver;
+import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.models.User;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
+import android.os.SystemClock;
+import android.util.Log;
 
 public class Toggl extends Application {
 
@@ -17,6 +24,9 @@ public class Toggl extends Application {
   private ConnectivityManager connectivityManager;
   private User currentUser;
 
+  private AlarmManager am;
+  private PendingIntent syncAlarmIntent;  
+  
   public Toggl getInstance() {
     return singleton;
   }
@@ -49,6 +59,7 @@ public class Toggl extends Application {
   }
   
   public void logOut() {
+    clearSyncSchedule();
     clearCurrentUser();
     storeAPIToken(null);
   }
@@ -56,6 +67,24 @@ public class Toggl extends Application {
   public boolean isConnected() {
     return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting() ||
         connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+  }
+
+  public void initSyncSchedule() {
+    Log.d("Toggl", "initing schedule");
+    Intent intent = new Intent(SyncAlarmReceiver.ACTION_SYNC_ALARM);
+    syncAlarmIntent = PendingIntent.getBroadcast(this,
+            0, intent, 0);
+
+    long timeToRefresh = SystemClock.elapsedRealtime() + 1000;
+
+    // Schedule the alarm!
+    am = (AlarmManager)getSystemService(ALARM_SERVICE);
+    am.setRepeating(AlarmManager.ELAPSED_REALTIME,
+                    timeToRefresh, 60*1000, syncAlarmIntent);    
+  }
+  
+  public void clearSyncSchedule() {
+    am.cancel(syncAlarmIntent);
   }
 
   @Override

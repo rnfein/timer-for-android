@@ -46,7 +46,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -55,6 +54,7 @@ public class SyncService extends Service {
   public static final String SYNC_COMPLETED = "com.apprise.toggl.remote.SYNC_COMPLETED";
   public static final String COLLECTION = "com.apprise.toggl.remote.COLLECTION";
   public static final String ALL_COMPLETED = "com.apprise.toggl.remote.ALL_COMPLETED";
+  public static final String ALL_COMPLETED_SCHEDULED = "com.apprise.toggl.remote.ALL_COMPLETED_SCHEDULED";
   public static final String PROJECTS_COMPLETED = "com.apprise.toggl.remote.PROJECTS_COMPLETED";
   public static final String TASKS_COMPLETED = "com.apprise.toggl.remote.TASKS_COMPLETED";
   public static final String CLIENTS_COMPLETED = "com.apprise.toggl.remote.CLIENTS_COMPLETED";
@@ -87,7 +87,7 @@ public class SyncService extends Service {
 
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
-    initSyncSchedule();
+    app.initSyncSchedule();
   }
   
   @Override
@@ -126,21 +126,8 @@ public class SyncService extends Service {
     api.setApiToken(apiToken);
   }
 
-  private void initSyncSchedule() {
-    Log.d(TAG, "initing schedule");
-    Intent intent = new Intent(SyncAlarmReceiver.ACTION_SYNC_ALARM);
-    PendingIntent sender = PendingIntent.getBroadcast(SyncService.this,
-            0, intent, 0);
 
-    long timeToRefresh = SystemClock.elapsedRealtime() + 1000;
-
-    // Schedule the alarm!
-    AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-    am.setRepeating(AlarmManager.ELAPSED_REALTIME,
-                    timeToRefresh, AlarmManager.INTERVAL_HOUR, sender);    
-  }
-
-  public void syncAll() {
+  public void syncAll(boolean scheduled) {
     if (app.isConnected()) {
       Log.d(TAG, "connection found, starting sync.");
       syncWorkspaces();
@@ -151,7 +138,11 @@ public class SyncService extends Service {
       syncPlannedTasks();
 
       Intent intent = new Intent(SYNC_COMPLETED);
-      intent.putExtra(COLLECTION, ALL_COMPLETED);
+      if (scheduled) {
+        intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);
+      } else {
+        intent.putExtra(COLLECTION, ALL_COMPLETED);        
+      }
       sendBroadcast(intent);
     }
   }
@@ -160,7 +151,7 @@ public class SyncService extends Service {
 
     public void run() {
       try {
-        syncAll();
+        syncAll(true);
       } catch (Exception e) {
         Log.e(TAG, "Exception", e);
       }
