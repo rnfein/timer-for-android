@@ -120,8 +120,7 @@ public class SyncService extends Service {
   };
 
   public void syncAll() {
-    if (connectivityManager.getNetworkInfo(0).isConnectedOrConnecting()
-        || connectivityManager.getNetworkInfo(1).isConnectedOrConnecting()) {
+    if (app.isConnected()) {
       Log.d(TAG, "connection found, starting sync.");
       syncWorkspaces();
       syncClients();
