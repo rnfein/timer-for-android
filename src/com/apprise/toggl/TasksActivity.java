@@ -155,20 +155,24 @@ public class TasksActivity extends ListActivity {
     long duration = 0;
     long id = 0;
 
-    tasksCursor.moveToFirst();
+    // TODO shouldn't be here if cursor is closed
+    if (!tasksCursor.isClosed()) {
+      tasksCursor.moveToFirst();
 
-    while (!tasksCursor.isAfterLast()) {
-      id = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks._ID));
-      
-      if (id == trackedTaskId) {
-        duration = Util.convertIfRunningTime(trackedTaskDurationSeconds);
-      } else {
-        duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));  
-      }
+      while (!tasksCursor.isAfterLast()) {
+        id = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks._ID));
+        
+        if (id == trackedTaskId) {
+          duration = Util.convertIfRunningTime(trackedTaskDurationSeconds);
+        } else {
+          duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));  
+        }
 
-      duration_total += duration;
-      tasksCursor.moveToNext();
+        duration_total += duration;
+        tasksCursor.moveToNext();
+      }      
     }
+
     return duration_total;
   }
   
