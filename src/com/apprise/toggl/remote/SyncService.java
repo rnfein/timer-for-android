@@ -64,6 +64,8 @@ public class SyncService extends Service {
   
   public static final String TAG = "SyncService";
   
+  public static boolean isSyncingAll = false;
+  
   private TimeTrackingService trackingService;
   private Toggl app;
   private TogglWebApi api;
@@ -100,21 +102,33 @@ public class SyncService extends Service {
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     // explicitly started, not bound by an activity,
-    // hence start complete sync immediately 
-    new Thread(new Runnable() {
-      public void run() {
-        try {
-          syncAllModels();
-          
-          Intent intent = new Intent(SYNC_COMPLETED);
-          intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);        
-          sendBroadcast(intent);
-        } catch(Exception e) {
-          Log.e(TAG, "Error while syncing implicitly.", e);
-        }
+    // hence start complete sync immediately
+
+    // to avoid interfering with explicitly started sync  
+    if (!isSyncingAll) {
+      isSyncingAll = true;
+
+      try {
+        new Thread(new Runnable() {
+          public void run() {
+            try {
+              
+              syncAllModels();
+              
+              Intent intent = new Intent(SYNC_COMPLETED);
+              intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);        
+              sendBroadcast(intent);
+            } catch(Exception e) {
+              Log.e(TAG, "Error while syncing implicitly.", e);
+            }
+          }
+        }).start();        
+      } finally {
+        isSyncingAll = false;
       }
-    }).start();
-    return START_STICKY;
+    }
+
+    return START_NOT_STICKY;
   }
 
   @Override
@@ -141,13 +155,19 @@ public class SyncService extends Service {
   }
 
   public void syncAll() {
-    if (app.isConnected()) {
+    if (app.isConnected() && !isSyncingAll) {
+      isSyncingAll = true;
       Log.d(TAG, "connection found, starting sync.");
-      syncAllModels();
+      
+      try {
+        syncAllModels();
 
-      Intent intent = new Intent(SYNC_COMPLETED);
-      intent.putExtra(COLLECTION, ALL_COMPLETED);        
-      sendBroadcast(intent);
+        Intent intent = new Intent(SYNC_COMPLETED);
+        intent.putExtra(COLLECTION, ALL_COMPLETED);        
+        sendBroadcast(intent);        
+      } finally {
+        isSyncingAll = false;
+      }
     }
   }
 
