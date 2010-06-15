@@ -222,8 +222,7 @@ public class TasksActivity extends ListActivity {
     public void run() {
       if (app.isConnected()) {
         try {
-          boolean scheduled = false;
-          syncService.syncAll(scheduled);
+          syncService.syncAll();
         } catch (Exception e) {
           Log.e(TAG, "Exception", e);
           runOnUiThread(new Runnable() {
@@ -251,11 +250,14 @@ public class TasksActivity extends ListActivity {
     @Override
     public void onReceive(Context context, Intent intent) {
       if (SyncService.SYNC_COMPLETED.equals(intent.getAction())) {
-        if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED) || 
-            intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED_SCHEDULED)) {
-          Log.d(TAG, "received Broadcast: sync all completed");
+        String syncedHeader = intent.getStringExtra(SyncService.COLLECTION); 
+        if (SyncService.ALL_COMPLETED.equals(syncedHeader) ||
+            SyncService.ALL_COMPLETED_SCHEDULED.equals(syncedHeader)) {
+          Log.d(TAG, "Received Broadcast: sync all completed");
+
           adapter.clearSections();
           populateList();
+
           setProgressBarIndeterminateVisibility(false);      
         }        
       }

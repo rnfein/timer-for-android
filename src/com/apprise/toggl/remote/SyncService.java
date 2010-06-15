@@ -99,8 +99,22 @@ public class SyncService extends Service {
   
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    new Thread(syncAllInBackground).start();
-    return super.onStartCommand(intent, flags, startId);
+    // explicitly started, not bound by an activity,
+    // hence start complete sync immediately 
+    new Thread(new Runnable() {
+      public void run() {
+        try {
+          syncAllModels();
+          
+          Intent intent = new Intent(SYNC_COMPLETED);
+          intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);        
+          sendBroadcast(intent);
+        } catch(Exception e) {
+          Log.e(TAG, "Error while syncing implicitly.", e);
+        }
+      }
+    }).start();
+    return START_STICKY;
   }
 
   @Override
@@ -126,38 +140,18 @@ public class SyncService extends Service {
     api.setApiToken(apiToken);
   }
 
-
-  public void syncAll(boolean scheduled) {
+  public void syncAll() {
     if (app.isConnected()) {
       Log.d(TAG, "connection found, starting sync.");
-      syncWorkspaces();
-      syncClients();
-      syncTags();
-      syncProjects();
-      syncTasks();
-      syncPlannedTasks();
+      syncAllModels();
 
       Intent intent = new Intent(SYNC_COMPLETED);
-      if (scheduled) {
-        intent.putExtra(COLLECTION, ALL_COMPLETED_SCHEDULED);
-      } else {
-        intent.putExtra(COLLECTION, ALL_COMPLETED);        
-      }
+      intent.putExtra(COLLECTION, ALL_COMPLETED);        
       sendBroadcast(intent);
     }
   }
 
-  protected Runnable syncAllInBackground = new Runnable() {
 
-    public void run() {
-      try {
-        syncAll(true);
-      } catch (Exception e) {
-        Log.e(TAG, "Exception", e);
-      }
-    }
-  };
-  
   
   public void createOrUpdateRemoteTask(Task task) {
     if (app.isConnected()) {    
@@ -588,6 +582,15 @@ public class SyncService extends Service {
     public void onServiceDisconnected(ComponentName name) {}
 
   };
+  
+  private void syncAllModels() {
+    syncWorkspaces();
+    syncClients();
+    syncTags();
+    syncProjects();
+    syncTasks();
+    syncPlannedTasks();    
+  }
   
   /**
    * Only starts tracking if timer service is not already tracking

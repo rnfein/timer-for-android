@@ -274,8 +274,7 @@ public class AccountActivity extends Activity {
     public void run() {
       syncService.setApiToken(app.getAPIToken());
       try {
-        boolean scheduled = false;
-        syncService.syncAll(scheduled);
+        syncService.syncAll();
       } catch (FailedResponseException e) {
         Log.e(TAG, "FailedResponseException", e);
         runOnUiThread(new Runnable() {
