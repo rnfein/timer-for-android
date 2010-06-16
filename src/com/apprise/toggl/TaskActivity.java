@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.apprise.toggl.remote.SyncService;
+import com.apprise.toggl.remote.exception.FailedResponseException;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
@@ -137,7 +138,7 @@ public class TaskActivity extends ApplicationActivity {
   protected void onPause() {
     if (!deleted) {
       task.description = descriptionView.getText().toString();
-      saveTask();      
+      saveTask();
       new Thread(postTaskInBackground).start();
     }
     super.onPause();
@@ -559,7 +560,11 @@ public class TaskActivity extends ApplicationActivity {
             if (task.id > 0) {
               new Thread(new Runnable() {
                 public void run() {
-                  syncService.deleteRemoteTask(task);
+                  try {
+                    syncService.deleteRemoteTask(task);
+                  } catch (FailedResponseException e) {
+                    Log.e(TAG, "FailedResponseException", e);
+                  }
                 }
               }).start();
             }
