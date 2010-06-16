@@ -139,7 +139,7 @@ public class TimeTrackingService extends ServiceCompat {
     Intent intent = new Intent(this, TaskActivity.class);
     intent.putExtra(TaskActivity.TASK_ID, task._id);
     
-    PendingIntent launchIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    PendingIntent launchIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     
     // event shown in expanded status bar
     notification.setLatestEventInfo(getApplicationContext(),
