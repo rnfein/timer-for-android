@@ -88,11 +88,11 @@ public class TimeTrackingService extends ServiceCompat {
   }
   
   public long stopTracking() {
-    long endDuration = seconds;
     timer.cancel();
+    long endDuration = seconds;
+    pullFromForeground();
     task = null;
     seconds = 0;
-    pullFromForeground();
     isTracking = false;
     return endDuration;
   }
@@ -124,7 +124,7 @@ public class TimeTrackingService extends ServiceCompat {
    * Returns true if the given task is currently being tracked. 
    */
   public boolean isTracking(Task task) {
-    return isTracking && task._id == this.task._id; // TODO: task.equals(this.task);
+    return isTracking && task._id == this.task._id;
   }
   
   private void pushToForeground() {
@@ -137,9 +137,10 @@ public class TimeTrackingService extends ServiceCompat {
     
     // activity to launch when notification is clicked
     Intent intent = new Intent(this, TaskActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     intent.putExtra(TaskActivity.TASK_ID, task._id);
     
-    PendingIntent launchIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    PendingIntent launchIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     
     // event shown in expanded status bar
     notification.setLatestEventInfo(getApplicationContext(),
