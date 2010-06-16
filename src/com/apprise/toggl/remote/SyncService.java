@@ -29,6 +29,7 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.ORM;
 import com.apprise.toggl.storage.models.Client;
 import com.apprise.toggl.storage.models.DeletedModel;
+import com.apprise.toggl.storage.models.DeletedTask;
 import com.apprise.toggl.storage.models.Model;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
@@ -173,7 +174,7 @@ public class SyncService extends Service {
 
   
   public void createOrUpdateRemoteTask(Task task) {
-    if (app.isConnected()) {    
+    if (app.isConnected() && !isSyncingAll) {    
       Log.d(TAG, "connection found, #createOrUpdateRemoteTask starting.");
       if (task.id > 0) {
         Task updatedTask = api.updateTask(task, app);
@@ -188,6 +189,17 @@ public class SyncService extends Service {
       }
       // sync projects in case user created one
       syncProjects();
+    }
+  }
+  
+  public void deleteRemoteTask(Task task) {
+    if (app.isConnected() && !isSyncingAll) {    
+      Log.d(TAG, "connection found, #deleteRemoteTask starting.");
+      DeletedTask deletedTask = dbAdapter.findDeletedTask(task.id);
+      if (deletedTask != null) {
+        api.deleteTask(deletedTask.taskRemoteId);        
+        dbAdapter.deleteDeletedTask(deletedTask._id);
+      }
     }
   }
 

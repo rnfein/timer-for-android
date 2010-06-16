@@ -146,7 +146,7 @@ public class TimeTrackingService extends ServiceCompat {
       getString(R.string.notification_expanded_title),
       getString(R.string.notification_expanded_content),
       launchIntent);
- 
+    
     startForegroundCompat(NOTIFICATION_ID, notification);
   }
   

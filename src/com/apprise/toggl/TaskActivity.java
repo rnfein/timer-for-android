@@ -63,6 +63,7 @@ public class TaskActivity extends ApplicationActivity {
   private CheckBox billableCheckBox;
   
   private boolean startAutomatically = false;
+  private boolean deleted = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -134,9 +135,11 @@ public class TaskActivity extends ApplicationActivity {
 
   @Override
   protected void onPause() {
-    task.description = descriptionView.getText().toString();
-    saveTask();
-    new Thread(postTaskInBackground).start();    
+    if (!deleted) {
+      task.description = descriptionView.getText().toString();
+      saveTask();      
+      new Thread(postTaskInBackground).start();
+    }
     super.onPause();
   }
 
@@ -553,6 +556,14 @@ public class TaskActivity extends ApplicationActivity {
               trackingService.stopTracking();
             }
             dbAdapter.deleteTask(task);
+            if (task.id > 0) {
+              new Thread(new Runnable() {
+                public void run() {
+                  syncService.deleteRemoteTask(task);
+                }
+              }).start();
+            }
+            deleted = true;
             finish();
           }
         });
