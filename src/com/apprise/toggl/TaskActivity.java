@@ -607,6 +607,7 @@ public class TaskActivity extends ApplicationActivity {
 
     public void onDateSet(DatePicker view, int year, int month, int date) {
       setDate(year, month, date);
+      updateTrackingButton();
     }
   };
 
