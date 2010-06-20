@@ -30,6 +30,7 @@
 		    android:layout_height="wrap_content"
 		    android:textColor="@color/light_gray"
 		    android:gravity="center_vertical"
+		    android:singleLine="true"
 		    android:paddingLeft="@dimen/listitem_padding_left"
 		    android:paddingBottom="4dp"
 		    android:textSize="@dimen/listitem_note_text_size"     
