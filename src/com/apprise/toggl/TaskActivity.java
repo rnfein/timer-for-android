@@ -206,8 +206,12 @@ public class TaskActivity extends ApplicationActivity {
   }
   
   private void updateTrackingButton() {
-    if (!todaysTask()) {
+    if (!todaysTask() && ((trackingService != null && !trackingService.isTracking(task)) || trackingService == null)) {
       timeTrackingButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.timer_trigger_button_continue_today));
+    } else if (trackingService != null && trackingService.isTracking(task)) {
+      timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);
+    } else {
+      timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);      
     }
   }
   
@@ -242,7 +246,7 @@ public class TaskActivity extends ApplicationActivity {
   protected void attachEvents() {
     timeTrackingButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        if (todaysTask()) {
+        if (todaysTask() || trackingService.isTracking(task)) {
           triggerTracking();
         } else {
           continueToday();
@@ -294,7 +298,6 @@ public class TaskActivity extends ApplicationActivity {
       task.duration = trackingService.stopTracking();
       task.stop = Util.formatDateToString(Util.currentDate());
       saveTask();
-      timeTrackingButton.setBackgroundResource(R.drawable.timer_trigger_button);
     } else if (trackingService.isTracking()) {
       // is tracking another task, stop it and save
       Task currentlyTracked = trackingService.getTrackedTask();
@@ -311,9 +314,9 @@ public class TaskActivity extends ApplicationActivity {
     if (startTracking) {
       task.duration = trackingService.startTracking(task);
       saveTask();
-
-      timeTrackingButton.setBackgroundResource(R.drawable.trigger_active);          
     }
+    
+    updateTrackingButton();
   }
   
   private void continueToday() {
