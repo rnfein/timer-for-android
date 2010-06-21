@@ -5,6 +5,7 @@ import com.apprise.toggl.remote.TogglWebApi;
 import com.apprise.toggl.remote.exception.FailedResponseException;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
+import com.apprise.toggl.tracking.TimeTrackingService;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,6 +40,7 @@ public class AccountActivity extends Activity {
 
   private TogglWebApi webApi;
   private SyncService syncService;
+  private TimeTrackingService trackingService;  
 
   private EditText emailEditText;
   private EditText passwordEditText;
@@ -53,6 +55,12 @@ public class AccountActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     init();
+
+    Intent timeTrackingServiceIntent = new Intent(this, TimeTrackingService.class);
+    if (!TimeTrackingService.isAlive()) {
+      startService(timeTrackingServiceIntent);
+    }
+    bindService(timeTrackingServiceIntent, trackingConnection, BIND_AUTO_CREATE);
 
     setContentView(R.layout.account);
     
@@ -76,6 +84,7 @@ public class AccountActivity extends Activity {
   
   @Override
   protected void onDestroy() {
+    unbindService(trackingConnection);    
     unbindService(syncConnection);
     super.onDestroy();
   }
@@ -105,6 +114,9 @@ public class AccountActivity extends Activity {
     switch (item.getItemId()) {
       case R.id.account_menu_log_out:
         app.logOut();
+        if (trackingService.isTracking()) {
+          trackingService.stopTracking();
+        }
         initFields();
         return true;
     }
@@ -257,6 +269,7 @@ public class AccountActivity extends Activity {
       }
     }
   };  
+    
   
   private ServiceConnection syncConnection = new ServiceConnection() {
     
@@ -285,6 +298,18 @@ public class AccountActivity extends Activity {
           }
         });    
       }
+    }
+  };
+  
+
+  private ServiceConnection trackingConnection = new ServiceConnection() {
+
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      TimeTrackingService.TimeTrackingBinder binding = (TimeTrackingService.TimeTrackingBinder) service;
+      trackingService = binding.getService();
+    }
+
+    public void onServiceDisconnected(ComponentName name) {
     }
   };  
   
