@@ -124,9 +124,9 @@
       android:layout_marginTop="40dp"
       android:layout_marginRight="15dp"
       android:gravity="center">
-      <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/toggl_startlogo"/>
+      <LinearLayout
+        android:layout_width="117dp"
+        android:layout_height="46dp"
+        android:background="@drawable/toggl_startlogo"/>
     </LinearLayout>
 </LinearLayout>
