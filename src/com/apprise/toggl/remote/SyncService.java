@@ -122,6 +122,7 @@ public class SyncService extends Service {
             Log.e(TAG, "Error while syncing implicitly.", e);
           } finally {
             isSyncingAll = false;
+            stopSelf();            
           }
         }
       }).start();
