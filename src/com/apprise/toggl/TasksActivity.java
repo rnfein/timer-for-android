@@ -77,6 +77,7 @@ public class TasksActivity extends ListActivity {
   protected void onResume() {
     super.onResume();    
     currentUser = app.getCurrentUser();
+    trackedTaskId = -1;
 
     IntentFilter syncFilter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, syncFilter);
