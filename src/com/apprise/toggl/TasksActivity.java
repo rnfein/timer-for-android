@@ -273,6 +273,8 @@ public class TasksActivity extends ListActivity {
           TextView durationView = taskAdapter.getDurationView(trackedTaskId);
           if (durationView != null) {
             durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
+            durationView.setTextColor(getResources().getColor(R.color.red));            
+            durationView.setTextSize(getResources().getDimension(R.dimen.listitem_running_duration_text_size));            
 
             SectionedHeader header = adapter.getHeader(taskAdapters.indexOf(taskAdapter));
             header.cursor = taskAdapter.getCursor();

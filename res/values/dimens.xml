@@ -15,6 +15,7 @@
   <dimen name="listitem_margin_right">15dp</dimen>
   <dimen name="listitem_padding_left">10dp</dimen>
   <dimen name="listitem_note_text_size">11dp</dimen>
+  <dimen name="listitem_running_duration_text_size">12dp</dimen>
   
   <dimen name="login_edittext_size">15dp</dimen>
   <dimen name="login_edittext_padding_right">8dp</dimen>
