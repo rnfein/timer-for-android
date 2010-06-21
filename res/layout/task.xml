@@ -65,6 +65,7 @@
     android:layout_height="fill_parent"
     android:layout_weight="1"
     android:padding="10dp"
+    android:gravity="top"
     android:layout_marginBottom="5dp"
     android:background="@drawable/textfield"
     android:textColor="@color/black" />
