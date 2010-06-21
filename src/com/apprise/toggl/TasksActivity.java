@@ -362,7 +362,7 @@ public class TasksActivity extends ListActivity {
 
       TextView descriprionView = (TextView) view.findViewById(R.id.task_item_description);
       String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
-      if (description == null) {
+      if (description == null || description.equals("")) {
         descriprionView.setText(R.string.no_description);
         descriprionView.setTextColor(R.color.light_gray);
       } else {
