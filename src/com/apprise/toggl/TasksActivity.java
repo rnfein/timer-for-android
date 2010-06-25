@@ -111,8 +111,10 @@ public class TasksActivity extends ListActivity {
     newTaskButton.setOnClickListener(new View.OnClickListener() {
       
       public void onClick(View v) {
-        Intent intent = new Intent(TasksActivity.this, TaskActivity.class);
-        startActivity(intent);
+        if (app.getCurrentUser() != null) {
+          Intent intent = new Intent(TasksActivity.this, TaskActivity.class);
+          startActivity(intent);
+        }
       }
     });
   }
