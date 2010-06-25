@@ -45,6 +45,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.provider.BaseColumns;
@@ -104,9 +105,11 @@ public class SyncService extends Service {
   public int onStartCommand(Intent intent, int flags, int startId) {
     // explicitly started, not bound by an activity,
     // hence start complete sync immediately
+    
+    ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-    // to avoid interfering with explicitly started sync
-    if (!isSyncingAll) {
+    // avoid interfering with explicitly started sync, respect backgrounddata setting
+    if (!isSyncingAll && connectivityManager.getBackgroundDataSetting()) {
       isSyncingAll = true;
 
       new Thread(new Runnable() {
