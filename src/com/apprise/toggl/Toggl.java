@@ -1,15 +1,20 @@
 package com.apprise.toggl;
 
 import com.apprise.toggl.remote.SyncAlarmReceiver;
+import com.apprise.toggl.remote.SyncService;
 import com.apprise.toggl.storage.models.User;
 
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -97,6 +102,8 @@ public class Toggl extends Application {
     singleton = this;
     settings = getSharedPreferences(TOGGL_PREFS, MODE_PRIVATE);
     connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+    IntentFilter connFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+    registerReceiver(updateReceiver, connFilter);
   }
 
   @Override
@@ -106,7 +113,24 @@ public class Toggl extends Application {
 
   @Override
   public void onTerminate() {
-    super.onTerminate();
+    unregisterReceiver(updateReceiver);
+    super.onTerminate();    
   }
+  
+  protected BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+
+      if (getCurrentUser() != null && networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE
+            || networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+          Intent syncServiceIntent = new Intent(context, SyncService.class);
+          context.startService(syncServiceIntent);
+        }
+      }
+
+    }
+  };
 
 }
