@@ -89,44 +89,44 @@ public final class R {
         public static final int txt_top_selector=0x7f02002e;
     }
     public static final class id {
-        public static final int account_menu_log_out=0x7f080021;
-        public static final int create_account=0x7f080003;
-        public static final int create_project_cancel=0x7f080008;
-        public static final int create_project_create=0x7f080007;
-        public static final int decrement=0x7f08000e;
-        public static final int email=0x7f080000;
-        public static final int increment=0x7f08000c;
-        public static final int item_name=0x7f080009;
-        public static final int login=0x7f080002;
-        public static final int new_project_client_area=0x7f080005;
-        public static final int new_task_button=0x7f08001f;
-        public static final int password=0x7f080001;
-        public static final int picker_duration_hours=0x7f08000a;
-        public static final int picker_duration_minutes=0x7f08000b;
-        public static final int project_client=0x7f080006;
-        public static final int project_name=0x7f080004;
-        public static final int signup_menu_return=0x7f080022;
-        public static final int task_billable_cb=0x7f080017;
-        public static final int task_date=0x7f080016;
-        public static final int task_date_area=0x7f080015;
-        public static final int task_description=0x7f080012;
-        public static final int task_item_client_project_name=0x7f08001d;
-        public static final int task_item_description=0x7f08001c;
-        public static final int task_item_duration=0x7f08001e;
-        public static final int task_list_header_text=0x7f080020;
-        public static final int task_menu_delete_task=0x7f080023;
-        public static final int task_planned_tasks=0x7f080019;
-        public static final int task_planned_tasks_area=0x7f080018;
-        public static final int task_project=0x7f080014;
-        public static final int task_project_area=0x7f080013;
-        public static final int task_tags=0x7f08001b;
-        public static final int task_tags_area=0x7f08001a;
-        public static final int task_timer_area=0x7f08000f;
-        public static final int task_timer_duration=0x7f080011;
-        public static final int tasks_menu_account=0x7f080025;
-        public static final int tasks_menu_refresh=0x7f080024;
-        public static final int timepicker_input=0x7f08000d;
-        public static final int timer_trigger=0x7f080010;
+        public static final int account_menu_log_out=0x7f090021;
+        public static final int create_account=0x7f090003;
+        public static final int create_project_cancel=0x7f090008;
+        public static final int create_project_create=0x7f090007;
+        public static final int decrement=0x7f09000e;
+        public static final int email=0x7f090000;
+        public static final int increment=0x7f09000c;
+        public static final int item_name=0x7f090009;
+        public static final int login=0x7f090002;
+        public static final int new_project_client_area=0x7f090005;
+        public static final int new_task_button=0x7f09001f;
+        public static final int password=0x7f090001;
+        public static final int picker_duration_hours=0x7f09000a;
+        public static final int picker_duration_minutes=0x7f09000b;
+        public static final int project_client=0x7f090006;
+        public static final int project_name=0x7f090004;
+        public static final int signup_menu_return=0x7f090022;
+        public static final int task_billable_cb=0x7f090017;
+        public static final int task_date=0x7f090016;
+        public static final int task_date_area=0x7f090015;
+        public static final int task_description=0x7f090012;
+        public static final int task_item_client_project_name=0x7f09001d;
+        public static final int task_item_description=0x7f09001c;
+        public static final int task_item_duration=0x7f09001e;
+        public static final int task_list_header_text=0x7f090020;
+        public static final int task_menu_delete_task=0x7f090023;
+        public static final int task_planned_tasks=0x7f090019;
+        public static final int task_planned_tasks_area=0x7f090018;
+        public static final int task_project=0x7f090014;
+        public static final int task_project_area=0x7f090013;
+        public static final int task_tags=0x7f09001b;
+        public static final int task_tags_area=0x7f09001a;
+        public static final int task_timer_area=0x7f09000f;
+        public static final int task_timer_duration=0x7f090011;
+        public static final int tasks_menu_account=0x7f090025;
+        public static final int tasks_menu_refresh=0x7f090024;
+        public static final int timepicker_input=0x7f09000d;
+        public static final int timer_trigger=0x7f090010;
     }
     public static final class layout {
         public static final int account=0x7f030000;
@@ -142,10 +142,10 @@ public final class R {
         public static final int welcome=0x7f03000a;
     }
     public static final class menu {
-        public static final int account_menu=0x7f070000;
-        public static final int signup_menu=0x7f070001;
-        public static final int task_menu=0x7f070002;
-        public static final int tasks_menu=0x7f070003;
+        public static final int account_menu=0x7f080000;
+        public static final int signup_menu=0x7f080001;
+        public static final int task_menu=0x7f080002;
+        public static final int tasks_menu=0x7f080003;
     }
     public static final class string {
         public static final int account=0x7f060002;
@@ -194,5 +194,8 @@ public final class R {
         public static final int task=0x7f060003;
         public static final int tasks=0x7f060004;
         public static final int yes=0x7f060015;
+    }
+    public static final class style {
+        public static final int tasklist_running_duration=0x7f070000;
     }
 }

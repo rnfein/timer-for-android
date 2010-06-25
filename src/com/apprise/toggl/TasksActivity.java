@@ -25,7 +25,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -276,8 +275,7 @@ public class TasksActivity extends ListActivity {
           TextView durationView = taskAdapter.getDurationView(trackedTaskId);
           if (durationView != null) {
             durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
-            durationView.setTextColor(getResources().getColor(R.color.red));            
-            durationView.setTextSize(getResources().getDimension(R.dimen.listitem_running_duration_text_size));            
+            durationView.setTextAppearance(context, R.style.tasklist_running_duration);
 
             SectionedHeader header = adapter.getHeader(taskAdapters.indexOf(taskAdapter));
             header.cursor = taskAdapter.getCursor();
@@ -317,6 +315,12 @@ public class TasksActivity extends ListActivity {
     public SectionedHeader getHeader(int index) {
       return headers.get(index);
     }
+
+    @Override
+    public void clearSections() {
+      headers.clear();
+      super.clearSections();
+    }
     
   };
   
@@ -343,7 +347,7 @@ public class TasksActivity extends ListActivity {
       cal.add(Calendar.DATE, -1);
       String yesterday = dateFormat.format(cal.getTime());
       String tasksDateString = dateFormat.format(tasksDate);
-      String prettyTotal = Util.secondsToHM(getDurationTotal(cursor));      
+      String prettyTotal = Util.secondsToHM(getDurationTotal(cursor));
       
       if (tasksDateString.equals(today)) {
         return "Today (" + prettyTotal + " h)";
