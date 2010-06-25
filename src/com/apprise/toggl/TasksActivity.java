@@ -1,5 +1,6 @@
 package com.apprise.toggl;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -323,6 +325,7 @@ public class TasksActivity extends ListActivity {
     public TextView textView;
     public Date tasksDate;
     public Cursor cursor;
+
     
     public SectionedHeader(Date tasksDate, Cursor cursor) {
       this.tasksDate = tasksDate;
@@ -334,9 +337,22 @@ public class TasksActivity extends ListActivity {
     }
     
     public String toString() {
-      String prettyDate = Util.smallDateString(tasksDate);
-      String prettyTotal = Util.secondsToHM(getDurationTotal(cursor)); 
-      return prettyDate + " (" + prettyTotal + " h)";
+      Calendar cal = Calendar.getInstance();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      String today = dateFormat.format(cal.getTime());
+      cal.add(Calendar.DATE, -1);
+      String yesterday = dateFormat.format(cal.getTime());
+      String tasksDateString = dateFormat.format(tasksDate);
+      String prettyTotal = Util.secondsToHM(getDurationTotal(cursor));      
+      
+      if (tasksDateString.equals(today)) {
+        return "Today (" + prettyTotal + " h)";
+      } else if (tasksDateString.equals(yesterday)) {
+        return "Yesterday (" + prettyTotal + " h)";
+      } else {
+        String prettyDate = Util.smallDateString(tasksDate);
+        return prettyDate + " (" + prettyTotal + " h)";
+      }
     }
   }
   
