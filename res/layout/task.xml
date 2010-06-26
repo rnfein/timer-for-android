@@ -22,6 +22,7 @@
       android:text="@string/task"/>
   </LinearLayout>   
   <LinearLayout
+    android:id="@+id/task_divider"
     android:background="@drawable/divider"
     android:layout_marginTop="5dp"
     android:layout_width="fill_parent"
@@ -59,8 +60,10 @@
 	      android:layout_weight="1"/>  
     </LinearLayout>
   </LinearLayout>     
-  <EditText
+  <AutoCompleteTextView
     android:id="@+id/task_description"
+    android:dropDownAnchor="@id/task_divider"
+    android:dropDownHeight="100dp"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_weight="1"

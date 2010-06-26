@@ -367,6 +367,25 @@ public class DatabaseAdapter {
     return db.query(Tasks.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);        
   }  
   
+  public Cursor findTasksForAutocomplete(CharSequence constraint) { // TODO: tests
+    String sqlConstraint = "*" + constraint.toString().toUpperCase() + "*";
+
+    String[] args = new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(sqlConstraint), String.valueOf(sqlConstraint) };
+
+    String sqlString = "SELECT " +
+    " max(" + Tasks.TABLE_NAME + "." + Tasks._ID + ") AS _id, " +
+    Tasks.DESCRIPTION + ", " + 
+    Projects.CLIENT_PROJECT_NAME +
+    " FROM tasks " +
+    " LEFT OUTER JOIN projects ON tasks.project_remote_id = projects.remote_id" +
+    " WHERE " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? " +
+    " AND (UPPER(" + Tasks.DESCRIPTION + ") GLOB ? OR UPPER(" + Projects.CLIENT_PROJECT_NAME + ") GLOB ?)" +
+    " GROUP BY " + Tasks.DESCRIPTION + ", " + Projects.CLIENT_PROJECT_NAME;
+    
+    Cursor cursor = db.rawQuery(sqlString, args);
+    return cursor;
+  }  
+  
   public boolean updateTask(Task task) {
     ContentValues values = setTaskValues(task);
     

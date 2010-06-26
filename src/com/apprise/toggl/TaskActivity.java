@@ -9,6 +9,7 @@ import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.PlannedTasks;
 import com.apprise.toggl.storage.DatabaseAdapter.Projects;
 import com.apprise.toggl.storage.DatabaseAdapter.Tags;
+import com.apprise.toggl.storage.DatabaseAdapter.Tasks;
 import com.apprise.toggl.storage.models.PlannedTask;
 import com.apprise.toggl.storage.models.Project;
 import com.apprise.toggl.storage.models.Task;
@@ -29,13 +30,18 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CursorAdapter;
 import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -55,7 +61,7 @@ public class TaskActivity extends ApplicationActivity {
   private Task task;
   private Button timeTrackingButton;
   private TextView durationView;
-  private EditText descriptionView;
+  private AutoCompleteTextView descriptionView;
   private TextView projectView;
   private TextView dateView;
   private TextView plannedTasksView;
@@ -124,6 +130,10 @@ public class TaskActivity extends ApplicationActivity {
   @Override
   protected void onResume() {
     super.onResume();    
+    updateAllViews();
+  }
+
+  private void updateAllViews() {
     billableCheckBox.setChecked(task.billable);
     updateDescriptionView();
     updateProjectView();
@@ -172,12 +182,39 @@ public class TaskActivity extends ApplicationActivity {
   protected void initViews() {
     timeTrackingButton = (Button) findViewById(R.id.timer_trigger);
     durationView = (TextView) findViewById(R.id.task_timer_duration);
-    descriptionView = (EditText) findViewById(R.id.task_description);
+    initDescriptionAutoComplete();
     dateView = (TextView) findViewById(R.id.task_date);
     projectView = (TextView) findViewById(R.id.task_project);
     plannedTasksView = (TextView) findViewById(R.id.task_planned_tasks);
     tagsView = (TextView) findViewById(R.id.task_tags);
     billableCheckBox = (CheckBox) findViewById(R.id.task_billable_cb);
+  }
+
+  private void initDescriptionAutoComplete() {
+    descriptionView = (AutoCompleteTextView) findViewById(R.id.task_description);
+    descriptionView.clearFocus();
+    
+    String constraint = "";
+    Cursor tasksCursor = dbAdapter.findTasksForAutocomplete(constraint);
+    startManagingCursor(tasksCursor);
+
+    DescriptionAutocompleteCursorAdapter adapter = new DescriptionAutocompleteCursorAdapter(this, tasksCursor);
+    descriptionView.setAdapter(adapter);
+    
+    descriptionView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+        Task selectedTask = dbAdapter.findTask(id);
+        task.billable = selectedTask.billable;
+        task.description = selectedTask.description;
+        task.planned_task = selectedTask.planned_task;
+        task.project = selectedTask.project;
+        task.workspace = selectedTask.workspace;
+        task.tag_names = selectedTask.tag_names;
+        updateAllViews();        
+      }
+    });
+    
+    
   }
 
   private void updateProjectView() {
@@ -706,5 +743,54 @@ public class TaskActivity extends ApplicationActivity {
       }
     }
   };  
+  
+  public class DescriptionAutocompleteCursorAdapter extends CursorAdapter implements Filterable {
+
+    public DescriptionAutocompleteCursorAdapter(Context context, Cursor c) {
+      super(context, c);
+    }
+    
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+      LayoutInflater inflater = LayoutInflater.from(context);
+      View view = inflater.inflate(R.layout.dropdown_item, parent, false);
+      bindView(view, context, cursor);
+      return view;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+      String text = getItemText(cursor);
+      TextView itemText = (TextView) view.findViewById(R.id.dropdown_item_text);
+      itemText.setText(text);
+    }
+
+    private String getItemText(Cursor cursor) {
+      String description = cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
+      String clientProjectName = cursor.getString(cursor.getColumnIndex(Projects.CLIENT_PROJECT_NAME));
+      String text;
+      if (clientProjectName != null && !clientProjectName.equals("")) {
+        text = description + " - " + clientProjectName;
+      } else {
+        text = description;        
+      }
+      return text;
+    }
+    
+    @Override
+    public String convertToString(Cursor cursor) {
+      return cursor.getString(cursor.getColumnIndex(Tasks.DESCRIPTION));
+    }
+
+    @Override
+    public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+      if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
+
+      if (constraint == null) constraint = "";
+      Cursor c = dbAdapter.findTasksForAutocomplete(constraint);
+
+      return c;
+    }
+  }
   
 }
