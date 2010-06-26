@@ -35,12 +35,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
@@ -192,7 +194,6 @@ public class TaskActivity extends ApplicationActivity {
 
   private void initDescriptionAutoComplete() {
     descriptionView = (AutoCompleteTextView) findViewById(R.id.task_description);
-    descriptionView.clearFocus();
     
     String constraint = "";
     Cursor tasksCursor = dbAdapter.findTasksForAutocomplete(constraint);
@@ -210,11 +211,15 @@ public class TaskActivity extends ApplicationActivity {
         task.project = selectedTask.project;
         task.workspace = selectedTask.workspace;
         task.tag_names = selectedTask.tag_names;
-        updateAllViews();        
+        updateAllViews();
+        
+        //set focus to invisible view, hide soft keyboard
+        ((EditText) findViewById(R.id.invisible_view)).requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(descriptionView.getWindowToken(), 0);        
       }
     });
-    
-    
+
   }
 
   private void updateProjectView() {

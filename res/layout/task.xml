@@ -9,6 +9,11 @@
   android:paddingRight="@dimen/layout_padding_right"
   android:paddingBottom="@dimen/layout_padding_bottom"
   android:paddingLeft="@dimen/layout_padding_left" >
+  <EditText
+    android:id="@+id/invisible_view"
+    android:inputType="none"
+    android:layout_width="0dp"
+    android:layout_height="0dp"/>
   <LinearLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
