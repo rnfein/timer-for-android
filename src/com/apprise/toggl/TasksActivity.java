@@ -301,11 +301,7 @@ public class TasksActivity extends ListActivity {
     }
 
     protected View getHeaderView(String caption, int index, View convertView, ViewGroup parent) {
-      LinearLayout result = (LinearLayout) convertView;
-
-      if (convertView == null) {
-        result = (LinearLayout) getLayoutInflater().inflate(R.layout.tasks_group_header, null);
-      }
+      LinearLayout result = (LinearLayout) getLayoutInflater().inflate(R.layout.tasks_group_header, null);
 
       TextView headerView = (TextView) result.findViewById(R.id.task_list_header_text);      
       headerView.setText(caption);
