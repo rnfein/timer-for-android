@@ -12,11 +12,9 @@ import com.apprise.toggl.storage.models.Task;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.PowerManager;
 
 public class TimeTrackingService extends ServiceCompat {
 
@@ -29,12 +27,9 @@ public class TimeTrackingService extends ServiceCompat {
   
   private Timer timer;
   private Task task;
-  private long seconds = 0l;
+  private long runningTimeStart = 0l;
   private boolean isTracking = false;
   
-  private PowerManager.WakeLock wakeLock;
-  private PowerManager powerManager;
-
   public static boolean isAlive() {
     return isAlive;
   }
@@ -79,25 +74,24 @@ public class TimeTrackingService extends ServiceCompat {
     timer.schedule(new TimerTask() {
       @Override
       public void run() {
-        seconds += 1l;
         Intent intent = new Intent(BROADCAST_SECOND_ELAPSED);
         intent.putExtra(TRACKED_TASK_ID, TimeTrackingService.this.task._id);
-        intent.putExtra(TRACKED_TASK_DURATION, seconds);
+        intent.putExtra(TRACKED_TASK_DURATION, runningTimeStart);
         sendBroadcast(intent);
       }
     }, new Date(System.currentTimeMillis() + 1000), 1000);
 
     pushToForeground();
     isTracking = true;
-    return Util.getRunningTimeStart(seconds);
+    return runningTimeStart;
   }
   
   public long stopTracking() {
     timer.cancel();
-    long endDuration = seconds;
+    long endDuration = Util.convertIfRunningTime(runningTimeStart);;
     pullFromForeground();
     task = null;
-    seconds = 0;
+    runningTimeStart = 0l;
     isTracking = false;
     return endDuration;
   }
@@ -105,17 +99,14 @@ public class TimeTrackingService extends ServiceCompat {
   public Task getTrackedTask() {
     return task;
   }
-  
+
   public long getCurrentDuration() {
-    if (isTracking) {
-      return Util.getRunningTimeStart(seconds);
-    } else {
-      return seconds;
-    }
+    return runningTimeStart;
   }
   
   public void setCurrentDuration(long seconds) {
-    this.seconds = Util.convertIfRunningTime(seconds);
+    long s = Util.convertIfRunningTime(seconds);
+    this.runningTimeStart = Util.getRunningTimeStart(s);
   }
 
   /**
@@ -152,17 +143,12 @@ public class TimeTrackingService extends ServiceCompat {
       getString(R.string.notification_expanded_title),
       getString(R.string.notification_expanded_content),
       launchIntent);
-    
-    powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TimeTrackingService");
-    wakeLock.acquire();
-    
+
     startForegroundCompat(NOTIFICATION_ID, notification);
   }
   
   private void pullFromForeground() {
     stopForegroundCompat(NOTIFICATION_ID);
-    wakeLock.release();
   }
   
 }

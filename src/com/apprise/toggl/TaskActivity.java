@@ -552,7 +552,6 @@ public class TaskActivity extends ApplicationActivity {
 
             long duration = (hours * 60 * 60) + (minutes * 60) + seconds;
             if (trackingService.isTracking(task)) {
-              duration = Util.getRunningTimeStart(duration);              
               trackingService.setCurrentDuration(duration);
             }
             
