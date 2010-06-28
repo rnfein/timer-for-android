@@ -12,9 +12,11 @@ import com.apprise.toggl.storage.models.Task;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 public class TimeTrackingService extends ServiceCompat {
 
@@ -29,6 +31,9 @@ public class TimeTrackingService extends ServiceCompat {
   private Task task;
   private long seconds = 0l;
   private boolean isTracking = false;
+  
+  private PowerManager.WakeLock wakeLock;
+  private PowerManager powerManager;
 
   public static boolean isAlive() {
     return isAlive;
@@ -148,11 +153,16 @@ public class TimeTrackingService extends ServiceCompat {
       getString(R.string.notification_expanded_content),
       launchIntent);
     
+    powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TimeTrackingService");
+    wakeLock.acquire();
+    
     startForegroundCompat(NOTIFICATION_ID, notification);
   }
   
   private void pullFromForeground() {
     stopForegroundCompat(NOTIFICATION_ID);
+    wakeLock.release();
   }
   
 }
