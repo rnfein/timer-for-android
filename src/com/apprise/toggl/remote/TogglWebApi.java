@@ -327,7 +327,7 @@ public class TogglWebApi {
     HttpPost request = new HttpPost(url);
     StringEntity entity = null;
     try {
-      entity = new StringEntity(data);
+      entity = new StringEntity(data, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
@@ -341,7 +341,7 @@ public class TogglWebApi {
     HttpPut request = new HttpPut(url);
     StringEntity entity = null;
     try {
-      entity = new StringEntity(data);
+      entity = new StringEntity(data, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
