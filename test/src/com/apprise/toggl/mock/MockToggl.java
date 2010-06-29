@@ -13,5 +13,9 @@ public class MockToggl extends Toggl {
   public String getAPIToken() {
     return apiTokenStorage;
   }
+  
+  public void initSyncSchedule() {
+    
+  }
 
 }
