@@ -237,7 +237,7 @@ public class DatabaseAdapter {
     return values;
   }
 
-  public Client createClient(Client client) { // TODO: test
+  public Client createClient(Client client) { 
     ContentValues values = setClientValues(client);
     
     long _id = db.insert(Clients.TABLE_NAME, Clients.NAME, values);
@@ -315,7 +315,7 @@ public class DatabaseAdapter {
     }
   }
   
-  public Task findRunningTask() { // TODO: tests
+  public Task findRunningTask() {
     Cursor cursor = db.rawQuery("SELECT * " + " FROM " + Tasks.TABLE_NAME
         + " WHERE " + Tasks.DURATION + " < 0 " + " AND " + Tasks.TABLE_NAME
         + "." + Tasks.OWNER_USER_ID + " = ?", new String[] { String.valueOf(app
@@ -342,7 +342,7 @@ public class DatabaseAdapter {
     }
   }
   
-  public Cursor findTasksForListByDate(Date date) { // TODO: test
+  public Cursor findTasksForListByDate(Date date) {
     String dateString = Util.formatDateToString(date); 
     Cursor cursor = db.rawQuery("SELECT " 
         + Tasks.TABLE_NAME + "." + Tasks._ID + ", "
@@ -359,7 +359,7 @@ public class DatabaseAdapter {
     return cursor;
   }  
   
-  public Cursor findAllTasksByProjectLocalId(long projectLocalId) { // TODO: test
+  public Cursor findAllTasksByProjectLocalId(long projectLocalId) {
     return db.query(Tasks.TABLE_NAME, null, " owner_user_id = ? AND "+ Tasks.PROJECT_LOCAL_ID +" = ?", new String[]{ String.valueOf(app.getCurrentUser()._id), String.valueOf(projectLocalId)}, null, null, null);        
   }  
   
@@ -367,7 +367,7 @@ public class DatabaseAdapter {
     return db.query(Tasks.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);        
   }  
   
-  public Cursor findTasksForAutocomplete(CharSequence constraint) { // TODO: tests
+  public Cursor findTasksForAutocomplete(CharSequence constraint) {
     String sqlConstraint = "*" + constraint.toString().toUpperCase() + "*";
 
     String[] args = new String[] { String.valueOf(app.getCurrentUser()._id), String.valueOf(sqlConstraint), String.valueOf(sqlConstraint) };

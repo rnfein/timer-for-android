@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.apprise.toggl.Toggl;
 import com.apprise.toggl.TogglTests;
+import com.apprise.toggl.Util;
 import com.apprise.toggl.mock.MockToggl;
 import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.DatabaseAdapter.DeletedTasks;
@@ -75,7 +76,14 @@ public class DatabaseAdapterTest extends AndroidTestCase {
   }
   
   public void testFindUserByApiToken() {
-    //TODO
+    User user = dbAdapter.createUser(new User());
+    user.api_token = "APIAPIAPPI";
+    dbAdapter.updateUser(user);
+    User foundUser = dbAdapter.findUserByApiToken("APIAPIAPPI");
+    
+    assertNotNull(foundUser);
+    assertEquals(user.id, foundUser.id);
+    assertEquals("APIAPIAPPI", foundUser.api_token);
   }
   
   public void testFindUserByRemoteId() {
@@ -385,6 +393,20 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals("do a frontflip", foundTask.description);    
   }
   
+  public void testFindRunnintTask() {
+    Task task = new Task();
+    task.duration = -5213512; //running task with startpoint since epoch
+    Task runningTask = dbAdapter.createTask(task);
+    
+    dbAdapter.createTask(new Task());
+    dbAdapter.createTask(new Task());
+    
+    Task foundTask = dbAdapter.findRunningTask();
+    assertNotNull(foundTask);
+    assertEquals(runningTask._id, foundTask._id);
+    assertEquals(-5213512, foundTask.duration);    
+  }
+  
   public void testFindAllTasks() {
     Task task1 = dbAdapter.createTask(new Task());
     Task task2 = dbAdapter.createTask(new Task());
@@ -399,12 +421,87 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     allTasks.close();
   }
   
+  public void testFindTasksByProjectLocalId() {
+    Task taskContents = new Task();
+    Project project = dbAdapter.createProject(new Project());
+    
+    taskContents.project = null;
+    dbAdapter.createTask(taskContents); //task without project
+    
+    taskContents.project = project;
+    Task task1 = dbAdapter.createTask(taskContents);
+    
+    taskContents.project = project;
+    Task task2 = dbAdapter.createTask(taskContents);
+    
+    Cursor tasks = dbAdapter.findAllTasksByProjectLocalId(project._id);
+    assertNotNull(tasks);
+    assertEquals(2, tasks.getCount());
+    tasks.moveToFirst();
+    assertEquals(task1._id, tasks.getLong(tasks.getColumnIndex(Tasks._ID)));
+    tasks.moveToNext();
+    assertEquals(task2._id, tasks.getLong(tasks.getColumnIndex(Tasks._ID)));
+    tasks.close();
+  }
+  
+  public void testFindTasksForList() {
+    Task taskContents = new Task();
+    
+    taskContents.start = "2010-06-12T06:19:45+02:00";
+    dbAdapter.createTask(taskContents); //task with another date
+    
+    taskContents.start = "2010-05-12T06:19:45+02:00";
+    Task task1 = dbAdapter.createTask(taskContents);
+    
+    taskContents.start = "2010-05-12T10:19:45+02:00";
+    Task task2 = dbAdapter.createTask(taskContents);
+    
+    Date date = new Date(110, 04, 12, 12, 00);
+    Log.d("DBtests", "date: " + Util.formatDateToString(date));
+    Cursor tasks = dbAdapter.findTasksForListByDate(date);
+    assertNotNull(tasks);
+    assertEquals(2, tasks.getCount());
+    tasks.moveToFirst();
+    assertEquals(task1._id, tasks.getLong(tasks.getColumnIndex(Tasks._ID)));
+    tasks.moveToNext();
+    assertEquals(task2._id, tasks.getLong(tasks.getColumnIndex(Tasks._ID)));
+    tasks.close();
+  }
+  
+  public void testFindTasksForAutocomplete() { //TODO: fishi
+    Task otherTask = new Task();
+    otherTask.description = "ZXCZX";
+    dbAdapter.createTask(otherTask); //out of constraint
+    
+    Task taskContents1 = new Task();    
+    taskContents1.description = "aaaaa";
+    dbAdapter.createTask(taskContents1);
+    
+    Project projectContents = new Project();
+    projectContents.client_project_name = "aaaaa - AAA";
+    Project project = dbAdapter.createProject(projectContents);
+    
+    Task taskContents2 = new Task();    
+    taskContents2.project = project;
+    dbAdapter.createTask(taskContents2);
+    
+    CharSequence constraint = "aa";
+    Cursor tasks = dbAdapter.findTasksForAutocomplete(constraint);
+    Log.d("DBTests", "count: " + tasks.getCount());
+    
+    assertNotNull(tasks);
+    assertEquals(2, tasks.getCount());
+    tasks.close();
+  }
+  
   public void testUpdateTask() {
     Task task = dbAdapter.createTask(new Task());
     Project project = dbAdapter.createProject(new Project());
     Workspace workspace = dbAdapter.createWorkspace(new Workspace());
     assertEquals(0l, task.id);
     assertEquals(null, task.description);
+
+    String[] tagNamesArray = new String[] {String.valueOf("tag1"), String.valueOf("tag2")};
     
     task.id = 2;
     task.billable = true;
@@ -414,7 +511,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     task.start = "2010-02-12T16:19:45+02:00";
     task.stop = null;
     task.workspace = workspace;
-    //TODO task.tag_names
+    task.tag_names = tagNamesArray;
     dbAdapter.updateTask(task);
     
     Task foundTask = dbAdapter.findTask(task._id);
@@ -424,6 +521,7 @@ public class DatabaseAdapterTest extends AndroidTestCase {
     assertEquals(10, foundTask.duration);
     assertEquals(project._id, foundTask.project._id);
     assertEquals("2010-02-12T16:19:45+02:00", foundTask.start);
+    assertEquals("tag1;tag2", Util.joinStringArray(foundTask.tag_names, ";"));
     assertNull(foundTask.stop);
     assertEquals(workspace._id, foundTask.workspace._id);
   }
@@ -500,7 +598,28 @@ public class DatabaseAdapterTest extends AndroidTestCase {
   }
   
   public void testFindPlannedTasksByProjectId() {
-    //TODO
+    Project projectContents = new Project();
+    projectContents.id = 123123l;
+    Project project = dbAdapter.createProject(projectContents);
+    
+    PlannedTask plannedTaskContents1 = new PlannedTask();
+    plannedTaskContents1.project = project;
+    PlannedTask projectPlannedTask1 = dbAdapter.createPlannedTask(plannedTaskContents1);
+
+    PlannedTask plannedTaskContents2 = new PlannedTask();
+    plannedTaskContents2.project = project;
+    PlannedTask projectPlannedTask2 = dbAdapter.createPlannedTask(plannedTaskContents2);
+    
+    dbAdapter.createPlannedTask(new PlannedTask());
+    
+    Cursor allPlannedTasks = dbAdapter.findPlannedTasksByProjectId(project.id);
+    assertNotNull(allPlannedTasks);
+    assertEquals(2, allPlannedTasks.getCount());
+    allPlannedTasks.moveToFirst();
+    assertEquals(projectPlannedTask1._id, allPlannedTasks.getLong(allPlannedTasks.getColumnIndex(PlannedTasks._ID)));
+    allPlannedTasks.moveToNext();
+    assertEquals(projectPlannedTask2._id, allPlannedTasks.getLong(allPlannedTasks.getColumnIndex(PlannedTasks._ID)));
+    allPlannedTasks.close();
   }
   
   public void testFindPlannedTaskByRemoteId() {
