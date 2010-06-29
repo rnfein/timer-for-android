@@ -1,5 +1,6 @@
 package com.apprise.toggl.tracking;
 
+import com.apprise.toggl.Util;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.tracking.TimeTrackingService;
 
@@ -33,7 +34,9 @@ public class TimeTrackingServiceTest extends ServiceTestCase<TimeTrackingService
     service.startTracking(task);
     
     Thread.sleep(2100);
-    assertEquals(2l, task.duration);
+    long duration = Util.convertIfRunningTime(service.getCurrentDuration());
+    
+    assertEquals(2l, duration);
   }
 
   public void testStopTracking() throws Exception {
@@ -44,7 +47,7 @@ public class TimeTrackingServiceTest extends ServiceTestCase<TimeTrackingService
     
     Thread.sleep(1100);
     
-    service.stopTracking();
+    task.duration = service.stopTracking();
     assertEquals(441l, task.duration);
   }
   
