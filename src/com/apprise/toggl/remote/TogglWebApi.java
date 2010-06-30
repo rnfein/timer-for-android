@@ -46,7 +46,7 @@ public class TogglWebApi {
   private static final int CONNECTION_TIMEOUT = 30 * 1000; // ms
 
   private static final String TAG = "TogglWebApi";
-  private static final String BASE_URL = "http://www.toggl.com";
+  private static final String BASE_URL = "https://www.toggl.com";
   private static final String API_URL = BASE_URL + "/api/v1";
   private static final String SESSIONS_URL = API_URL + "/sessions.json";
   private static final String TASKS_URL = API_URL + "/tasks.json";
