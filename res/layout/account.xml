@@ -46,8 +46,8 @@
 		      android:layout_height="wrap_content">
 		      <LinearLayout
 		        android:background="@drawable/txt_top_clean"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content">
+		        android:layout_width="283dp"
+		        android:layout_height="43dp">
 			      <TextView
 			          android:layout_width="30dp"
 			          android:layout_height="fill_parent"
@@ -73,8 +73,8 @@
 		      </LinearLayout>      
 		      <LinearLayout
 		        android:background="@drawable/txt_bottom_clean"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content">
+		        android:layout_width="283dp"
+		        android:layout_height="43dp">
 			      <TextView
 		            android:layout_width="50dp"
 		            android:layout_height="fill_parent"

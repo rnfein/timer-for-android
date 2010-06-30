@@ -88,8 +88,8 @@
 		  
 		  <LinearLayout
 		    android:id="@+id/task_project_area"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="43dp"
 		    android:background="@drawable/txt_top_selector"
 		    android:clickable="true"
 		    android:focusable="true">
@@ -119,8 +119,8 @@
 		  </LinearLayout>
 		  <LinearLayout
 		    android:id="@+id/task_date_area"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+		    android:layout_height="43dp"
 		    android:background="@drawable/txt_middle_selector"
 		    android:clickable="true"
 		    android:focusable="true">
@@ -148,8 +148,8 @@
 		      android:maxLines="1"/>
 		  </LinearLayout>  
 		  <LinearLayout
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="43dp"
 		    android:gravity="right"
 		    android:background="@drawable/txt_middle_clean">
 		    <TextView
@@ -170,8 +170,8 @@
 		  </LinearLayout>    
 		  <LinearLayout
 		    android:id="@+id/task_planned_tasks_area"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="43dp"
 		    android:background="@drawable/txt_middle_selector"
 		    android:clickable="true"
 		    android:focusable="true">
@@ -202,8 +202,8 @@
 		  </LinearLayout>  
 		  <LinearLayout
 		    android:id="@+id/task_tags_area"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="43dp"
 		    android:background="@drawable/txt_bottom_selector"
 		    android:clickable="true"
 		    android:focusable="true">
