@@ -10,13 +10,14 @@
   android:paddingBottom="@dimen/layout_padding_bottom"
   android:paddingLeft="@dimen/layout_padding_left" >
   <ScrollView
-	  android:layout_width="fill_parent"
-	  android:layout_height="fill_parent"
-	  android:scrollbars="none">
-	  <LinearLayout
-		  android:layout_height="fill_parent"
-		  android:layout_width="fill_parent"
-		  android:orientation="vertical">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:scrollbars="none">
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:layout_gravity="center_horizontal">
 		  <EditText
 		    android:id="@+id/invisible_view"
 		    android:inputType="none"
@@ -77,7 +78,7 @@
 		    android:id="@+id/task_description"
 		    android:dropDownAnchor="@id/task_divider"
 		    android:dropDownHeight="100dp"
-		    android:layout_width="fill_parent"
+		    android:layout_width="wrap_content"
 		    android:layout_height="fill_parent"
 		    android:layout_weight="1"
 		    android:padding="10dp"
