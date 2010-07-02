@@ -101,7 +101,7 @@ public final class R {
         public static final int increment=0x7f09000e;
         public static final int invisible_view=0x7f090011;
         public static final int item_name=0x7f09000a;
-        public static final int log_in=0x7f090003;
+        public static final int login=0x7f090003;
         public static final int new_project_client_area=0x7f090006;
         public static final int new_task_button=0x7f090023;
         public static final int password=0x7f090002;
