@@ -33,6 +33,7 @@
     <string name="email">E-mail</string>
     <string name="password">Password</string>
     <string name="log_in">Log in</string>
+    <string name="google_login">Google login</string>
     <string name="create_account">Create a new account</string>
     <string name="logging_in">Signing in...</string>
     
