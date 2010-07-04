@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ public class AccountActivity extends Activity {
   private EditText passwordEditText;
   private TextView createNewAccount;
   private Button loginButton;
+  private LinearLayout googleLogin;
   private Toggl app;
 
   private static final String TAG = "AccountActivity";
@@ -71,14 +73,17 @@ public class AccountActivity extends Activity {
   @Override
   protected void onResume() {
     initFields();    
-    IntentFilter filter = new IntentFilter(SyncService.SYNC_COMPLETED);
-    registerReceiver(updateReceiver, filter);    
+    IntentFilter syncFilter = new IntentFilter(SyncService.SYNC_COMPLETED);
+    registerReceiver(syncReceiver, syncFilter);    
+    IntentFilter googleAuthFilter = new IntentFilter(TogglWebApi.GOOGLE_AUTH_COMPLETED);
+    registerReceiver(googleAuthReceiver, googleAuthFilter);    
     super.onResume();
   }  
   
   @Override
   protected void onPause() {
-    unregisterReceiver(updateReceiver);
+    unregisterReceiver(syncReceiver);
+    unregisterReceiver(googleAuthReceiver);
     super.onPause();
   }
   
@@ -135,6 +140,7 @@ public class AccountActivity extends Activity {
     passwordEditText = (EditText) findViewById(R.id.password);
     loginButton = (Button) findViewById(R.id.login);
     createNewAccount = (TextView) findViewById(R.id.create_account);
+    googleLogin = (LinearLayout) findViewById(R.id.google_login);
   }
   
   private void initFields() {
@@ -168,6 +174,18 @@ public class AccountActivity extends Activity {
       public void onClick(View v) {
         Intent intent = new Intent(AccountActivity.this, SignUpActivity.class);
         startActivity(intent);
+      }
+    });
+    
+    googleLogin.setOnClickListener(new View.OnClickListener() {
+      
+      public void onClick(View v) {
+        if (app.isConnected()) {
+          showDialog(DIALOG_LOGGING_IN);
+          webApi.authenticateWithGoogle(getApplicationContext());
+        } else {
+          showNoConnectionDialog();
+        }        
       }
     });
   }
@@ -211,6 +229,34 @@ public class AccountActivity extends Activity {
     startActivity(new Intent(AccountActivity.this, TasksActivity.class));
   }
   
+  private void fixLoginAndSync(User user) {
+    if (user != null) {
+      user = saveCurrentUser(user);        
+      app.logIn(user);
+      webApi.setApiToken(user.api_token);
+      Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());
+      
+      runOnUiThread(new Runnable() {
+        public void run() {
+          showDialog(DIALOG_SYNCING);
+        }
+      });
+      
+      new Thread(syncAllInBackground).start();        
+    } else {
+      showAuthFailedToast();
+    }
+  }
+
+  private void showAuthFailedToast() {
+    runOnUiThread(new Runnable() {
+      public void run() {
+        Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed),
+            Toast.LENGTH_SHORT).show(); 
+      }
+    });
+  }
+  
   private User saveCurrentUser(User user) {
     DatabaseAdapter dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
@@ -233,32 +279,22 @@ public class AccountActivity extends Activity {
       User user = webApi.authenticateWithCredentials(email, password);
 
       dismissDialog(DIALOG_LOGGING_IN);
-
-      if (user != null) {
-        user = saveCurrentUser(user);        
-        app.logIn(user);
-        webApi.setApiToken(user.api_token);
-        Log.d(TAG, "CurrentUser: " + app.getCurrentUser().toString());
-
-        runOnUiThread(new Runnable() {
-          public void run() {
-            showDialog(DIALOG_SYNCING);
-          }
-        });
-
-        new Thread(syncAllInBackground).start();        
-      } else {
-        runOnUiThread(new Runnable() {
-          public void run() {
-            Toast.makeText(AccountActivity.this, getString(R.string.authentication_failed),
-                Toast.LENGTH_SHORT).show(); 
-          }
-        });
-      }
+      fixLoginAndSync(user);
     }
   };
   
-  private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+  private Runnable fetchUserInBackground = new Runnable() {
+    
+    public void run() {
+      User user = webApi.fetchMe();
+      Log.d(TAG, "me: " + user);
+      dismissDialog(DIALOG_LOGGING_IN);
+      fixLoginAndSync(user);
+    }
+
+  };
+  
+  private BroadcastReceiver syncReceiver = new BroadcastReceiver() {
     
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -266,6 +302,20 @@ public class AccountActivity extends Activity {
       if (intent.getStringExtra(SyncService.COLLECTION).equals(SyncService.ALL_COMPLETED)) {
         dismissDialog(DIALOG_SYNCING);
         startTasksActivity();
+      }
+    }
+  };  
+  
+  private BroadcastReceiver googleAuthReceiver = new BroadcastReceiver() {
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      Log.d(TAG, "googleAuth intent: " + intent);
+      Log.d(TAG, "googleAuth result: " + intent.getStringExtra(TogglWebApi.RESULT));
+      if (intent.getStringExtra(TogglWebApi.RESULT).equals(TogglWebApi.SUCCESSFUL)) {
+        new Thread(fetchUserInBackground).start();
+      } else {
+        showAuthFailedToast();
       }
     }
   };  
