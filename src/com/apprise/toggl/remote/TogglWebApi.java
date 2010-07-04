@@ -103,17 +103,22 @@ public class TogglWebApi {
   }
 
   private void getTogglSessionWithGoogle() {
+    Log.d(TAG, "getTogglSessionWithGoogle");
     for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
       Log.d(TAG, "cookie: " + cookie);
     }    
     
     new Thread(new Runnable() {
       public void run() {
-        httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
+//        httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
 
         try {
           HttpGet httpGet = new HttpGet(GOOGLE_LOGIN_URL);
           httpClient.execute(httpGet);
+          
+          for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
+            Log.d(TAG, "cookie: " + cookie);
+          }             
           
           if (getSession()) {
             Intent intent = new Intent(GOOGLE_AUTH_COMPLETED);
@@ -125,7 +130,7 @@ public class TogglWebApi {
         } catch (IOException e) {
           Log.e(TAG, "IOException when performing remote request", e);
         } finally {
-          httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
+//          httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
         }
         
       }
