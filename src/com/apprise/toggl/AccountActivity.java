@@ -36,6 +36,7 @@ public class AccountActivity extends Activity {
   
   private static final String STATE_EMAIL = "com.apprise.toggl.STATE_EMAIL";
   private static final String STATE_PASSWORD = "com.apprise.toggl.STATE_PASSWORD";
+  private static final int GOOGLE_AUTH_REQUEST = 1;
   private static final int DIALOG_LOGGING_IN = 1;
   private static final int DIALOG_SYNCING = 2;
 
@@ -75,15 +76,12 @@ public class AccountActivity extends Activity {
     initFields();    
     IntentFilter syncFilter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(syncReceiver, syncFilter);    
-    IntentFilter googleAuthFilter = new IntentFilter(TogglWebApi.GOOGLE_AUTH_COMPLETED);
-    registerReceiver(googleAuthReceiver, googleAuthFilter);    
     super.onResume();
   }  
   
   @Override
   protected void onPause() {
     unregisterReceiver(syncReceiver);
-    unregisterReceiver(googleAuthReceiver);
     super.onPause();
   }
   
@@ -181,8 +179,8 @@ public class AccountActivity extends Activity {
       
       public void onClick(View v) {
         if (app.isConnected()) {
-          showDialog(DIALOG_LOGGING_IN);
-          webApi.authenticateWithGoogle(getApplicationContext());
+          Intent intent = new Intent(AccountActivity.this, GoogleAuthActivity.class);
+          startActivityForResult(intent, GOOGLE_AUTH_REQUEST);
         } else {
           showNoConnectionDialog();
         }        
@@ -306,21 +304,6 @@ public class AccountActivity extends Activity {
     }
   };  
   
-  private BroadcastReceiver googleAuthReceiver = new BroadcastReceiver() {
-    
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      Log.d(TAG, "googleAuth intent: " + intent);
-      Log.d(TAG, "googleAuth result: " + intent.getStringExtra(TogglWebApi.RESULT));
-      if (intent.getStringExtra(TogglWebApi.RESULT).equals(TogglWebApi.SUCCESSFUL)) {
-        new Thread(fetchUserInBackground).start();
-      } else {
-        showAuthFailedToast();
-      }
-    }
-  };  
-    
-  
   private ServiceConnection syncConnection = new ServiceConnection() {
     
     public void onServiceDisconnected(ComponentName name) {}
@@ -362,5 +345,17 @@ public class AccountActivity extends Activity {
     public void onServiceDisconnected(ComponentName name) {
     }
   };  
+
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == GOOGLE_AUTH_REQUEST) {
+      if (resultCode == RESULT_OK) {
+        String togglSessionId = data.getStringExtra(GoogleAuthActivity.TOGGL_SESSION_ID);
+        Log.d(TAG, "togglSessionId: " + togglSessionId);
+        webApi.setSession(togglSessionId);
+        showDialog(DIALOG_LOGGING_IN);        
+        new Thread(fetchUserInBackground).start();        
+      }
+    }
+  }  
   
 }

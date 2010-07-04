@@ -11,24 +11,22 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import com.apprise.toggl.Toggl;
-import com.apprise.toggl.googleauth.GoogleAuth;
 import com.apprise.toggl.remote.exception.FailedResponseException;
 import com.apprise.toggl.remote.exception.NotSignedInException;
 import com.apprise.toggl.storage.models.Client;
@@ -42,10 +40,6 @@ import com.apprise.toggl.storage.models.Workspace;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.util.Log;
 
 public class TogglWebApi {
@@ -64,19 +58,11 @@ public class TogglWebApi {
   private static final String PLANNED_TASKS_URL = API_URL + "/planned_tasks.json";
   private static final String CLIENTS_URL = API_URL + "/clients.json";
   private static final String TAGS_URL = API_URL + "/tags.json";
-  private static final String GOOGLE_LOGIN_URL = BASE_URL + "/user/google_login";
   private static final String EMAIL = "email";
   private static final String PASSWORD = "password";
   private static final String API_TOKEN = "api_token";
 
-  public static final String GOOGLE_AUTH_COMPLETED = "com.apprise.toggl.remote.TogglWebApi.GOOGLE_AUTH_COMPLETED";  
-  public static final String RESULT = "com.apprise.toggl.remote.TogglWebApi.RESULT";  
-  public static final String SUCCESSFUL = "com.apprise.toggl.remote.TogglWebApi.SUCCESSFUL";  
-  public static final String FAILED = "com.apprise.toggl.remote.TogglWebApi.FAILED";  
-  public static final String USER = "com.apprise.toggl.remote.TogglWebApi.USER";  
-  
   private static DefaultHttpClient httpClient;
-  private Context context;
 
   private String apiToken;
   private boolean restartSession = true; 
@@ -91,51 +77,15 @@ public class TogglWebApi {
     this.restartSession = true;
   }
   
-  public void authenticateWithGoogle(Context context) {
-    IntentFilter filter = new IntentFilter(GoogleAuth.AUTH_COMPLETED);
-    this.context = context;
-    context.registerReceiver(updateReceiver, filter);
+  public void setSession(String togglSessionId) {
+    BasicClientCookie togglSession = new BasicClientCookie("_toggl_session", togglSessionId);
+    togglSession.setDomain("www.toggl.com");
+    togglSession.setPath("/");
     
-    GoogleAuth googleAuth = new GoogleAuth(context);
-    
-    // Invokes AsyncTask, response is handled in updateReceiver
-    googleAuth.getGoogleSessionFor(httpClient);
+    Log.d(TAG, "setting session cookie: " + togglSession);
+    httpClient.getCookieStore().addCookie(togglSession);
+    restartSession = false;
   }
-
-  private void getTogglSessionWithGoogle() {
-    Log.d(TAG, "getTogglSessionWithGoogle");
-    for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
-      Log.d(TAG, "cookie: " + cookie);
-    }    
-    
-    new Thread(new Runnable() {
-      public void run() {
-//        httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
-
-        try {
-          HttpGet httpGet = new HttpGet(GOOGLE_LOGIN_URL);
-          httpClient.execute(httpGet);
-          
-          for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
-            Log.d(TAG, "cookie: " + cookie);
-          }             
-          
-          if (getSession()) {
-            Intent intent = new Intent(GOOGLE_AUTH_COMPLETED);
-            intent.putExtra(RESULT, SUCCESSFUL);
-            context.sendBroadcast(intent);        
-          }
-        } catch (ClientProtocolException e) {
-          Log.e(TAG, "ClientProtocolException when performing remote request", e);
-        } catch (IOException e) {
-          Log.e(TAG, "IOException when performing remote request", e);
-        } finally {
-//          httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
-        }
-        
-      }
-    });
-  }  
   
   public User authenticateWithCredentials(final String email, final String password) {
     ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -178,28 +128,32 @@ public class TogglWebApi {
   }
   
   public User fetchMe() {
-    Type type = new TypeToken<User>() {}.getType();
-    HttpResponse response = executeGetRequest(ME_URL);
-    if (ok(response)) {
-      Gson gson = new Gson();
-      Log.d(TAG, "TogglWebApi#fetchMe got a successful response");
-      InputStreamReader reader = null;
-      try {
-        reader = getResponseReader(response);
-        return gson.fromJson(reader, type);          
-      } finally {
+    if (getSession()) {    
+      Type type = new TypeToken<User>() {}.getType();
+      HttpResponse response = executeGetRequest(ME_URL);
+      if (ok(response)) {
+        Gson gson = new Gson();
+        Log.d(TAG, "TogglWebApi#fetchMe got a successful response");
+        InputStreamReader reader = null;
         try {
-          reader.close();
-        } catch (IOException e) {}
+          reader = getResponseReader(response);
+          return gson.fromJson(reader, type);          
+        } finally {
+          try {
+            reader.close();
+          } catch (IOException e) {}
+        }
+      } else if (response != null) {
+        Log.e(TAG, "TogglWebApi#fetchMe got a failed request: "
+            + response.getStatusLine().getStatusCode());
+        throw new FailedResponseException();
+      } else {
+        Log.w(TAG, "TogglWebApi#fetchMe got no response"); 
+        throw new FailedResponseException();        
       }
-    } else if (response != null) {
-      Log.e(TAG, "TogglWebApi#fetchMe got a failed request: "
-          + response.getStatusLine().getStatusCode());
-      throw new FailedResponseException();
     } else {
-      Log.w(TAG, "TogglWebApi#fetchMe got no response"); 
-      throw new FailedResponseException();        
-    }   
+      throw new NotSignedInException();
+    }
   }
   
   @SuppressWarnings("unchecked")
@@ -373,7 +327,9 @@ public class TogglWebApi {
    * Authenticate if session cookies are missing
    * */
   private boolean getSession() {
+    Log.d(TAG, "restartSession: " + restartSession);
     if (!restartSession) { 
+      Log.d(TAG, "cookies: " + httpClient.getCookieStore().toString());
       for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
         Log.d(TAG, "cookie: " + cookie.getName());
         if (cookie.getName().equals("_toggl_session"))
@@ -490,22 +446,5 @@ public class TogglWebApi {
       ConnManagerParams.setTimeout(params, CONNECTION_TIMEOUT);      
     }
   }
-
-  private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      Log.d(TAG, "googleSessionReceiver: " + intent);
-      Log.d(TAG, "result: " + intent.getStringExtra(GoogleAuth.RESULT));
-      if (intent.getStringExtra(GoogleAuth.RESULT).equals(GoogleAuth.SUCCESSFUL)) {
-        getTogglSessionWithGoogle();
-      } else {
-        Intent authFailed = new Intent(GOOGLE_AUTH_COMPLETED);
-        authFailed.putExtra(RESULT, FAILED);
-        context.sendBroadcast(authFailed);         
-      }
-    }
-
-  };    
   
 }

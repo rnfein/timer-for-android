@@ -34,6 +34,7 @@
       </intent-filter>    
     </activity>
     <activity android:name="SignUpActivity"/>
+    <activity android:name=".GoogleAuthActivity"/>
     <receiver android:name=".remote.SyncAlarmReceiver">
       <intent-filter>
         <action android:name="com.apprise.toggl.remote.ACTION_SYNC_ALARM"/>
