@@ -63,12 +63,14 @@ public class GoogleAuthActivity extends Activity {
           end = s.indexOf(";");
         }
         String togglSession = s.substring(0, end);
-
-        Intent intent = getIntent();
-        intent.putExtra(TOGGL_SESSION_ID, togglSession);
-        setResult(RESULT_OK, intent);
-        view.stopLoading();
-        finish();
+        
+        if (togglSession.length() < 200) {
+          Intent intent = getIntent();
+          intent.putExtra(TOGGL_SESSION_ID, togglSession);
+          setResult(RESULT_OK, intent);
+          view.stopLoading();
+          finish();
+        }
       }
       super.onPageStarted(view, url, favicon);
     }
