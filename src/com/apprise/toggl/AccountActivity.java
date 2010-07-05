@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,11 @@ public class AccountActivity extends Activity {
   private static final int GOOGLE_AUTH_REQUEST = 1;
   private static final int DIALOG_LOGGING_IN = 1;
   private static final int DIALOG_SYNCING = 2;
+  
+  public static final int SENSOR_ORIENTATION = 4;
+  public static final int PORTRAIT = 1;
+  public static final int LANDSCAPE = 0;
+  
 
   private TogglWebApi webApi;
   private SyncService syncService;
@@ -159,11 +165,13 @@ public class AccountActivity extends Activity {
 
         if (app.isConnected()) {
           showDialog(DIALOG_LOGGING_IN);
+          lockOrientation();
           new Thread(authenticateInBackground).start();
         } else {
           showNoConnectionDialog();
         }
       }
+
     });
 
     createNewAccount.setOnClickListener(new View.OnClickListener() {
@@ -186,6 +194,19 @@ public class AccountActivity extends Activity {
       }
     });
   }
+
+  private void lockOrientation() {
+    Display display = getWindowManager().getDefaultDisplay();
+
+    int width = display.getWidth();  
+    int height = display.getHeight();     
+
+    if (width < height) {
+      setRequestedOrientation(PORTRAIT);      
+    } else {
+      setRequestedOrientation(LANDSCAPE);
+    }
+  }  
   
   @Override
   protected Dialog onCreateDialog(int id) {
@@ -320,13 +341,15 @@ public class AccountActivity extends Activity {
       syncService.setApiToken(app.getAPIToken());
       try {
         syncService.syncAll();
+        setRequestedOrientation(SENSOR_ORIENTATION);        
       } catch (FailedResponseException e) {
         Log.e(TAG, "FailedResponseException", e);
         runOnUiThread(new Runnable() {
           public void run() {
             Toast.makeText(AccountActivity.this, getString(R.string.sync_failed),
                 Toast.LENGTH_SHORT).show(); 
-            dismissDialog(DIALOG_SYNCING);            
+            dismissDialog(DIALOG_SYNCING);
+            setRequestedOrientation(SENSOR_ORIENTATION);            
           }
         });    
       }
@@ -351,6 +374,7 @@ public class AccountActivity extends Activity {
         String togglSessionId = data.getStringExtra(GoogleAuthActivity.TOGGL_SESSION_ID);
         Log.d(TAG, "togglSessionId: " + togglSessionId);
         webApi.setSession(togglSessionId);
+        lockOrientation();        
         showDialog(DIALOG_LOGGING_IN);        
         new Thread(fetchUserInBackground).start();        
       }

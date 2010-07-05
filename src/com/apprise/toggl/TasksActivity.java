@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -85,7 +86,7 @@ public class TasksActivity extends ListActivity {
     
     IntentFilter timerFilter = new IntentFilter(TimeTrackingService.BROADCAST_SECOND_ELAPSED);
     registerReceiver(updateReceiver, timerFilter);
-
+    
     adapter.clearSections();
     populateList();
   }
@@ -203,6 +204,7 @@ public class TasksActivity extends ListActivity {
     switch (item.getItemId()) {
       case R.id.tasks_menu_refresh:
         setProgressBarIndeterminateVisibility(true);
+        lockOrientation();
         new Thread(syncAllInBackground).start();
         return true;
       case R.id.tasks_menu_account:
@@ -211,6 +213,19 @@ public class TasksActivity extends ListActivity {
     }
     return super.onOptionsItemSelected(item);
   }  
+
+  private void lockOrientation() {
+    Display display = getWindowManager().getDefaultDisplay();
+
+    int width = display.getWidth();  
+    int height = display.getHeight();     
+
+    if (width < height) {
+      setRequestedOrientation(AccountActivity.PORTRAIT);      
+    } else {
+      setRequestedOrientation(AccountActivity.LANDSCAPE);
+    }
+  }    
   
   protected ServiceConnection syncConnection = new ServiceConnection() {
     
@@ -238,6 +253,7 @@ public class TasksActivity extends ListActivity {
               Toast.makeText(TasksActivity.this,
                   getString(R.string.sync_failed), Toast.LENGTH_SHORT).show();
               setProgressBarIndeterminateVisibility(false);
+              setRequestedOrientation(AccountActivity.SENSOR_ORIENTATION);              
             }
           });
         }
@@ -247,6 +263,7 @@ public class TasksActivity extends ListActivity {
             Toast.makeText(TasksActivity.this,
                 getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
             setProgressBarIndeterminateVisibility(false);
+            setRequestedOrientation(AccountActivity.SENSOR_ORIENTATION);
           }
         });
       }
@@ -266,7 +283,8 @@ public class TasksActivity extends ListActivity {
           adapter.clearSections();
           populateList();
 
-          setProgressBarIndeterminateVisibility(false);      
+          setProgressBarIndeterminateVisibility(false);
+          setRequestedOrientation(AccountActivity.SENSOR_ORIENTATION);          
         }        
       }
       else if (TimeTrackingService.BROADCAST_SECOND_ELAPSED.equals(intent.getAction())) {

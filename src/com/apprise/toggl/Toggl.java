@@ -115,7 +115,7 @@ public class Toggl extends Application {
   public void onTerminate() {
     unregisterReceiver(updateReceiver);
     super.onTerminate();    
-  }
+  }     
   
   protected BroadcastReceiver updateReceiver = new BroadcastReceiver() {
     @Override
