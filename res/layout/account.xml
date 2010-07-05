@@ -133,7 +133,6 @@
 		    </LinearLayout>
 	    </LinearLayout>
       <LinearLayout
-        android:id="@+id/google_login"
         android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
@@ -145,9 +144,12 @@
           android:layout_marginRight="4dp"
           android:background="@drawable/google_icon"/>
         <TextView
+          android:id="@+id/google_login"        
+	        android:clickable="true"
+	        android:focusable="true"        
           android:layout_height="fill_parent"
           android:layout_width="wrap_content"
-          android:textColor="@color/light_blue"
+          android:textColor="@color/google_login_selector"
           android:textStyle="bold"    
           android:text="@string/google_login"/>
       </LinearLayout>       

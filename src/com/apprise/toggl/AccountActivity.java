@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +47,7 @@ public class AccountActivity extends Activity {
   private EditText passwordEditText;
   private TextView createNewAccount;
   private Button loginButton;
-  private LinearLayout googleLogin;
+  private TextView googleLogin;
   private Toggl app;
 
   private static final String TAG = "AccountActivity";
@@ -138,7 +137,7 @@ public class AccountActivity extends Activity {
     passwordEditText = (EditText) findViewById(R.id.password);
     loginButton = (Button) findViewById(R.id.login);
     createNewAccount = (TextView) findViewById(R.id.create_account);
-    googleLogin = (LinearLayout) findViewById(R.id.google_login);
+    googleLogin = (TextView) findViewById(R.id.google_login);
   }
   
   private void initFields() {

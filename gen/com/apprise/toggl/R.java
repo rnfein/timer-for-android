@@ -12,11 +12,12 @@ public final class R {
     }
     public static final class color {
         public static final int black=0x7f040001;
+        public static final int google_login_selector=0x7f040007;
         public static final int gray=0x7f040003;
         public static final int light_blue=0x7f040005;
         public static final int light_gray=0x7f040004;
         public static final int red=0x7f040006;
-        public static final int timer_duration_selector=0x7f040007;
+        public static final int timer_duration_selector=0x7f040008;
         public static final int transparent=0x7f040000;
         public static final int white=0x7f040002;
     }
