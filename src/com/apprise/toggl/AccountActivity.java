@@ -78,7 +78,7 @@ public class AccountActivity extends Activity {
   
   @Override
   protected void onResume() {
-    initFields();    
+    initFields();
     IntentFilter syncFilter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(syncReceiver, syncFilter);    
     super.onResume();
@@ -147,7 +147,6 @@ public class AccountActivity extends Activity {
   }
   
   private void initFields() {
-    passwordEditText.setText(null);
     if (app.getCurrentUser() != null) {
       emailEditText.setText(app.getCurrentUser().email);
     } else {
@@ -257,9 +256,11 @@ public class AccountActivity extends Activity {
       runOnUiThread(new Runnable() {
         public void run() {
           showDialog(DIALOG_SYNCING);
+          passwordEditText.setText(null);          
+          initFields();          
         }
       });
-      
+
       new Thread(syncAllInBackground).start();        
     } else {
       showAuthFailedToast();
