@@ -327,11 +327,8 @@ public class TogglWebApi {
    * Authenticate if session cookies are missing
    * */
   private boolean getSession() {
-    Log.d(TAG, "restartSession: " + restartSession);
     if (!restartSession) { 
-      Log.d(TAG, "cookies: " + httpClient.getCookieStore().toString());
       for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
-        Log.d(TAG, "cookie: " + cookie.getName());
         if (cookie.getName().equals("_toggl_session"))
           return true;
       }
