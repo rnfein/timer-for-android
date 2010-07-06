@@ -201,8 +201,9 @@ public class SyncService extends Service {
       Log.d(TAG, "connection found, #deleteRemoteTask starting.");
       DeletedTask deletedTask = dbAdapter.findDeletedTask(task.id);
       if (deletedTask != null) {
-        api.deleteTask(deletedTask.taskRemoteId);        
-        dbAdapter.deleteDeletedTask(deletedTask._id);
+        if (api.deleteTask(deletedTask.taskRemoteId)) {        
+          dbAdapter.deleteDeletedTask(deletedTask._id);
+        }
       }
     }
   }
