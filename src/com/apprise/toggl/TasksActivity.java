@@ -301,15 +301,17 @@ public class TasksActivity extends ListActivity {
       }
       else if (TimeTrackingService.BROADCAST_SECOND_ELAPSED.equals(intent.getAction())) {
         for (TasksCursorAdapter taskAdapter : taskAdapters) {
-          TextView durationView = taskAdapter.getDurationView(timeTrackingService.getId());
-          if (durationView != null) {
-            durationView.setText(Util.secondsToHMS(timeTrackingService.getCurrentDuration()));
-            durationView.setTextAppearance(context, R.style.tasklist_running_duration);
+          if (timeTrackingService != null) {
+            TextView durationView = taskAdapter.getDurationView(timeTrackingService.getId());
+            if (durationView != null) {
+              durationView.setText(Util.secondsToHMS(timeTrackingService.getCurrentDuration()));
+              durationView.setTextAppearance(context, R.style.tasklist_running_duration);
 
-            SectionedHeader header = adapter.getHeader(taskAdapters.indexOf(taskAdapter));
-            header.cursor = taskAdapter.getCursor();
-            header.update();
-            break;
+              SectionedHeader header = adapter.getHeader(taskAdapters.indexOf(taskAdapter));
+              header.cursor = taskAdapter.getCursor();
+              header.update();
+              break;
+            }
           }
         }
       }
