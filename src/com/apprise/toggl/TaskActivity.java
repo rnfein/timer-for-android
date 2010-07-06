@@ -796,7 +796,8 @@ public class TaskActivity extends ApplicationActivity {
 
       if (constraint == null) constraint = "";
       Cursor c = dbAdapter.findTasksForAutocomplete(constraint);
-
+      startManagingCursor(c);
+      
       return c;
     }
   }
