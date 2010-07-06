@@ -101,6 +101,7 @@ public class TasksActivity extends ListActivity {
   protected void onDestroy() {
     dbAdapter.close();
     unbindService(syncConnection);
+    unbindService(trackingConnection);
     super.onDestroy();
   }
 
