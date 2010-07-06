@@ -385,6 +385,8 @@ public class TaskActivity extends ApplicationActivity {
     continueTask.duration = 0;
     continueTask.id = 0;
     dbAdapter.updateTask(continueTask);
+
+    finish();
     
     Intent intent = new Intent(this, TaskActivity.class);
     intent.putExtra(TASK_ID, continueTask._id);
