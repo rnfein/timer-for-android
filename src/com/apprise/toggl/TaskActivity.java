@@ -86,8 +86,22 @@ public class TaskActivity extends ApplicationActivity {
     
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
+    
+    Intent timeTrackingServiceIntent = new Intent(this, TimeTrackingService.class);
+    if (!TimeTrackingService.isAlive()) {
+      startService(timeTrackingServiceIntent);
+    }
+    bindService(timeTrackingServiceIntent, trackingConnection, BIND_AUTO_CREATE);
+    
     long _id = getIntent().getLongExtra(TASK_ID, -1);
     
+    instantiateTask(_id);
+
+    initViews();
+    attachEvents();
+  }
+
+  private void instantiateTask(long _id) {
     boolean newTask = false;
     if (_id > 0) {
       task = dbAdapter.findTask(_id);
@@ -96,19 +110,18 @@ public class TaskActivity extends ApplicationActivity {
       task = dbAdapter.createDirtyTask();
       newTask = true;
     }
-
-    Intent timeTrackingServiceIntent = new Intent(this, TimeTrackingService.class);
-    if (!TimeTrackingService.isAlive()) {
-      startService(timeTrackingServiceIntent);
-    }
-    bindService(timeTrackingServiceIntent, trackingConnection, BIND_AUTO_CREATE);
-
-    initViews();
-    attachEvents();
     
     if (app.getCurrentUser().new_tasks_start_automatically && newTask) {
       startAutomatically = true;
     }
+  }
+  
+  @Override
+  protected void onNewIntent(Intent intent) {
+    long _id = intent.getLongExtra(TASK_ID, -1);
+    instantiateTask(_id);
+    initViews();
+    super.onNewIntent(intent);
   }
 
   @Override
@@ -146,7 +159,7 @@ public class TaskActivity extends ApplicationActivity {
   @Override
   protected void onPause() {
     if (!deleted) {
-      if (!task.description.equals(descriptionView.getText().toString())) {
+      if (task.description != null && !task.description.equals(descriptionView.getText().toString())) {
         task.description = descriptionView.getText().toString();
         saveTask();
       }
@@ -377,7 +390,6 @@ public class TaskActivity extends ApplicationActivity {
     intent.putExtra(TASK_ID, continueTask._id);
     intent.putExtra(NEW_TASK, true);
     startActivity(intent);
-    finish();
   }
   
   private void showChooseProjectDialog() {
@@ -612,6 +624,8 @@ public class TaskActivity extends ApplicationActivity {
                     syncService.deleteRemoteTask(task);
                   } catch (FailedResponseException e) {
                     Log.e(TAG, "FailedResponseException", e);
+                  } catch (Exception e) {
+                    Log.e(TAG, "Exception", e);                    
                   }
                 }
               }).start();
