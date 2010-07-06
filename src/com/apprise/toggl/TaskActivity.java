@@ -142,6 +142,7 @@ public class TaskActivity extends ApplicationActivity {
   protected void onResume() {
     super.onResume();    
     updateAllViews();
+    unfocusAutocompleteField();    
   }
 
   private void updateAllViews() {
@@ -225,16 +226,18 @@ public class TaskActivity extends ApplicationActivity {
         task.workspace = selectedTask.workspace;
         task.tag_names = selectedTask.tag_names;
         updateAllViews();
-        
-        //set focus to invisible view, hide soft keyboard
-        ((EditText) findViewById(R.id.invisible_view)).requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(descriptionView.getWindowToken(), 0);        
       }
     });
 
   }
 
+  private void unfocusAutocompleteField() {
+    //set focus to invisible view, hide soft keyboard
+    ((EditText) findViewById(R.id.invisible_view)).requestFocus();
+    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    imm.hideSoftInputFromWindow(descriptionView.getWindowToken(), 0);
+  }
+  
   private void updateProjectView() {
     if (task.project != null) {
       projectView.setText(task.project.client_project_name);
