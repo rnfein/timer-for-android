@@ -15,6 +15,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 public class TimeTrackingService extends ServiceCompat {
 
@@ -66,6 +67,14 @@ public class TimeTrackingService extends ServiceCompat {
 
   }
   
+  public long getId() {
+    if (task != null) {
+      return task._id;
+    } else {
+      return -1;
+    }
+  }
+  
   public long startTracking(Task task) {
     this.task = task;
     setCurrentDuration(this.task.duration);
@@ -93,6 +102,7 @@ public class TimeTrackingService extends ServiceCompat {
     task = null;
     runningTimeStart = 0l;
     isTracking = false;
+    stopSelf();
     return endDuration;
   }
 

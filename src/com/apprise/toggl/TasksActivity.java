@@ -45,14 +45,12 @@ public class TasksActivity extends ListActivity {
   
   private DatabaseAdapter dbAdapter;
   private SyncService syncService;
+  private TimeTrackingService timeTrackingService;
   private Toggl app;
   private User currentUser;
   private SectionedTasksAdapter adapter;
   private LinkedList<TasksCursorAdapter> taskAdapters;
   private Button newTaskButton;
-  
-  private long trackedTaskId;
-  private long trackedTaskDurationSeconds;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -68,8 +66,11 @@ public class TasksActivity extends ListActivity {
     dbAdapter = new DatabaseAdapter(this, app);
     dbAdapter.open();
 
-    Intent intent = new Intent(this, SyncService.class);
-    bindService(intent, syncConnection, BIND_AUTO_CREATE);
+    Intent syncIntent = new Intent(this, SyncService.class);
+    bindService(syncIntent, syncConnection, BIND_AUTO_CREATE);
+    
+    Intent trackingIntent = new Intent(this, TimeTrackingService.class);
+    bindService(trackingIntent, trackingConnection, BIND_AUTO_CREATE);
     
     initViews();
     attachEvents();
@@ -79,7 +80,6 @@ public class TasksActivity extends ListActivity {
   protected void onResume() {
     super.onResume();    
     currentUser = app.getCurrentUser();
-    trackedTaskId = -1;
 
     IntentFilter syncFilter = new IntentFilter(SyncService.SYNC_COMPLETED);
     registerReceiver(updateReceiver, syncFilter);
@@ -167,8 +167,8 @@ public class TasksActivity extends ListActivity {
       while (!tasksCursor.isAfterLast()) {
         id = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks._ID));
         
-        if (id == trackedTaskId) {
-          duration = Util.convertIfRunningTime(trackedTaskDurationSeconds);
+        if (timeTrackingService != null && id == timeTrackingService.getId()) {
+          duration = Util.convertIfRunningTime(timeTrackingService.getCurrentDuration());
         } else {
           duration = tasksCursor.getLong(tasksCursor.getColumnIndex(Tasks.DURATION));  
         }
@@ -238,6 +238,17 @@ public class TasksActivity extends ListActivity {
 
   };
   
+  protected ServiceConnection trackingConnection = new ServiceConnection() {
+    
+    public void onServiceDisconnected(ComponentName name) {}
+    
+    public void onServiceConnected(ComponentName name, IBinder serviceBinding) {
+      TimeTrackingService.TimeTrackingBinder binding = (TimeTrackingService.TimeTrackingBinder) serviceBinding;
+      timeTrackingService = binding.getService();
+    }
+    
+  };
+  
   
   
   protected Runnable syncAllInBackground = new Runnable() {
@@ -288,13 +299,10 @@ public class TasksActivity extends ListActivity {
         }        
       }
       else if (TimeTrackingService.BROADCAST_SECOND_ELAPSED.equals(intent.getAction())) {
-        trackedTaskId = intent.getLongExtra(TimeTrackingService.TRACKED_TASK_ID, -1);
-        trackedTaskDurationSeconds = intent.getLongExtra(TimeTrackingService.TRACKED_TASK_DURATION, -1);
-        
         for (TasksCursorAdapter taskAdapter : taskAdapters) {
-          TextView durationView = taskAdapter.getDurationView(trackedTaskId);
+          TextView durationView = taskAdapter.getDurationView(timeTrackingService.getId());
           if (durationView != null) {
-            durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
+            durationView.setText(Util.secondsToHMS(timeTrackingService.getCurrentDuration()));
             durationView.setTextAppearance(context, R.style.tasklist_running_duration);
 
             SectionedHeader header = adapter.getHeader(taskAdapters.indexOf(taskAdapter));
@@ -390,8 +398,8 @@ public class TasksActivity extends ListActivity {
       TextView durationView = (TextView) view.findViewById(R.id.task_item_duration);
       long id = cursor.getLong(cursor.getColumnIndex(Tasks._ID));
       
-      if (id == trackedTaskId) {
-        durationView.setText(Util.secondsToHMS(trackedTaskDurationSeconds));
+      if (timeTrackingService != null && id == timeTrackingService.getId()) {
+        durationView.setText(Util.secondsToHMS(timeTrackingService.getCurrentDuration()));
       } else {
         long seconds = cursor.getLong(cursor.getColumnIndex(Tasks.DURATION));
         durationView.setText(Util.secondsToHMS(seconds));        
