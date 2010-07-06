@@ -150,9 +150,13 @@ public class TaskActivity extends ApplicationActivity {
   @Override
   protected void onPause() {
     if (!deleted) {
-      task.description = descriptionView.getText().toString();
-      saveTask();
-      new Thread(postTaskInBackground).start();
+      if (!task.description.equals(descriptionView.getText().toString())) {
+        task.description = descriptionView.getText().toString();
+        saveTask();
+      }
+      if (task.sync_dirty) {
+        new Thread(postTaskInBackground).start();        
+      }
     }
     super.onPause();
   }
