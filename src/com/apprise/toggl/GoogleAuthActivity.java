@@ -69,6 +69,7 @@ public class GoogleAuthActivity extends Activity {
           intent.putExtra(TOGGL_SESSION_ID, togglSession);
           setResult(RESULT_OK, intent);
           view.stopLoading();
+          cookieManager.removeAllCookie();
           finish();
         }
       }
