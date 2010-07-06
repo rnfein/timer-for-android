@@ -12,7 +12,8 @@
     <activity
       android:name="TasksActivity"/>
     <activity
-      android:name="TaskActivity"/>
+      android:name="TaskActivity"
+      android:launchMode="singleTop"/>
     <activity
       android:name="CreateProjectActivity"/>
     <activity
