@@ -462,11 +462,11 @@ public class TaskActivity extends ApplicationActivity {
         task.project = plannedTask.project;
         task.workspace = plannedTask.workspace;
         task.planned_task = plannedTask;
-        if (task.description == null || task.description.equals("")) {
+        if (descriptionView.length() == 0) {
           task.description = plannedTask.name;
+          updateDescriptionView();          
         }
         updateProjectView();
-        updateDescriptionView();
         updatePlannedTaskView();
         saveTask();
       }
