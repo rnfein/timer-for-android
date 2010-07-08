@@ -383,6 +383,7 @@ public class TaskActivity extends ApplicationActivity {
     continueTask.updateAttributes(task);
     String now = Util.formatDateToString(Util.currentDate());
     
+    continueTask.description = descriptionView.getText().toString();    
     continueTask.start = now;
     continueTask.stop = now;
     continueTask.duration = 0;
