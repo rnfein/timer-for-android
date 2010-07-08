@@ -460,8 +460,10 @@ public class TaskActivity extends ApplicationActivity {
         PlannedTask plannedTask = dbAdapter.findPlannedTask(clickedId);
         task.project = plannedTask.project;
         task.workspace = plannedTask.workspace;
-        task.description = plannedTask.name;
         task.planned_task = plannedTask;
+        if (task.description == null || task.description.equals("")) {
+          task.description = plannedTask.name;
+        }
         updateProjectView();
         updateDescriptionView();
         updatePlannedTaskView();
