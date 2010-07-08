@@ -160,7 +160,7 @@ public class TaskActivity extends ApplicationActivity {
   @Override
   protected void onPause() {
     if (!deleted) {
-      if (task.description != null && !task.description.equals(descriptionView.getText().toString())) {
+      if ((task.description == null) || (task.description != null && !task.description.equals(descriptionView.getText().toString()))) {
         task.description = descriptionView.getText().toString();
         saveTask();
       }
