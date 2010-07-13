@@ -2,6 +2,7 @@ package com.apprise.toggl;
 
 import com.apprise.toggl.remote.SyncAlarmReceiver;
 import com.apprise.toggl.remote.SyncService;
+import com.apprise.toggl.storage.DatabaseAdapter;
 import com.apprise.toggl.storage.models.User;
 
 import android.app.AlarmManager;
@@ -106,6 +107,15 @@ public class Toggl extends Application {
     registerReceiver(updateReceiver, connFilter);
   }
 
+  /* use in case the application has been stopped to free memory */
+  public void retrieveCurrentUser(DatabaseAdapter dbAdapter) {
+    if (currentUser == null) {
+      String apiToken = getAPIToken();
+      User user = dbAdapter.findUserByApiToken(apiToken);
+      if (user != null) logIn(user);
+    }
+  }
+  
   @Override
   public void onLowMemory() {
     super.onLowMemory();

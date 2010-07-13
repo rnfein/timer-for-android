@@ -86,6 +86,7 @@ public class TaskActivity extends ApplicationActivity {
     
     dbAdapter = new DatabaseAdapter(this, (Toggl) getApplication());
     dbAdapter.open();
+    app.retrieveCurrentUser(dbAdapter);
     
     Intent timeTrackingServiceIntent = new Intent(this, TimeTrackingService.class);
     if (!TimeTrackingService.isAlive()) {
