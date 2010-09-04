@@ -96,7 +96,11 @@ public class TaskActivity extends ApplicationActivity {
     
     long _id = getIntent().getLongExtra(TASK_ID, -1);
     
-    instantiateTask(_id);
+    this.task = (Task) getLastNonConfigurationInstance();    
+       
+    if (this.task == null) {
+      instantiateTask(_id);
+    }
 
     initViews();
     attachEvents();
@@ -178,6 +182,11 @@ public class TaskActivity extends ApplicationActivity {
     unbindService(trackingConnection);
     unbindService(syncConnection);    
     super.onDestroy();
+  }
+  
+    @Override
+  public Object onRetainNonConfigurationInstance() {
+    return task;
   }
 
   @Override
@@ -610,7 +619,7 @@ public class TaskActivity extends ApplicationActivity {
     if (task._id > 0) {
       dbAdapter.updateTask(task);
     } else {
-      dbAdapter.createTask(task);
+      this.task = dbAdapter.createTask(task);
     }
   }
 
