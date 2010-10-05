@@ -354,7 +354,7 @@ public class DatabaseAdapter {
         "((" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_REMOTE_ID + " = " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + ") AND " + Projects.TABLE_NAME + "." + Projects.REMOTE_ID + " > 0)" +
         " OR (" + Tasks.TABLE_NAME + "." + Tasks.PROJECT_LOCAL_ID + " = " + Projects.TABLE_NAME + "." + Projects._ID + ")" +
         " WHERE strftime('%Y-%m-%d', " + Tasks.START + ", 'localtime') = strftime('%Y-%m-%d', ?, 'localtime')" +
-        " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
+        " AND " + Tasks.TABLE_NAME + "." + Tasks.OWNER_USER_ID + " = ? ORDER BY start DESC", new String[] { String.valueOf(dateString), String.valueOf(app.getCurrentUser()._id) });
 
     return cursor;
   }  
