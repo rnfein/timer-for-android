@@ -129,6 +129,8 @@ public class Util {
   
   public static String joinStringArray(String[] array, String separator){
     if (array != null) {
+      Arrays.sort(array);
+      
       List<String> list = Arrays.asList(array);
       JSONArray jsonArray = new JSONArray(list);
       String string = null;    

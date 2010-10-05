@@ -490,7 +490,8 @@ public class DatabaseAdapter {
   }
   
   public Cursor findAllTags() {
-    return db.query(Tags.TABLE_NAME, null, " owner_user_id = ? ", new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, null);     
+    return db.query(Tags.TABLE_NAME, null, " owner_user_id = ? ",
+        new String[]{ String.valueOf(app.getCurrentUser()._id)}, null, null, Tags.NAME + " ASC");
   }
   
   public boolean updateTag(Tag tag) {
