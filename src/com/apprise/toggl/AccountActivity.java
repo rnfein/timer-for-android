@@ -305,9 +305,18 @@ public class AccountActivity extends Activity {
   private Runnable fetchUserInBackground = new Runnable() {
     
     public void run() {
-      User user = webApi.fetchMe();
+      User user = null;
+      
+      try {
+        user = webApi.fetchMe();
+      } catch (FailedResponseException e) {
+        showAuthFailedToast();
+        return;
+      } finally {
+        dismissDialog(DIALOG_LOGGING_IN);
+      }
+
       Log.d(TAG, "me: " + user);
-      dismissDialog(DIALOG_LOGGING_IN);
       fixLoginAndSync(user);
     }
 
