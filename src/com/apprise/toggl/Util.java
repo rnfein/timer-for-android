@@ -42,6 +42,8 @@ public class Util {
       date = iso8601Format.parse(dateString);
     } catch (java.text.ParseException e) {
       e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();      
     }
     return date;
   }
@@ -67,8 +69,15 @@ public class Util {
   }
   
   public static String smallDateString(Date date) {
-    SimpleDateFormat smallFormat = new SimpleDateFormat("dd. MMM, EEE");    
-    return smallFormat.format(date);
+    SimpleDateFormat smallFormat = new SimpleDateFormat("dd. MMM, EEE");
+    String ret = "";
+
+    try {
+      ret = smallFormat.format(date);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return ret;
   }
   
   public static Date currentDate() {
