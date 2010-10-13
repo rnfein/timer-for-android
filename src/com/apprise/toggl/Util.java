@@ -14,8 +14,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.res.Resources;
+import android.util.Log;
 
 public class Util {
+  
+  private static final String TAG = "Util";  
 
   public static String inputStreamToString(InputStream is) {
     StringBuilder out = new StringBuilder();
@@ -41,9 +44,9 @@ public class Util {
     try {
       date = iso8601Format.parse(dateString);
     } catch (java.text.ParseException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();      
+      Log.e(TAG, "dateString ParseException", e);
+    } catch (NullPointerException e) {
+      Log.e(TAG, "dateString NullPointerException", e);      
     }
     return date;
   }
@@ -74,8 +77,8 @@ public class Util {
 
     try {
       ret = smallFormat.format(date);
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (NullPointerException e) {
+      Log.e(TAG, "dateString NullPointerException", e);   
     }
     return ret;
   }

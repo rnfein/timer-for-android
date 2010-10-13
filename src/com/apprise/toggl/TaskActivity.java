@@ -261,7 +261,7 @@ public class TaskActivity extends ApplicationActivity {
   }  
 
   private void updateDateView() {
-    dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
+    if (task.start != null) dateView.setText(Util.smallDateString(Util.parseStringToDate(task.start)));
   }
   
   private void updatePlannedTaskView() {
