@@ -1,8 +1,8 @@
 package com.apprise.toggl.storage.models;
 
 import com.apprise.toggl.Util;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.mygson.Gson;
+import com.google.mygson.JsonObject;
 
 
 public class Task extends Model {

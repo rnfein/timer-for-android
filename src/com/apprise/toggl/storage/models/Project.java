@@ -1,7 +1,7 @@
 package com.apprise.toggl.storage.models;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.mygson.Gson;
+import com.google.mygson.JsonObject;
 
 
 public class Project extends Model {

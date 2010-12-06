@@ -37,8 +37,8 @@ import com.apprise.toggl.storage.models.Tag;
 import com.apprise.toggl.storage.models.Task;
 import com.apprise.toggl.storage.models.User;
 import com.apprise.toggl.storage.models.Workspace;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.mygson.Gson;
+import com.google.mygson.reflect.TypeToken;
 
 import android.util.Log;
 
