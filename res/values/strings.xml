@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Toggl</string>
-    
+
     <string name="refresh">Refresh</string>
     <string name="account">Account</string>
     <string name="task">Task</string>
     <string name="tasks">Tasks</string>
     <string name="date">Date</string>
+    <string name="start_time">Start time</string>
+    <string name="stop_time">End time</string>
     <string name="billable">Billable</string>
     <string name="planned">Planned</string>
     <string name="tags">Tags</string>
     <string name="project">Project</string>
     <string name="projects">Projects</string>
-    <string name="planned_task">Planned Task</string>    
+    <string name="planned_task">Planned Task</string>
     <string name="log_out">Log Out</string>
     <string name="authentication_failed">Authentication failed</string>
     <string name="syncing">Synchronizing tasks...</string>
@@ -24,7 +26,7 @@
     <string name="set">Set</string>
     <string name="yes">Yes</string>
     <string name="are_you_sure">Are you sure?</string>
-    
+
     <string name="hour">hour</string>
     <string name="hours">hours</string>
     <string name="minute">minute</string>
@@ -36,22 +38,22 @@
     <string name="google_login">Google login</string>
     <string name="create_account">Create a new account</string>
     <string name="logging_in">Signing in...</string>
-    
+
     <string name="choose_tip">(choose)</string>
     <string name="no_project">No Project</string>
     <string name="create_new">Create New</string>
     <string name="no_description">(no description)</string>
-    
+
     <string name="new_project">New Project</string>
     <string name="client">Client</string>
     <string name="choose_client">Choose Client</string>
 
     <string name="delete_task">Delete Task</string>
-    
+
     <string name="no_internet_connection">No internet connection.</string>
     <string name="no_internet_msg">You are currently offline. Proceed to your internet settings?</string>
     <string name="settings">Settings</string>
-    
+
     <string name="notification_ticker">Time tracking started</string>
     <string name="notification_expanded_title">Toggl</string>
     <string name="notification_expanded_content">Task timer is ticking. Tap to get details.</string>
